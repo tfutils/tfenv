@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$TFENV_DEBUG" ] && set -x
+
+if [ $# -ne 1 ];then
+  echo "usage: tfenv install <version>" 1>&2
+  exit 1
+fi
+
+version="${1}"
+if [ -z "${version}" ];then
+  echo "version is not specified" 1>&2
+  exit 1
+fi
+
+dst_path=${TFENV_ROOT}/versions/${version}
+if [ -f ${dst_path}/terraform ];then
+  echo "already installed"
+  exit
+fi
+
+archive_name="terraform_${version}_darwin_amd64.zip"
+archive_url="https://releases.hashicorp.com/terraform/${version}/${archive_name}"
+mkdir -p ${dst_path}
+echo "install Terraform ${version}"
+echo "get archive from ${archive_url}"
+curl -f -o /tmp/${archive_name} "${archive_url}"
+unzip /tmp/${archive_name} -d ${dst_path}
+echo -e "\033[0;32mthe installation ${version} was successful!!!\033[0;39m"
