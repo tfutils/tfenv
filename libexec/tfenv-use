@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$TFENV_DEBUG" ] && set -x
+
+if [ $# -ne 1 ];then
+  echo "usage: tfenv use <version>" 1>&2
+  exit 1
+fi
+
+version="${1}"
+if [ -z "${version}" ];then
+  echo "version is not specified" 1>&2
+  exit 1
+fi
+
+target_path=${TFENV_ROOT}/versions/${version}
+if [ ! -f ${target_path}/terraform ];then
+  echo "${version} is not installed" 1>&2
+  exit 1
+fi
+
+bin_path=${TFENV_ROOT}/bin
+rm -f ${bin_path}/terraform*
+for bin in ${target_path}/*; do
+  ln -s ${bin} ${bin_path}
+done
+terraform --version 

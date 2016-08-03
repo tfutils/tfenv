@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Summary: Display the version of tfenv
+#
+# Displays the version number of this tfenv release, including the
+# current revision from git, if available.
+#
+# The format of the git revision is:
+#   <version>-<num_commits>-<git_sha>
+# where `num_commits` is the number of commits since `version` was
+# tagged.
+
+set -e
+[ -n "$TFENV_DEBUG" ] && set -x
+
+version="0.0.1"
+git_revision=""
+
+if cd "${BASH_SOURCE%/*}" 2>/dev/null && git remote -v 2>/dev/null | grep -q tfenv; then
+  git_revision="$(git describe --tags HEAD 2>/dev/null || true)"
+  git_revision="${git_revision#v}"
+fi
+
+echo "tfenv ${git_revision:-$version}"

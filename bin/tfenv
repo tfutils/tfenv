@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$TFENV_DEBUG" ] && set -x
+
+if [ -z "${TFENV_ROOT}" ]; then
+  TFENV_ROOT=$(cd $(dirname $0)/.. && pwd)
+else
+  TFENV_ROOT="${TFENV_ROOT%/}"
+fi
+export TFENV_ROOT
+PATH="${TFENV_ROOT}/libexec:${PATH}"
+export PATH
+
+abort() {
+  { if [ "$#" -eq 0 ]; then cat -
+    else echo "tfenv: $*"
+    fi
+  } >&2
+  exit 1
+}
+
+command="$1"
+case "$command" in
+"" )
+  { tfenv---version
+    tfenv-help
+  } | abort
+  ;;
+-v | --version )
+  exec tfenv---version
+  ;;
+-h | --help )
+  exec tfenv-help
+  ;;
+* )
+  command_path="$(command -v "tfenv-${command}" || true)"
+  if [ -z "$command_path" ];then
+    { echo "no such command '$command'"
+      tfenv-help
+    } | abort
+  fi
+  shift 1
+  exec "$command_path" "$@"
+  ;;
+esac

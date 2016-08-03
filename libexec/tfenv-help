@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$TFENV_DEBUG" ] && set -x
+echo "usage: tfenv (install|use) <version>"
