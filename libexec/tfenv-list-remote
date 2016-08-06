@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$TFENV_DEBUG" ] && set -x
+
+if [ $# -ne 0 ];then
+  echo "usage: tfenv list-remote" 1>&2
+  exit 1
+fi
+
+curl -sf https://releases.hashicorp.com/terraform/ | grep -o -E "\d+\.\d+.\d+(-rc\d+)?" | uniq
