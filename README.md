@@ -31,3 +31,6 @@ Switch a version to use
 ```sh
 $ tfenv use 0.7.0
 ```
+
+## .terraform-version
+If you put `.terraform-version` file on your project root, tfenv detects it and use the version written in it.
