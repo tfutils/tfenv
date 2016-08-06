@@ -3,7 +3,6 @@ set -x
 
 TFENV_ROOT=$(cd $(dirname $0)/.. && pwd)
 export PATH="${TFENV_ROOT}/bin:${PATH}"
-export TFENV_DEBUG=1
 
 rm -rf ${TFENV_ROOT}/versions
 
