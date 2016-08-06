@@ -18,6 +18,7 @@ for v in 0.{1..7}.0; do
 done
 
 if [ ${#error_versions[@]} -ne 0 ];then
-  echo "Following versions couldn't be installed properly"
+  echo "Following versions couldn't be installed properly" 1>&2
   echo "${error_versions[@]}"
+  exit 1
 fi
