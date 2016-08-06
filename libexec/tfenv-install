@@ -19,7 +19,15 @@ if [ -f ${dst_path}/terraform ];then
   exit
 fi
 
-archive_name="terraform_${version}_darwin_amd64.zip"
+case "$(uname -s)" in
+Darwin* )
+  os="darwin_amd64"
+  ;;
+* )
+  os="linux_amd64"
+esac
+
+archive_name="terraform_${version}_${os}.zip"
 archive_url="https://releases.hashicorp.com/terraform/${version}/${archive_name}"
 mkdir -p ${dst_path}
 echo "install Terraform ${version}"

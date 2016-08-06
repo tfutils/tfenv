@@ -3,7 +3,6 @@ set -x
 
 TFENV_ROOT=$(cd $(dirname $0)/.. && pwd)
 export PATH="${TFENV_ROOT}/bin:${PATH}"
-export TFENV_DEBUG=1
 
 rm -rf ${TFENV_ROOT}/versions
 
@@ -18,6 +17,7 @@ for v in 0.{1..7}.0; do
 done
 
 if [ ${#error_versions[@]} -ne 0 ];then
-  echo "Following versions couldn't be installed properly"
+  echo "Following versions couldn't be installed properly" 1>&2
   echo "${error_versions[@]}"
+  exit 1
 fi
