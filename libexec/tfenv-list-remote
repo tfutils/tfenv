@@ -7,4 +7,4 @@ if [ $# -ne 0 ];then
   exit 1
 fi
 
-curl -sf https://releases.hashicorp.com/terraform/ | grep -o -E "\d+\.\d+.\d+(-rc\d+)?" | uniq
+curl -sf https://releases.hashicorp.com/terraform/ | grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?" | uniq

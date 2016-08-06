@@ -12,6 +12,11 @@ if [ -z "${version}" ];then
   version=$(tfenv-list-remote | head -n 1)
 fi
 
+if [ -z "${version}" ];then
+  echo "version is not specified" 1>&2
+  exit 1
+fi
+
 dst_path=${TFENV_ROOT}/versions/${version}
 if [ -f ${dst_path}/terraform ];then
   echo "already installed ${version}"
