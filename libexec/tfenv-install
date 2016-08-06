@@ -2,12 +2,16 @@
 set -e
 [ -n "$TFENV_DEBUG" ] && set -x
 
-if [ $# -ne 1 ];then
-  echo "usage: tfenv install <version>" 1>&2
+if [ $# -gt 1 ];then
+  echo "usage: tfenv install [<version>]" 1>&2
   exit 1
 fi
 
 version="${1}"
+if [ -z "${version}" ];then
+  version=$(tfenv-list-remote | head -n 1)
+fi
+
 if [ -z "${version}" ];then
   echo "version is not specified" 1>&2
   exit 1
@@ -15,7 +19,7 @@ fi
 
 dst_path=${TFENV_ROOT}/versions/${version}
 if [ -f ${dst_path}/terraform ];then
-  echo "already installed"
+  echo "already installed ${version}"
   exit
 fi
 
