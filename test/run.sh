@@ -1,23 +1,21 @@
 #!/usr/bin/env bash
-set -x
 
-TFENV_ROOT=$(cd $(dirname $0)/.. && pwd)
+export TFENV_ROOT=$(cd $(dirname $0)/.. && pwd)
 export PATH="${TFENV_ROOT}/bin:${PATH}"
 
-rm -rf ${TFENV_ROOT}/versions
+errors=()
+if [ $# -ne 0 ];then
+  targets="$@"
+else
+  targets=`ls $(dirname $0) | grep 'test_'`
+fi
 
-error_versions=()
-for v in 0.{1..7}.0; do
-  echo "======================================================================"
-  tfenv install ${v}
-  tfenv use ${v}
-  if [ "$(terraform --version | grep -E "^Terraform v[0-9\.]+$")" != "Terraform v${v}" ]; then
-    error_versions+=( ${v} )
-  fi
+for t in ${targets}; do
+  bash $(dirname $0)/${t} || errors+=( ${t} )
 done
 
-if [ ${#error_versions[@]} -ne 0 ];then
-  echo "Following versions couldn't be installed properly" 1>&2
-  echo "${error_versions[@]}"
+if [ ${#errors[@]} -ne 0 ];then
+  echo -e "\033[0;31m===== Following tests failed ====\033[0;39m" 1>&2
+  echo "${errors[@]}"
   exit 1
 fi

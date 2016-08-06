@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$TFENV_DEBUG" ] && set -x
+
+if [ $# -ne 0 ];then
+  echo "usage: tfenv list" 1>&2
+  exit 1
+fi
+
+ls -1 "${TFENV_ROOT}/versions" | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3
