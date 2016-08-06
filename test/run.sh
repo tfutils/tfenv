@@ -7,10 +7,10 @@ errors=()
 if [ $# -ne 0 ];then
   targets="$@"
 else
-  targets=`ls -1 $(dirname $0) | grep 'test_'`
+  targets=`ls $(dirname $0) | grep 'test_'`
 fi
 
-for t in "${targets}"; do
+for t in ${targets}; do
   bash $(dirname $0)/${t} || errors+=( ${t} )
 done
 
