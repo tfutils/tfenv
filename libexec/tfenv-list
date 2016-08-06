@@ -7,4 +7,4 @@ if [ $# -ne 0 ];then
   exit 1
 fi
 
-ls -1 "${TFENV_ROOT}/versions" | sort -t'.' -k 1n,1 -k 2n,2 -k 3n,3
+ls -1 "${TFENV_ROOT}/versions" | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3
