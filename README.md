@@ -2,8 +2,9 @@
 [Terraform](https://www.terraform.io/) version manager inspired by [rbenv](https://github.com/rbenv/rbenv)
 
 ## Support
-Currently tfenv supports only Mac OS X because developer (@kamatama41) uses it (Yosemite 10.10.5).
-
+Currently tfenv supports the following OSes
+- Mac OS X (64bit)
+- Linux (64bit)
 
 ## Installation
 1. Check out tfenv into any path
