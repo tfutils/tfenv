@@ -26,6 +26,7 @@ fi
 ### tfenv install
 Install terraform
 ```sh
+$ tfenv install # install latest version
 $ tfenv install 0.7.0
 ```
 
