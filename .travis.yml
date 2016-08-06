@@ -12,6 +12,5 @@ matrix:
       osx_image: xcode6.2 # OS X 10.9
 before_script:
   - export PATH=$PWD/bin:$PATH
-  - export TFENV_DEBUG=1
 script:
   - ./test/run.sh
