@@ -10,7 +10,5 @@ matrix:
       osx_image: xcode7   # OS X 10.10
     - os: osx
       osx_image: xcode6.2 # OS X 10.9
-before_script:
-  - export PATH=$PWD/bin:$PATH
 script:
   - ./test/run.sh
