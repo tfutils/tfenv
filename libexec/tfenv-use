@@ -19,9 +19,5 @@ if [ ! -f ${target_path}/terraform ];then
   exit 1
 fi
 
-bin_path=${TFENV_ROOT}/bin
-rm -f ${bin_path}/terraform*
-for bin in ${target_path}/*; do
-  ln -s ${bin} ${bin_path}
-done
-terraform --version 
+echo "${version}" > "${TFENV_ROOT}/version"
+terraform --version

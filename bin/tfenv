@@ -10,6 +10,7 @@ fi
 export TFENV_ROOT
 PATH="${TFENV_ROOT}/libexec:${PATH}"
 export PATH
+export TFENV_DIR="${PWD}"
 
 abort() {
   { if [ "$#" -eq 0 ]; then cat -
