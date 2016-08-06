@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-TFENV_ROOT=$(cd $(dirname $0)/.. && pwd)
-export PATH="${TFENV_ROOT}/bin:${PATH}"
-
 available() {
   v=${1}
   [ "$(terraform --version | grep -E "^Terraform v[0-9\.]+$")" == "Terraform v${v}" ]

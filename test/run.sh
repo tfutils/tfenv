@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+export TFENV_ROOT=$(cd $(dirname $0)/.. && pwd)
+export PATH="${TFENV_ROOT}/bin:${PATH}"
+
 errors=()
 for t in `ls -1 $(dirname $0) | grep 'test_'`; do
   bash $(dirname $0)/${t} || errors+=( ${t} )
