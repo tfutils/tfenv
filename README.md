@@ -35,5 +35,21 @@ Switch a version to use
 $ tfenv use 0.7.0
 ```
 
+### tfenv list
+List installed versions
+```sh
+% tfenv list
+0.1.0
+0.2.0
+0.3.0
+0.4.0
+0.5.0
+0.6.0
+0.6.1
+0.6.2
+0.6.16
+0.7.0
+```
+
 ## .terraform-version
 If you put `.terraform-version` file on your project root, tfenv detects it and use the version written in it.
