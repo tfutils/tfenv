@@ -8,6 +8,10 @@ if [ $# -gt 1 ];then
 fi
 
 version="${1}"
+if [ -z "${version}" ]; then
+  version="$(cat $(tfenv-version-file) || true)"
+fi
+
 if [ -z "${version}" ];then
   version=$(tfenv-list-remote | head -n 1)
 fi
