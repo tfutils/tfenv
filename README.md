@@ -30,6 +30,8 @@ $ tfenv install # install latest version
 $ tfenv install 0.7.0
 ```
 
+If you use `.terraform-version`, `tfenv install` will install the version written in it.
+
 ### tfenv use
 Switch a version to use
 ```sh
