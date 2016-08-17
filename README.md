@@ -70,7 +70,7 @@ If you put `.terraform-version` file on your project root, tfenv detects it and 
 
 ## Upgrading
 ```sh
-$ git --git-dir=/some/path/to/tfenv pull
+$ git --git-dir=/some/path/to/tfenv/.git pull
 ```
 
 ## Uninstalling
