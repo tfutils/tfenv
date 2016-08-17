@@ -68,6 +68,11 @@ List installable versions
 ## .terraform-version
 If you put `.terraform-version` file on your project root, tfenv detects it and use the version written in it.
 
+## Upgrading
+```sh
+$ git --git-dir=/some/path/to/tfenv pull
+```
+
 ## Uninstalling
 ```sh
 $ rm -rf /some/path/to/tfenv
