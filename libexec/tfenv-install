@@ -40,9 +40,9 @@ esac
 
 archive_name="terraform_${version}_${os}.zip"
 archive_url="https://releases.hashicorp.com/terraform/${version}/${archive_name}"
-mkdir -p ${dst_path}
 echo "install Terraform ${version}"
 echo "get archive from ${archive_url}"
 curl -f -o /tmp/${archive_name} "${archive_url}"
+mkdir -p ${dst_path}
 unzip /tmp/${archive_name} -d ${dst_path}
 echo -e "\033[0;32mthe installation ${version} was successful!!!\033[0;39m"
