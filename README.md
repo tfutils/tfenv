@@ -26,11 +26,11 @@ fi
 ### tfenv install
 Install terraform
 ```sh
-$ tfenv install # install latest version
 $ tfenv install 0.7.0
+$ tfenv install latest # latest version
 ```
 
-If you use [.terraform-version](#terraform-version), `tfenv install` will install the version written in it.
+If you use [.terraform-version](#terraform-version), `tfenv install` (no argument) will install the version written in it.
 
 ### tfenv use
 Switch a version to use

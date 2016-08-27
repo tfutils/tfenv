@@ -8,12 +8,15 @@ if [ $# -gt 1 ];then
 fi
 
 version="${1}"
-if [ -z "${version}" ]; then
-  version="$(cat $(tfenv-version-file) || true)"
+if [ "${version}" == "latest" ];then
+  version=$(tfenv-list-remote | head -n 1)
 fi
 
-if [ -z "${version}" ];then
-  version=$(tfenv-list-remote | head -n 1)
+if [ -z "${version}" ]; then
+  version_file="$(tfenv-version-file)"
+  if [ "${version_file}" != "${TFENV_ROOT}/version" ];then
+    version="$(cat ${version_file} || true)"
+  fi
 fi
 
 if [ -z "${version}" ];then

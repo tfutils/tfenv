@@ -9,7 +9,7 @@ echo "### Install latest version"
 rm -rf ${TFENV_ROOT}/versions
 rm -rf ${TFENV_ROOT}/.terraform-version
 
-if ! tfenv install; then
+if ! tfenv install latest; then
   echo "Installing latest version ${v}" 1>&2
   exit 1
 fi
