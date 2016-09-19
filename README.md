@@ -24,7 +24,7 @@ fi
 
 ## Usage
 ### tfenv install
-Install terraform
+Install a specific version of Terraform
 ```sh
 $ tfenv install 0.7.0
 $ tfenv install latest # latest version
@@ -67,6 +67,23 @@ List installable versions
 
 ## .terraform-version
 If you put `.terraform-version` file on your project root, tfenv detects it and use the version written in it.
+
+```sh
+$ cat .terraform-version
+0.6.16
+
+$ terraform --version
+Terraform v0.6.16
+
+Your version of Terraform is out of date! The latest version
+is 0.7.3. You can update by downloading from www.terraform.io
+
+$ echo 0.7.3 > .terraform-version
+
+$ terraform --version
+Terraform v0.7.3
+
+```
 
 ## Upgrading
 ```sh
