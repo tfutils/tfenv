@@ -94,3 +94,8 @@ $ git --git-dir=/some/path/to/tfenv/.git pull
 ```sh
 $ rm -rf /some/path/to/tfenv
 ```
+
+## LICENSE
+- [tfenv itself](https://github.com/kamatama41/tfenv/blob/master/LICENSE)
+- [rbenv](https://github.com/rbenv/rbenv/blob/master/LICENSE)
+  - tfenv partially uses rbenv's source code
