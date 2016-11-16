@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if [ -n "$TFENV_DEBUG" ]; then
+  export PS4='+ [${BASH_SOURCE##*/}:${LINENO}] '
+  set -x
+fi
 export TFENV_ROOT=$(cd $(dirname $0)/.. && pwd)
 export PATH="${TFENV_ROOT}/bin:${PATH}"
 

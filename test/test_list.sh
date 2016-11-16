@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+[ -n "$TFENV_DEBUG" ] && set -x
+
 rm -rf ${TFENV_ROOT}/versions
 
 echo "### List local versions"
