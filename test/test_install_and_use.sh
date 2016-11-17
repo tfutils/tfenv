@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 
+[ -n "$TFENV_DEBUG" ] && set -x
+
 check_version() {
   v=${1}
-  [ "$(terraform --version | grep -E "^Terraform v[0-9\.]+$")" == "Terraform v${v}" ]
+  [ -n "$(terraform --version | grep "Terraform v${v}")" ]
 }
 
 echo "### Install latest version"
 rm -rf ${TFENV_ROOT}/versions
 rm -rf ${TFENV_ROOT}/.terraform-version
 
-if ! tfenv install latest; then
+v=$(tfenv list-remote | head -n 1)
+tfenv install latest
+tfenv use ${v}
+if ! check_version ${v}; then
   echo "Installing latest version ${v}" 1>&2
   exit 1
 fi
