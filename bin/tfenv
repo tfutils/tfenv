@@ -6,7 +6,7 @@ if [ -n "$TFENV_DEBUG" ]; then
 fi
 
 if [ -z "${TFENV_ROOT}" ]; then
-  TFENV_ROOT=$(cd $(dirname $0)/.. && pwd)
+  TFENV_ROOT=$(cd $(dirname $(readlink -f $0))/.. && pwd)
 else
   TFENV_ROOT="${TFENV_ROOT%/}"
 fi
