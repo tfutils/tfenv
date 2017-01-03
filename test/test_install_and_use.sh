@@ -8,8 +8,8 @@ check_version() {
 }
 
 echo "### Install latest version"
-rm -rf ${TFENV_ROOT}/versions
-rm -rf ${TFENV_ROOT}/.terraform-version
+rm -rf ./versions
+rm -rf ./.terraform-version
 
 v=$(tfenv list-remote | head -n 1)
 tfenv install latest
@@ -20,8 +20,8 @@ if ! check_version ${v}; then
 fi
 
 echo "### Install specific version"
-rm -rf ${TFENV_ROOT}/versions
-rm -rf ${TFENV_ROOT}/.terraform-version
+rm -rf ./versions
+rm -rf ./.terraform-version
 
 v=0.6.16
 tfenv install ${v}
@@ -32,11 +32,11 @@ if ! check_version ${v}; then
 fi
 
 echo "### Install .terraform-version"
-rm -rf ${TFENV_ROOT}/versions
-rm -rf ${TFENV_ROOT}/.terraform-version
+rm -rf ./versions
+rm -rf ./.terraform-version
 
 v=0.6.15
-touch ${TFENV_ROOT}/.terraform-version && echo ${v} > ${TFENV_ROOT}/.terraform-version
+echo ${v} > ./.terraform-version
 tfenv install
 if ! check_version ${v}; then
   echo "Installing .terraform-version ${v}" 1>&2
