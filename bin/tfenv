@@ -5,8 +5,22 @@ if [ -n "$TFENV_DEBUG" ]; then
   set -x
 fi
 
+# http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
+readlink_f() {
+  local target_file=$1
+  local file_name
+
+  while [ "$target_file" != "" ]; do
+    cd $(dirname ${target_file})
+    file_name=$(basename ${target_file})
+    target_file=$(readlink ${file_name})
+  done
+
+  echo $(pwd -P)/${file_name}
+}
+
 if [ -z "${TFENV_ROOT}" ]; then
-  TFENV_ROOT=$(cd $(dirname $(readlink -f $0))/.. && pwd)
+  TFENV_ROOT=$(cd $(dirname $(readlink_f $0))/.. && pwd)
 else
   TFENV_ROOT="${TFENV_ROOT%/}"
 fi
