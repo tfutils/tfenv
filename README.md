@@ -25,6 +25,12 @@ Currently tfenv supports the following OSes
   fi
   ```
 
+  OR you can make a symlink into a path that is already added to your `$PATH` 
+
+  ```
+  ln -s /some/path/to/tfenv/bin/tfenv /usr/local/bin/tfenv
+  ```
+
 ## Usage
 ### tfenv install
 Install a specific version of Terraform
