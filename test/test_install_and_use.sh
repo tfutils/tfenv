@@ -1,15 +1,10 @@
 #!/usr/bin/env bash
 
 [ -n "$TFENV_DEBUG" ] && set -x
-
-check_version() {
-  v=${1}
-  [ -n "$(terraform --version | grep "Terraform v${v}")" ]
-}
+source $(dirname $0)/helpers.sh
 
 echo "### Install latest version"
-rm -rf ./versions
-rm -rf ./.terraform-version
+cleanup
 
 v=$(tfenv list-remote | head -n 1)
 tfenv install latest
@@ -20,8 +15,7 @@ if ! check_version ${v}; then
 fi
 
 echo "### Install specific version"
-rm -rf ./versions
-rm -rf ./.terraform-version
+cleanup
 
 v=0.6.16
 tfenv install ${v}
@@ -32,8 +26,7 @@ if ! check_version ${v}; then
 fi
 
 echo "### Install .terraform-version"
-rm -rf ./versions
-rm -rf ./.terraform-version
+cleanup
 
 v=0.6.15
 echo ${v} > ./.terraform-version
