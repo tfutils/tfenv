@@ -25,7 +25,7 @@ Currently tfenv supports the following OSes
   fi
   ```
 
-  OR you can make a symlink into a path that is already added to your `$PATH` 
+  OR you can make symlinks for `tfenv/bin/*` scripts into a path that is already added to your `$PATH` (e.g. `/usr/local/bin`) 
 
   ```
   ln -s /some/path/to/tfenv/bin/* /usr/local/bin
