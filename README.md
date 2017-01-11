@@ -33,10 +33,11 @@ Currently tfenv supports the following OSes
 
 ## Usage
 ### tfenv install
-Install a specific version of Terraform
+Install a specific version of Terraform  
+`latest` is a syntax to install latest version
 ```sh
 $ tfenv install 0.7.0
-$ tfenv install latest # latest version
+$ tfenv install latest
 ```
 
 If you use [.terraform-version](#terraform-version), `tfenv install` (no argument) will install the version written in it.
