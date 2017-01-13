@@ -2,7 +2,6 @@ language: generic
 matrix:
   include:
     - os: linux
-    - os: linux
       dist: trusty
     - os: osx
       osx_image: xcode8.2 # OS X 10.12
@@ -10,7 +9,5 @@ matrix:
       osx_image: xcode8   # OS X 10.11
     - os: osx
       osx_image: xcode7   # OS X 10.10
-    - os: osx
-      osx_image: xcode6.2 # OS X 10.9
 script:
   - ./test/run.sh
