@@ -17,7 +17,7 @@ fi
 echo "### Install specific version"
 cleanup
 
-v=0.6.16
+v=0.7.13
 tfenv install ${v}
 tfenv use ${v}
 if ! check_version ${v}; then
@@ -33,5 +33,15 @@ echo ${v} > ./.terraform-version
 tfenv install
 if ! check_version ${v}; then
   echo "Installing .terraform-version ${v}" 1>&2
+  exit 1
+fi
+
+echo "### Install invalid version"
+cleanup
+
+v=9.9.9
+expected_error_message="'${v}' doesn't exist in remote, please confirm version name."
+if [ -z "$(tfenv install ${v} | grep "${expected_error_message}")" ]; then
+  echo "Installing invalid version ${v}" 1>&2
   exit 1
 fi
