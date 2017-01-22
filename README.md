@@ -9,26 +9,22 @@ Currently tfenv supports the following OSes
 - Linux (64bit)
 
 ## Installation
-1. Check out tfenv into any path
+1. Check out tfenv into any path (here is `${HOME}/.tfenv`)
 
   ```sh
-  $ git clone https://github.com/kamatama41/tfenv.git /some/path/to/tfenv
+  $ git clone https://github.com/kamatama41/tfenv.git ~/.tfenv
   ```
 
-2. Add `/some/path/to/tfenv/bin` to your `$PATH`
+2. Add `~/.tfenv/bin` to your `$PATH` any way you like
 
-  This is an example of adding `.zshrc`
-
-  ```
-  if [ -f /some/path/to/tfenv/bin/tfenv ]; then
-    path=(/some/path/to/tfenv/bin $path)
-  fi
+  ```sh
+  $ echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bash_profile
   ```
 
   OR you can make symlinks for `tfenv/bin/*` scripts into a path that is already added to your `$PATH` (e.g. `/usr/local/bin`) 
 
   ```
-  ln -s /some/path/to/tfenv/bin/* /usr/local/bin
+  ln -s ~/.tfenv/bin/* /usr/local/bin
   ```
 
 ## Usage
