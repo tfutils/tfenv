@@ -17,7 +17,7 @@ fi
 echo "### Install specific version"
 cleanup
 
-v=0.6.16
+v=0.7.13
 tfenv install ${v}
 tfenv use ${v}
 if ! check_version ${v}; then
