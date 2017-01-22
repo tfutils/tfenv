@@ -30,6 +30,11 @@ if [ -f ${dst_path}/terraform ];then
   exit
 fi
 
+if [ -z "$(tfenv-list-remote | grep "${version}")" ];then
+  echo "'${version}' doesn't exist in remote, please confirm version name."
+  exit 1
+fi
+
 case "$(uname -s)" in
 Darwin* )
   os="darwin_amd64"
