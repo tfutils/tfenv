@@ -93,7 +93,7 @@ Terraform v0.7.3
 
 ## Upgrading
 ```sh
-$ git --git-dir=/some/path/to/tfenv/.git pull
+$ git --git-dir=~/.tfenv/.git pull
 ```
 
 ## Uninstalling
