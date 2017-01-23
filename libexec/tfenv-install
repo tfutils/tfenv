@@ -39,6 +39,9 @@ case "$(uname -s)" in
 Darwin* )
   os="darwin_amd64"
   ;;
+MINGW64* )
+  os="windows_amd64"
+  ;;
 * )
   os="linux_amd64"
 esac
