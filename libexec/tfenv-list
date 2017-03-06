@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
-set -e
+
+function error_and_die() {
+  echo -e "${1}" >&2
+  exit 1
+}
+
 [ -n "$TFENV_DEBUG" ] && set -x
 
-if [ $# -ne 0 ];then
-  echo "usage: tfenv list" 1>&2
-  exit 1
-fi
+[ $# -ne 0 ] \
+  && error_and_die "usage: tfenv list"
 
+[ -d "${TFENV_ROOT}/versions" ] \
+  || error_and_die "No versions available. Please install one with: tfenv install"
+
+set -e
 ls -1 "${TFENV_ROOT}/versions" | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3
