@@ -27,7 +27,7 @@ fi
     | head -n 1
   )"
 
-[ -z "${version}" ] || error_and_die "Version not specified or not found"
+[ -n "${version}" ] || error_and_die "Version not specified or not found"
 
 target_path=${TFENV_ROOT}/versions/${version}
 [ -f ${target_path}/terraform ] \

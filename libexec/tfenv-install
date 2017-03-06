@@ -31,7 +31,7 @@ if [ -z "${version}" ]; then
   fi
 fi
 
-[ -z "${version}" ] || error_and_die "Version is not specified"
+[ -n "${version}" ] || error_and_die "Version is not specified"
 
 dst_path="${TFENV_ROOT}/versions/${version}"
 if [ -f ${dst_path}/terraform ];then
@@ -54,7 +54,7 @@ tarball_name="terraform_${version}_${os}.zip"
 tarball_url="https://releases.hashicorp.com/terraform/${version}/${tarball_name}"
 echo "Installing Terraform v${version}"
 echo "Downloading release tarball from ${tarball_url}"
-curl -f -o /tmp/${tarball_name} "${tarball_url}" || error_and_die "Tarball download failed"
+curl --tlsv1.2 -f -o /tmp/${tarball_name} "${tarball_url}" || error_and_die "Tarball download failed"
 mkdir -p ${dst_path} || error_and_die "Failed to make directory ${dst_path}"
 unzip /tmp/${tarball_name} -d ${dst_path} || error_and_die "Tarball unzip failed"
 echo -e "\033[0;32mInstallation of terraform v${version} successful\033[0;39m"
