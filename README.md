@@ -1,7 +1,6 @@
-[![Build Status](https://travis-ci.org/kamatama41/tfenv.svg?branch=master)](https://travis-ci.org/kamatama41/tfenv)
-
 # tfenv
 [Terraform](https://www.terraform.io/) version manager inspired by [rbenv](https://github.com/rbenv/rbenv)
+This version forked from [kamatama41](https://github.com/kamatama41/tfenv)
 
 ## Support
 Currently tfenv supports the following OSes
@@ -13,7 +12,7 @@ Currently tfenv supports the following OSes
 1. Check out tfenv into any path (here is `${HOME}/.tfenv`)
 
   ```sh
-  $ git clone https://github.com/kamatama41/tfenv.git ~/.tfenv
+  $ git clone https://github.com/cartest/tfenv.git ~/.tfenv
   ```
 
 2. Add `~/.tfenv/bin` to your `$PATH` any way you like
@@ -32,17 +31,23 @@ Currently tfenv supports the following OSes
 ### tfenv install
 Install a specific version of Terraform  
 `latest` is a syntax to install latest version
+`latest:<regex>` is a syntax to install latest version matching regex (used by grep -e)
 ```sh
 $ tfenv install 0.7.0
 $ tfenv install latest
+$ tfenv install latest:^0.8
 ```
 
 If you use [.terraform-version](#terraform-version), `tfenv install` (no argument) will install the version written in it.
 
 ### tfenv use
 Switch a version to use
+`latest` is a syntax to use the latest installed version
+`latest:<regex>` is a syntax to use latest installed version matching regex (used by grep -e)
 ```sh
 $ tfenv use 0.7.0
+$ tfenv use latest
+$ tfenv use latest:^0.8
 ```
 
 ### tfenv list
@@ -103,6 +108,7 @@ $ rm -rf /some/path/to/tfenv
 ```
 
 ## LICENSE
-- [tfenv itself](https://github.com/kamatama41/tfenv/blob/master/LICENSE)
+- [tfenv original](https://github.com/kamatama41/tfenv/blob/master/LICENSE)
+- [this tfenv fork](https://github.com/cartest/tfenv/blob/master/LICENSE)
 - [rbenv](https://github.com/rbenv/rbenv/blob/master/LICENSE)
   - tfenv partially uses rbenv's source code
