@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function error_and_die() {
-  echo -e "${1}" >&2
+  echo -e "tfenv: ${0}: ${1}" >&2
   exit 1
 }
 
