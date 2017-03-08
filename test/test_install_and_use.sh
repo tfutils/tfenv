@@ -14,6 +14,17 @@ if ! check_version ${v}; then
   exit 1
 fi
 
+echo "### Install latest version with Regex"
+cleanup
+
+v=$(tfenv list-remote | grep 0.8 | head -n 1)
+tfenv install latest:^0.8
+tfenv use latest:^0.8
+if ! check_version ${v}; then
+  echo "Installing latest version ${v} with Regex" 1>&2
+  exit 1
+fi
+
 echo "### Install specific version"
 cleanup
 
