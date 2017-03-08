@@ -32,17 +32,23 @@ Currently tfenv supports the following OSes
 ### tfenv install
 Install a specific version of Terraform  
 `latest` is a syntax to install latest version
+`latest:<regex>` is a syntax to install latest version matching regex (used by grep -e)
 ```sh
 $ tfenv install 0.7.0
 $ tfenv install latest
+$ tfenv install latest:^0.8
 ```
 
 If you use [.terraform-version](#terraform-version), `tfenv install` (no argument) will install the version written in it.
 
 ### tfenv use
 Switch a version to use
+`latest` is a syntax to use the latest installed version
+`latest:<regex>` is a syntax to use latest installed version matching regex (used by grep -e)
 ```sh
 $ tfenv use 0.7.0
+$ tfenv use latest
+$ tfenv use latest:^0.8
 ```
 
 ### tfenv list

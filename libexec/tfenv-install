@@ -1,15 +1,27 @@
 #!/usr/bin/env bash
-set -e
+
+function error_and_die() {
+  echo -e "${1}" >&2
+  exit 1
+}
+
 [ -n "$TFENV_DEBUG" ] && set -x
 
-if [ $# -gt 1 ];then
-  echo "usage: tfenv install [<version>]" 1>&2
-  exit 1
+[ $# -gt 1 ] && error_and_die "usage: tfenv install [<version>]"
+
+declare version regex
+if [[ "${1}" =~ ^latest\:.*$ ]]; then
+  version="${1%%\:*}"
+  regex="${1##*\:}"
+else
+  version="${1}"
 fi
 
-version="${1}"
-if [ "${version}" == "latest" ];then
-  version=$(tfenv-list-remote | head -n 1)
+if [ ${version} == "latest" ]; then
+  version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)"
+  [ -n "${version}" ] || error_and_die "No matching version found in remote"
+elif [ -z "$(tfenv-list-remote | grep "${version}")" ]; then
+  error_and_die "Terraform version '${version}' doesn't exist in remote, please confirm version name."
 fi
 
 if [ -z "${version}" ]; then
@@ -19,20 +31,12 @@ if [ -z "${version}" ]; then
   fi
 fi
 
-if [ -z "${version}" ];then
-  echo "version is not specified" 1>&2
-  exit 1
-fi
+[ -n "${version}" ] || error_and_die "Version is not specified"
 
-dst_path=${TFENV_ROOT}/versions/${version}
+dst_path="${TFENV_ROOT}/versions/${version}"
 if [ -f ${dst_path}/terraform ];then
-  echo "already installed ${version}"
-  exit
-fi
-
-if [ -z "$(tfenv-list-remote | grep "${version}")" ];then
-  echo "'${version}' doesn't exist in remote, please confirm version name."
-  exit 1
+  echo "Terraform v${version} is already installed"
+  exit 0
 fi
 
 case "$(uname -s)" in
@@ -46,11 +50,11 @@ MINGW64* )
   os="linux_amd64"
 esac
 
-archive_name="terraform_${version}_${os}.zip"
-archive_url="https://releases.hashicorp.com/terraform/${version}/${archive_name}"
-echo "install Terraform ${version}"
-echo "get archive from ${archive_url}"
-curl -f -o /tmp/${archive_name} "${archive_url}"
-mkdir -p ${dst_path}
-unzip /tmp/${archive_name} -d ${dst_path}
-echo -e "\033[0;32mthe installation ${version} was successful!!!\033[0;39m"
+tarball_name="terraform_${version}_${os}.zip"
+tarball_url="https://releases.hashicorp.com/terraform/${version}/${tarball_name}"
+echo "Installing Terraform v${version}"
+echo "Downloading release tarball from ${tarball_url}"
+curl --tlsv1.2 -f -o /tmp/${tarball_name} "${tarball_url}" || error_and_die "Tarball download failed"
+mkdir -p ${dst_path} || error_and_die "Failed to make directory ${dst_path}"
+unzip /tmp/${tarball_name} -d ${dst_path} || error_and_die "Tarball unzip failed"
+echo -e "\033[0;32mInstallation of terraform v${version} successful\033[0;39m"
