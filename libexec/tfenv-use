@@ -9,23 +9,29 @@ function error_and_die() {
 
 [ ${#} -ne 1 ] && error_and_die "usage: tfenv use <version>"
 
-declare version
-if [[ "${1}" =~ ^latest\:.*$ ]]; then
-  version="${1%%\:*}"
-  regex="${1##*\:}"
+declare version_requested version regex
+
+version_requested="${1}"
+
+if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
+  version="${version_requested%%\:*}"
+  regex="${version_requested##*\:}"
+elif [[ "${version_requested}" =~ ^latest$ ]]; then
+  version="${version_requested}"
+  regex=""
 else
-  version="${1}"
+  version="${version_requested}"
+  regex="${version_requested}"
 fi
 
 [ -d "${TFENV_ROOT}/versions" ] \
   || error_and_die "No versions of terraform installed. Please install one with: tfenv install"
 
-[ "${version}" == "latest" ] \
-  && version="$(\ls "${TFENV_ROOT}/versions" \
-    | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
-    | grep -e "${regex}" \
-    | head -n 1
-  )"
+version="$(\ls "${TFENV_ROOT}/versions" \
+  | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
+  | grep -e "${regex}" \
+  | head -n 1
+)"
 
 [ -n "${version}" ] || error_and_die "No installed versions of terraform matched '${1}'"
 

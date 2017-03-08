@@ -2,6 +2,7 @@
 
  * Update error_and_die functions to better report their source location
  * libexec/tfenv-version-name: Respect latest & latest:<regex> syntax in .terraform-version
+ * Extension and development of test suite standards
 
 ## 0.4.0 (March 6, 2017)
 
