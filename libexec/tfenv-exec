@@ -14,10 +14,9 @@
 #   PATH="$TFENV_ROOT/versions/0.7.0/bin:$PATH" terraform plan
 
 set -e
-[ -n "$TFENV_DEBUG" ] && set -x
+[ -n "${TFENV_DEBUG}" ] && set -x
 
-TFENV_VERSION="$(tfenv-version-name)"
-export TFENV_VERSION
+export TFENV_VERSION="$(tfenv-version-name)"
 TF_BIN_PATH="${TFENV_ROOT}/versions/${TFENV_VERSION}/terraform"
 export PATH="${TF_BIN_PATH}:${PATH}"
-"$TF_BIN_PATH" "$@"
+"${TF_BIN_PATH}" "${@}"

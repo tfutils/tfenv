@@ -2,19 +2,19 @@
 # Usage: tfenv version-file
 # Summary: Detect the file that sets the current tfenv version
 set -e
-[ -n "$TFENV_DEBUG" ] && set -x
+[ -n "${TFENV_DEBUG}" ] && set -x
 
 find_local_version_file() {
-  local root="$1"
-  while ! [[ "$root" =~ ^//[^/]*$ ]]; do
+  local root="${1}"
+  while ! [[ "${root}" =~ ^//[^/]*$ ]]; do
     if [ -e "${root}/.terraform-version" ]; then
       echo "${root}/.terraform-version"
       return 0
     fi
-    [ -n "$root" ] || break
+    [ -n "${root}" ] || break
     root="${root%/*}"
   done
   return 1
 }
 
-find_local_version_file "$TFENV_DIR" || echo "${TFENV_ROOT}/version"
+find_local_version_file "${TFENV_DIR}" || echo "${TFENV_ROOT}/version"

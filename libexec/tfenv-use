@@ -5,9 +5,9 @@ function error_and_die() {
   exit 1
 }
 
-[ -n "$TFENV_DEBUG" ] && set -x
+[ -n "${TFENV_DEBUG}" ] && set -x
 
-[ $# -ne 1 ] && error_and_die "usage: tfenv use <version>"
+[ ${#} -ne 1 ] && error_and_die "usage: tfenv use <version>"
 
 declare version
 if [[ "${1}" =~ ^latest\:.*$ ]]; then
@@ -27,11 +27,13 @@ fi
     | head -n 1
   )"
 
-[ -n "${version}" ] || error_and_die "Version not specified or not found"
+[ -n "${version}" ] || error_and_die "No installed versions of terraform matched '${1}'"
 
 target_path=${TFENV_ROOT}/versions/${version}
 [ -f ${target_path}/terraform ] \
-  || error_and_die "Terraform version ${version} is not installed"
+  || error_and_die "Version directory for ${version} is present, but the terraform binary is not! Manual intervention required."
+[ -x ${target_path}/terraform ] \
+  || error_and_die "Version directory for ${version} is present, but the terraform binary is not executable! Manual intervention required. "
 
 echo "${version}" > "${TFENV_ROOT}/version"
 terraform --version || error_and_die "'terraform --version' failed. Something is seriously wrong"

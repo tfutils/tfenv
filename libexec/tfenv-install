@@ -5,9 +5,9 @@ function error_and_die() {
   exit 1
 }
 
-[ -n "$TFENV_DEBUG" ] && set -x
+[ -n "${TFENV_DEBUG}" ] && set -x
 
-[ $# -gt 1 ] && error_and_die "usage: tfenv install [<version>]"
+[ ${#} -gt 1 ] && error_and_die "usage: tfenv install [<version>]"
 
 declare version regex
 if [[ "${1}" =~ ^latest\:.*$ ]]; then
@@ -17,7 +17,7 @@ else
   version="${1}"
 fi
 
-if [ ${version} == "latest" ]; then
+if [ "${version}" == "latest" ]; then
   version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)"
   [ -n "${version}" ] || error_and_die "No matching version found in remote"
 elif [ -z "$(tfenv-list-remote | grep "${version}")" ]; then
