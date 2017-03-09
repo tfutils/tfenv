@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 
 function error_and_die() {
-  echo -e "${1}" >&2
+  echo -e "tfenv: ${0}: ${1}" >&2
   exit 1
 }
 
-[ -n "$TFENV_DEBUG" ] && set -x
+[ -n "${TFENV_DEBUG}" ] && set -x
 
-[ $# -ne 0 ] \
+[ ${#} -ne 0 ] \
   && error_and_die "usage: tfenv list"
 
 [ -d "${TFENV_ROOT}/versions" ] \
   || error_and_die "No versions available. Please install one with: tfenv install"
 
-set -e
+[[ -x "${TFENV_ROOT}/versions" && -r "${TFENV_ROOT}/versions" ]] \
+  || error_and_die "tfenv versions directory is inaccessible!"
+
 ls -1 "${TFENV_ROOT}/versions" | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3

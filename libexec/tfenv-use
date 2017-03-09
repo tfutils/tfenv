@@ -1,37 +1,45 @@
 #!/usr/bin/env bash
 
 function error_and_die() {
-  echo -e "${1}" >&2
+  echo -e "tfenv: ${0}: ${1}" >&2
   exit 1
 }
 
-[ -n "$TFENV_DEBUG" ] && set -x
+[ -n "${TFENV_DEBUG}" ] && set -x
 
-[ $# -ne 1 ] && error_and_die "usage: tfenv use <version>"
+[ ${#} -ne 1 ] && error_and_die "usage: tfenv use <version>"
 
-declare version
-if [[ "${1}" =~ ^latest\:.*$ ]]; then
-  version="${1%%\:*}"
-  regex="${1##*\:}"
+declare version_requested version regex
+
+version_requested="${1}"
+
+if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
+  version="${version_requested%%\:*}"
+  regex="${version_requested##*\:}"
+elif [[ "${version_requested}" =~ ^latest$ ]]; then
+  version="${version_requested}"
+  regex=""
 else
-  version="${1}"
+  version="${version_requested}"
+  regex="${version_requested}"
 fi
 
 [ -d "${TFENV_ROOT}/versions" ] \
   || error_and_die "No versions of terraform installed. Please install one with: tfenv install"
 
-[ "${version}" == "latest" ] \
-  && version="$(\ls "${TFENV_ROOT}/versions" \
-    | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
-    | grep -e "${regex}" \
-    | head -n 1
-  )"
+version="$(\ls "${TFENV_ROOT}/versions" \
+  | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
+  | grep -e "${regex}" \
+  | head -n 1
+)"
 
-[ -n "${version}" ] || error_and_die "Version not specified or not found"
+[ -n "${version}" ] || error_and_die "No installed versions of terraform matched '${1}'"
 
 target_path=${TFENV_ROOT}/versions/${version}
 [ -f ${target_path}/terraform ] \
-  || error_and_die "Terraform version ${version} is not installed"
+  || error_and_die "Version directory for ${version} is present, but the terraform binary is not! Manual intervention required."
+[ -x ${target_path}/terraform ] \
+  || error_and_die "Version directory for ${version} is present, but the terraform binary is not executable! Manual intervention required. "
 
 echo "${version}" > "${TFENV_ROOT}/version"
 terraform --version || error_and_die "'terraform --version' failed. Something is seriously wrong"

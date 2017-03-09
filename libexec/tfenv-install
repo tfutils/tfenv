@@ -1,37 +1,39 @@
 #!/usr/bin/env bash
 
 function error_and_die() {
-  echo -e "${1}" >&2
+  echo -e "tfenv: ${0}: ${1}" >&2
   exit 1
 }
 
-[ -n "$TFENV_DEBUG" ] && set -x
+[ -n "${TFENV_DEBUG}" ] && set -x
 
-[ $# -gt 1 ] && error_and_die "usage: tfenv install [<version>]"
+[ ${#} -gt 1 ] && error_and_die "usage: tfenv install [<version>]"
 
-declare version regex
-if [[ "${1}" =~ ^latest\:.*$ ]]; then
-  version="${1%%\:*}"
-  regex="${1##*\:}"
-else
-  version="${1}"
-fi
+declare version_requested version regex
 
-if [ ${version} == "latest" ]; then
-  version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)"
-  [ -n "${version}" ] || error_and_die "No matching version found in remote"
-elif [ -z "$(tfenv-list-remote | grep "${version}")" ]; then
-  error_and_die "Terraform version '${version}' doesn't exist in remote, please confirm version name."
-fi
-
-if [ -z "${version}" ]; then
+if [ -z "${1}" ]; then
   version_file="$(tfenv-version-file)"
   if [ "${version_file}" != "${TFENV_ROOT}/version" ];then
-    version="$(cat ${version_file} || true)"
+    version_requested="$(cat ${version_file} || true)"
   fi
+else
+  version_requested="${1}"
+fi
+
+if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
+  version="${version_requested%%\:*}"
+  regex="${version_requested##*\:}"
+elif [[ "${version_requested}" =~ ^latest$ ]]; then
+  version="${version_requested}"
+  regex=""
+else
+  version="${version_requested}"
+  regex="${version_requested}"
 fi
 
 [ -n "${version}" ] || error_and_die "Version is not specified"
+version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)"
+[ -n "${version}" ] || error_and_die "No versions matching '${1}' found in remote"
 
 dst_path="${TFENV_ROOT}/versions/${version}"
 if [ -f ${dst_path}/terraform ];then

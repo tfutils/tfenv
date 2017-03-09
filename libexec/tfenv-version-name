@@ -1,24 +1,41 @@
 #!/usr/bin/env bash
 # Summary: Show the current Terraform version
 set -e
-[ -n "$TFENV_DEBUG" ] && set -x
+
+function error_and_die() {
+  echo -e "tfenv: ${0}: ${1}" >&2
+  exit 1
+}
+
+[ -n "${TFENV_DEBUG}" ] && set -x
+
+[ -d "${TFENV_ROOT}/versions" ] \
+  || error_and_die "No versions of terraform installed. Please install one with: tfenv install"
 
 TFENV_VERSION_FILE="$(tfenv-version-file)"
-TFENV_VERSION="$(cat "$TFENV_VERSION_FILE" || true)"
+TFENV_VERSION="$(cat "${TFENV_VERSION_FILE}" || true)"
 
-if [ -z "$TFENV_VERSION" ]; then
-  echo "tfenv: version could not be resolved (set by $TFENV_VERSION_FILE or tfenv use <version>)" >&2
-  exit 1
+if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
+  [[ "${TFENV_VERSION}" =~ ^latest\:.*$ ]] && regex="${TFENV_VERSION##*\:}"
+  version="$(\ls "${TFENV_ROOT}/versions" \
+    | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
+    | grep -e "${regex}" \
+    | head -n 1
+  )"
+  [ -n "${version}" ] || error_and_die "No installed versions of terraform matched '${TFENV_VERSION}'"
+  TFENV_VERSION="${version}"
 fi
 
+[ -z "${TFENV_VERSION}" ] \
+  && error_and_die "Version could not be resolved (set by ${TFENV_VERSION_FILE} or tfenv use <version>)"
+
 version_exists() {
-  local version="$1"
+  local version="${1}"
   [ -d "${TFENV_ROOT}/versions/${version}" ]
 }
 
-if version_exists "$TFENV_VERSION"; then
-  echo "$TFENV_VERSION"
+if version_exists "${TFENV_VERSION}"; then
+  echo "${TFENV_VERSION}"
 else
-  echo "tfenv: version \`$TFENV_VERSION' is not installed (set by $TFENV_VERSION_FILE)" >&2
-  exit 1
+  error_and_die "version \`${TFENV_VERSION}' is not installed (set by ${TFENV_VERSION_FILE})"
 fi
