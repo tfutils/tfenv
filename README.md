@@ -10,6 +10,14 @@ Currently tfenv supports the following OSes
 - Windows (64bit) - only tested in git-bash
 
 ## Installation
+### Automatic
+Install via Homebrew
+
+  ```sh
+  $ brew install tfenv
+  ```
+
+### Manual
 1. Check out tfenv into any path (here is `${HOME}/.tfenv`)
 
   ```sh
@@ -25,7 +33,7 @@ Currently tfenv supports the following OSes
   OR you can make symlinks for `tfenv/bin/*` scripts into a path that is already added to your `$PATH` (e.g. `/usr/local/bin`) `OSX/Linux Only!`
 
   ```sh
-  ln -s ~/.tfenv/bin/* /usr/local/bin
+  $ ln -s ~/.tfenv/bin/* /usr/local/bin
   ``` 
 
 ## Usage
