@@ -13,7 +13,7 @@ declare version_requested version regex
 
 if [ -z "${1}" ]; then
   version_file="$(tfenv-version-file)"
-  if [ "${version_file}" != "${TFENV_ROOT}/version" ];then
+  if [ "${version_file}" != "${TFENV_ROOT}/version" ]; then
     version_requested="$(cat ${version_file} || true)"
   fi
 else
@@ -36,7 +36,7 @@ version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)"
 [ -n "${version}" ] || error_and_die "No versions matching '${1}' found in remote"
 
 dst_path="${TFENV_ROOT}/versions/${version}"
-if [ -f ${dst_path}/terraform ];then
+if [ -f ${dst_path}/terraform ]; then
   echo "Terraform v${version} is already installed"
   exit 0
 fi
@@ -52,11 +52,40 @@ MINGW64* )
   os="linux_amd64"
 esac
 
+keybase=$(which keybase)
+shasum=$(which shasum)
+
+if [[ -n $keybase && -x "$keybase" ]]; then
+  if ! $keybase list-following | fgrep -q hashicorp; then
+    echo "NOTICE: Following 'hashicorp' with keybase will make this process smoother."
+  fi
+fi
+
+version_url="https://releases.hashicorp.com/terraform/${version}"
 tarball_name="terraform_${version}_${os}.zip"
-tarball_url="https://releases.hashicorp.com/terraform/${version}/${tarball_name}"
+shasums_name="terraform_${version}_SHA256SUMS"
 echo "Installing Terraform v${version}"
-echo "Downloading release tarball from ${tarball_url}"
-curl --tlsv1.2 -f -o /tmp/${tarball_name} "${tarball_url}" || error_and_die "Tarball download failed"
+echo "Downloading release tarball from ${version_url}/${tarball_name}"
+curl --tlsv1.2 -f -o /tmp/${tarball_name} "${version_url}/${tarball_name}" || error_and_die "Tarball download failed"
+echo "Downloading SHA hash file from ${version_url}/${sha256sums}"
+curl -s --tlsv1.2 -f -o /tmp/${shasums_name} "${version_url}/${shasums_name}" || error_and_die "SHA256 hashes download failed"
+
+if [[ -n $keybase && -x "$keybase" ]]; then
+  echo "Downloading SHA hash signature file from ${version_url}/${sha256sums}.sig"
+  curl -s --tlsv1.2 -f -o /tmp/${shasums_name}.sig "${version_url}/${shasums_name}.sig" || error_and_die "SHA256SUMS signature download failed"
+  ${keybase} pgp verify -S hashicorp -d "/tmp/${shasums_name}.sig" -i "/tmp/${shasums_name}" || error_and_die "SHA256SUMS signature does not match!"
+else
+  echo "No keybase install found, skipping SHA hash file validation..."
+fi
+
+if [[ -n $shasum && -x $shasum ]]; then
+  pushd /tmp >/dev/null
+  ${shasum} -a 256 -s -c <(fgrep ${tarball_name} /tmp/${shasums_name}) || error_and_die "SHA256 hash does not match!"
+  popd >/dev/null
+else
+  echo "No shasum tool for validating the SHA256 hash was found, skipping download validation..."
+fi
+
 mkdir -p ${dst_path} || error_and_die "Failed to make directory ${dst_path}"
 unzip /tmp/${tarball_name} -d ${dst_path} || error_and_die "Tarball unzip failed"
 echo -e "\033[0;32mInstallation of terraform v${version} successful\033[0;39m"
