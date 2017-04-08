@@ -47,6 +47,8 @@ $ tfenv install latest
 $ tfenv install latest:^0.8
 ```
 
+If shasum is present in the path, tfenv will verify the download against Hashicorp's published sha256 hash. If [keybase](https://keybase.io/) is available in the path it will also verify the signature for those published hashes using hashicorp's published public key. 
+
 If you use [.terraform-version](#terraform-version), `tfenv install` (no argument) will install the version written in it.
 
 ### tfenv use
