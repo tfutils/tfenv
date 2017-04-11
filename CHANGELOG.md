@@ -1,3 +1,8 @@
+## 0.4.3 (April 11, 2017)
+
+ * Move temporary directory from /tmp to mktemp
+ * Upgrade tfenv-install logging
+
 ## 0.4.2 (April 9, 2017)
 
  * Add support for verifying downloads of Terraform
