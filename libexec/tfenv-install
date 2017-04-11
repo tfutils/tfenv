@@ -66,7 +66,7 @@ tarball_name="terraform_${version}_${os}.zip"
 shasums_name="terraform_${version}_SHA256SUMS"
 echo "Installing Terraform v${version}"
 echo "Downloading release tarball from ${version_url}/${tarball_name}"
-curl -s --tlsv1.2 -f -o /tmp/${tarball_name} "${version_url}/${tarball_name}" || error_and_die "Tarball download failed"
+curl --tlsv1.2 -f -o /tmp/${tarball_name} "${version_url}/${tarball_name}" || error_and_die "Tarball download failed"
 echo "Downloading SHA hash file from ${version_url}/${sha256sums}"
 curl -s --tlsv1.2 -f -o /tmp/${shasums_name} "${version_url}/${shasums_name}" || error_and_die "SHA256 hashes download failed"
 
