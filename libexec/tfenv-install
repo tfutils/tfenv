@@ -81,7 +81,7 @@ else
 fi
 
 if [[ -n $shasum && -x $shasum ]]; then
-  ${shasum} -a 256 -s -c <(fgrep ${tarball_name} ${tfenv_temp}/${shasums_name}) || error_and_die "SHA256 hash does not match!"
+  ${shasum} -a 256 -s -c <(fgrep ${tfenv_temp}/${tarball_name} ${tfenv_temp}/${shasums_name}) || error_and_die "SHA256 hash does not match!"
 else
   echo "No shasum tool for validating the SHA256 hash was found, skipping download validation..."
 fi
