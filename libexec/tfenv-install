@@ -66,26 +66,29 @@ tarball_name="terraform_${version}_${os}.zip"
 shasums_name="terraform_${version}_SHA256SUMS"
 echo "Installing Terraform v${version}"
 echo "Downloading release tarball from ${version_url}/${tarball_name}"
-curl --tlsv1.2 -f -o /tmp/${tarball_name} "${version_url}/${tarball_name}" || error_and_die "Tarball download failed"
+TFENV_TEMP=$(mktemp -d tfenv-XXX)
+curl -s --tlsv1.2 -f -o ${TFENV_TEMP}/${tarball_name} "${version_url}/${tarball_name}" || error_and_die "Tarball download failed"
 echo "Downloading SHA hash file from ${version_url}/${sha256sums}"
-curl -s --tlsv1.2 -f -o /tmp/${shasums_name} "${version_url}/${shasums_name}" || error_and_die "SHA256 hashes download failed"
+curl -s --tlsv1.2 -f -o ${TFENV_TEMP}/${shasums_name} "${version_url}/${shasums_name}" || error_and_die "SHA256 hashes download failed"
 
 if [[ -n $keybase && -x "$keybase" ]]; then
   echo "Downloading SHA hash signature file from ${version_url}/${sha256sums}.sig"
-  curl -s --tlsv1.2 -f -o /tmp/${shasums_name}.sig "${version_url}/${shasums_name}.sig" || error_and_die "SHA256SUMS signature download failed"
-  ${keybase} pgp verify -S hashicorp -d "/tmp/${shasums_name}.sig" -i "/tmp/${shasums_name}" || error_and_die "SHA256SUMS signature does not match!"
+  curl -s --tlsv1.2 -f -o ${TFENV_TEMP}/${shasums_name}.sig "${version_url}/${shasums_name}.sig" || error_and_die "SHA256SUMS signature download failed"
+  ${keybase} pgp verify -S hashicorp -d "${TFENV_TEMP}/${shasums_name}.sig" -i "${TFENV_TEMP}/${shasums_name}" || error_and_die "SHA256SUMS signature does not match!"
 else
   echo "No keybase install found, skipping SHA hash file validation..."
 fi
 
 if [[ -n $shasum && -x $shasum ]]; then
   pushd /tmp >/dev/null
-  ${shasum} -a 256 -s -c <(fgrep ${tarball_name} /tmp/${shasums_name}) || error_and_die "SHA256 hash does not match!"
+  ${shasum} -a 256 -s -c <(fgrep ${tarball_name} ${TFENV_TEMP}/${shasums_name}) || error_and_die "SHA256 hash does not match!"
   popd >/dev/null
 else
   echo "No shasum tool for validating the SHA256 hash was found, skipping download validation..."
 fi
 
 mkdir -p ${dst_path} || error_and_die "Failed to make directory ${dst_path}"
-unzip /tmp/${tarball_name} -d ${dst_path} || error_and_die "Tarball unzip failed"
+unzip ${TFENV_TEMP}/${tarball_name} -d ${dst_path} || error_and_die "Tarball unzip failed"
 echo -e "\033[0;32mInstallation of terraform v${version} successful\033[0;39m"
+
+trap "rm -rf ${TFENV_TEMP}" EXIT;
