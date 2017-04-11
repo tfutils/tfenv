@@ -61,14 +61,8 @@ case "$(uname -s)" in
     ;;
 esac
 
-keybase_bin="$(which keybase)"
-shasum_bin="$(which shasum)"
-if [[ -n $keybase && -x "$keybase" ]]; then
-  info "Keybase install detected; using keybase to verify download signature"
-  if ! $keybase list-following | fgrep -q hashicorp; then
-    info "Following 'hashicorp' with keybase will make this process smoother"
-  fi
-fi
+keybase_bin=$(which keybase)
+shasum_bin=$(which shasum)
 
 version_url="https://releases.hashicorp.com/terraform/${version}"
 tarball_name="terraform_${version}_${os}.zip"
@@ -77,9 +71,9 @@ shasums_name="terraform_${version}_SHA256SUMS"
 info "Installing Terraform v${version}"
 
 # Create a local temporary directory for downloads
-download_tmp="$(mktemp -d download.XXXXXX)" || error_and_die "Unable to create temporary download directory in $(pwd)"
+download_tmp="$(mktemp -d tfenv_download.XXXXXX)" || error_and_die "Unable to create temporary download directory in $(pwd)"
 # Clean it up in case of error
-trap "rm -rf ${download_tmp}" EXIT;
+trap 'rm -rf "${download_tmp}"' EXIT;
 
 info "Downloading release tarball from ${version_url}/${tarball_name}"
 curl -s --tlsv1.2 -f -o ${download_tmp}/${tarball_name} "${version_url}/${tarball_name}" || error_and_die "Tarball download failed"
@@ -88,9 +82,21 @@ curl -s --tlsv1.2 -f -o ${download_tmp}/${shasums_name} "${version_url}/${shasum
 
 # Verify signature if keybase is present.
 if [[ -n "${keybase_bin}" && -x "${keybase_bin}" ]]; then
-  info "Downloading SHA hash signature file from ${version_url}/${shasums_name}.sig"
-  curl -s --tlsv1.2 -f -o ${download_tmp}/${shasums_name}.sig "${version_url}/${shasums_name}.sig" || error_and_die "SHA256SUMS signature download failed"
-  ${keybase_bin} pgp verify -S hashicorp -d "${download_tmp}/${shasums_name}.sig" -i "${download_tmp}/${shasums_name}" || error_and_die "SHA256SUMS signature does not match!"
+  $keybase_bin status | egrep -q '^Logged in:[[:space:]]*yes'
+  keybase_logged_in=$?
+  $keybase_bin list-following | fgrep -q hashicorp
+  keybase_following_hc=$?
+
+  if [[ $keybase_logged_in -ne 0 || $keybase_following_hc -ne 0 ]]; then
+    warn_and_continue "To verify the GPG signature on the hash file,\nmake sure you're logged into keybase and following hashicorp"
+  else
+    info "Downloading SHA hash signature file from ${version_url}/${shasums_name}.sig"
+    curl -s --tlsv1.2 -f -o ${download_tmp}/${shasums_name}.sig "${version_url}/${shasums_name}.sig" || error_and_die "SHA256SUMS signature download failed"
+    ${keybase_bin} pgp verify -S hashicorp -d "${download_tmp}/${shasums_name}.sig" -i "${download_tmp}/${shasums_name}" || error_and_die "SHA256SUMS signature does not match!"
+  fi
+else
+  # Warning about this avoids an unwarranted sense of confidence in the SHA check
+  warn_and_continue "No keybase install found, skipping GPG signature verification"
 fi
 
 if [[ -n "${shasum_bin}" && -x "${shasum_bin}" ]]; then
