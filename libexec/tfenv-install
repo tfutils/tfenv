@@ -15,7 +15,7 @@ function info() {
 
 [ -n "${TFENV_DEBUG}" ] && set -x
 
-[ ${#} -gt 1 ] && error_and_die "usage: tfenv install [<version>]"
+[ "${#}" -gt 1 ] && error_and_die "usage: tfenv install [<version>]"
 
 declare version_requested version regex
 
@@ -44,7 +44,7 @@ version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)"
 [ -n "${version}" ] || error_and_die "No versions matching '${1}' found in remote"
 
 dst_path="${TFENV_ROOT}/versions/${version}"
-if [ -f ${dst_path}/terraform ]; then
+if [ -f "${dst_path}/terraform" ]; then
   echo "Terraform v${version} is already installed"
   exit 0
 fi
@@ -76,23 +76,23 @@ download_tmp="$(mktemp -d tfenv_download.XXXXXX)" || error_and_die "Unable to cr
 trap 'rm -rf "${download_tmp}"' EXIT;
 
 info "Downloading release tarball from ${version_url}/${tarball_name}"
-curl -s --tlsv1.2 -f -o ${download_tmp}/${tarball_name} "${version_url}/${tarball_name}" || error_and_die "Tarball download failed"
+curl -s --tlsv1.2 -f -o "${download_tmp}/${tarball_name}" "${version_url}/${tarball_name}" || error_and_die "Tarball download failed"
 info "Downloading SHA hash file from ${version_url}/${shasums_name}"
-curl -s --tlsv1.2 -f -o ${download_tmp}/${shasums_name} "${version_url}/${shasums_name}" || error_and_die "SHA256 hashes download failed"
+curl -s --tlsv1.2 -f -o "${download_tmp}/${shasums_name}" "${version_url}/${shasums_name}" || error_and_die "SHA256 hashes download failed"
 
 # Verify signature if keybase is present.
 if [[ -n "${keybase_bin}" && -x "${keybase_bin}" ]]; then
-  $keybase_bin status | egrep -q '^Logged in:[[:space:]]*yes'
+  "${keybase_bin}" status | egrep -q '^Logged in:[[:space:]]*yes'
   keybase_logged_in=$?
-  $keybase_bin list-following | fgrep -q hashicorp
+  "${keybase_bin}" list-following | fgrep -q hashicorp
   keybase_following_hc=$?
 
-  if [[ $keybase_logged_in -ne 0 || $keybase_following_hc -ne 0 ]]; then
+  if [[ "${keybase_logged_in}" -ne 0 || "${keybase_following_hc}" -ne 0 ]]; then
     warn_and_continue "To verify the GPG signature on the hash file,\nmake sure you're logged into keybase and following hashicorp"
   else
     info "Downloading SHA hash signature file from ${version_url}/${shasums_name}.sig"
-    curl -s --tlsv1.2 -f -o ${download_tmp}/${shasums_name}.sig "${version_url}/${shasums_name}.sig" || error_and_die "SHA256SUMS signature download failed"
-    ${keybase_bin} pgp verify -S hashicorp -d "${download_tmp}/${shasums_name}.sig" -i "${download_tmp}/${shasums_name}" || error_and_die "SHA256SUMS signature does not match!"
+    curl -s --tlsv1.2 -f -o "${download_tmp}/${shasums_name}.sig" "${version_url}/${shasums_name}.sig" || error_and_die "SHA256SUMS signature download failed"
+    "${keybase_bin}" pgp verify -S hashicorp -d "${download_tmp}/${shasums_name}.sig" -i "${download_tmp}/${shasums_name}" || error_and_die "SHA256SUMS signature does not match!"
   fi
 else
   # Warning about this avoids an unwarranted sense of confidence in the SHA check
@@ -101,15 +101,15 @@ fi
 
 if [[ -n "${shasum_bin}" && -x "${shasum_bin}" ]]; then
   (
-    cd ${download_tmp}
-    ${shasum_bin} -a 256 -s -c <(fgrep ${tarball_name} ${shasums_name}) || error_and_die "SHA256 hash does not match!"
+    cd "${download_tmp}"
+    "${shasum_bin}" -a 256 -s -c <(fgrep "${tarball_name}" "${shasums_name}") || error_and_die "SHA256 hash does not match!"
   )
 else
   # Lack of shasum deserves a proper warning
   warn_and_continue "No shasum tool available. Skipping SHA256 hash validation"
 fi
 
-mkdir -p ${dst_path} || error_and_die "Failed to make directory ${dst_path}"
-unzip ${download_tmp}/${tarball_name} -d ${dst_path} || error_and_die "Tarball unzip failed"
+mkdir -p "${dst_path}" || error_and_die "Failed to make directory ${dst_path}"
+unzip "${download_tmp}/${tarball_name}" -d "${dst_path}" || error_and_die "Tarball unzip failed"
 
 info "Installation of terraform v${version} successful"
