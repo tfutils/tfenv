@@ -1,3 +1,13 @@
+## 0.4.3 (April 12, 2017)
+
+ * Move temporary directory from /tmp to mktemp
+ * Upgrade tfenv-install logging
+ * Prevent interactive prompting from keybase
+
+## 0.4.2 (April 9, 2017)
+
+ * Add support for verifying downloads of Terraform
+
 ## 0.4.1 (March 8, 2017)
 
  * Update error_and_die functions to better report their source location
