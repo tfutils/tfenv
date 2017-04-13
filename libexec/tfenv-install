@@ -59,5 +59,4 @@ echo "Downloading release tarball from ${tarball_url}"
 curl --tlsv1.2 -f -o /tmp/${tarball_name} "${tarball_url}" || error_and_die "Tarball download failed"
 mkdir -p ${dst_path} || error_and_die "Failed to make directory ${dst_path}"
 unzip /tmp/${tarball_name} -d ${dst_path} || error_and_die "Tarball unzip failed"
-rm /tmp/${tarball_name}
 echo -e "\033[0;32mInstallation of terraform v${version} successful\033[0;39m"
