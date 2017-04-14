@@ -61,6 +61,11 @@ $ tfenv use latest
 $ tfenv use latest:^0.8
 ```
 
+### pkenv uninstall
+ Uninstall a specific version of Packer
+ ```sh
+ $ pkenv uninstall 0.9.0
+
 ### tfenv list
 List installed versions
 ```sh
