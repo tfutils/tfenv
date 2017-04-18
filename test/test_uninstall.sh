@@ -25,7 +25,7 @@ done
 
 tfenv uninstall 0.1.0 || error_and_proceed "Uninstall of version ${v} failed"
 
-#tfenv list | grep 0.1.0 && exit 1 || exit 0
+tfenv list | grep 0.1.0 && exit 1 || exit 0
 if [ ${#errors[@]} -gt 0 ]; then
   echo -e "\033[0;31m===== The following list tests failed =====\033[0;39m" >&2
   for error in "${errors[@]}"; do

@@ -61,10 +61,10 @@ $ tfenv use latest
 $ tfenv use latest:^0.8
 ```
 
-### pkenv uninstall
- Uninstall a specific version of Packer
+### tfenv uninstall
+ Uninstall a specific version of Terraform
  ```sh
- $ pkenv uninstall 0.9.0
+ $ tfenv uninstall 0.9.0
 
 ### tfenv list
 List installed versions
