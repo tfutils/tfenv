@@ -63,8 +63,12 @@ $ tfenv use latest:^0.8
 
 ### tfenv uninstall
 Uninstall a specific version of Terraform
+`latest` is a syntax to uninstall latest version
+`latest:<regex>` is a syntax to uninstall latest version matching regex (used by grep -e)
 ```sh
-$ tfenv uninstall 0.9.0
+$ tfenv uninstall 0.7.0
+$ tfenv install latest
+$ tfenv install latest:^0.8
 ```
 
 ### tfenv list
