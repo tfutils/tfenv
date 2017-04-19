@@ -62,9 +62,10 @@ $ tfenv use latest:^0.8
 ```
 
 ### tfenv uninstall
- Uninstall a specific version of Terraform
- ```sh
- $ tfenv uninstall 0.9.0
+Uninstall a specific version of Terraform
+```sh
+$ tfenv uninstall 0.9.0
+```
 
 ### tfenv list
 List installed versions
