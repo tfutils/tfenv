@@ -26,6 +26,26 @@ v=0.1.0
   tfenv list | grep 0.1.0 && exit 1 || exit 0
 ) || error_and_proceed "Uninstall of version ${v} failed"
 
+echo "### Uninstall latest version"
+cleanup || error_and_die "Cleanup failed?!"
+
+v=$(tfenv list-remote | head -n 1)
+(
+  tfenv install latest || exit 1
+  tfenv uninstall latest || exit 1
+  tfenv list | grep ${v} && exit 1 || exit 0
+) || error_and_proceed "Uninstalling latest version ${v}"
+
+echo "### Uninstall latest version with Regex"
+cleanup || error_and_die "Cleanup failed?!"
+
+v=$(tfenv list-remote | grep 0.8 | head -n 1)
+(
+  tfenv install latest:^0.8 || exit 1
+  tfenv uninstall latest:^0.8 || exit 1
+  tfenv list | grep ${v} && exit 1 || exit 0
+) || error_and_proceed "Uninstalling latest version ${v} with Regex"
+
 if [ ${#errors[@]} -gt 0 ]; then
   echo -e "\033[0;31m===== The following list tests failed =====\033[0;39m" >&2
   for error in "${errors[@]}"; do
