@@ -113,3 +113,4 @@ mkdir -p "${dst_path}" || error_and_die "Failed to make directory ${dst_path}"
 unzip "${download_tmp}/${tarball_name}" -d "${dst_path}" || error_and_die "Tarball unzip failed"
 
 info "Installation of terraform v${version} successful"
+tfenv-use "$version"

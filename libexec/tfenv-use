@@ -5,6 +5,10 @@ function error_and_die() {
   exit 1
 }
 
+function info() {
+  echo -e "\033[0;32m[INFO] ${1}\033[0;39m"
+}
+
 [ -n "${TFENV_DEBUG}" ] && set -x
 
 [ ${#} -ne 1 ] && error_and_die "usage: tfenv use <version>"
@@ -41,5 +45,7 @@ target_path=${TFENV_ROOT}/versions/${version}
 [ -x ${target_path}/terraform ] \
   || error_and_die "Version directory for ${version} is present, but the terraform binary is not executable! Manual intervention required. "
 
+info "Switching to v${version}"
 echo "${version}" > "${TFENV_ROOT}/version"
-terraform --version || error_and_die "'terraform --version' failed. Something is seriously wrong"
+terraform --version 1>/dev/null || error_and_die "'terraform --version' failed. Something is seriously wrong"
+info "Switching completed"
