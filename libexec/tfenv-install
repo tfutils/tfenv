@@ -49,15 +49,16 @@ if [ -f "${dst_path}/terraform" ]; then
   exit 0
 fi
 
+TFENV_ARCH=${TFENV_ARCH:-amd64}
 case "$(uname -s)" in
   Darwin*)
-    os="darwin_amd64"
+    os="darwin_${TFENV_ARCH}"
     ;;
   MINGW64*)
-    os="windows_amd64"
+    os="windows_${TFENV_ARCH}"
     ;;
   *)
-    os="linux_amd64"
+    os="linux_${TFENV_ARCH}"
     ;;
 esac
 
