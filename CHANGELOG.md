@@ -1,3 +1,8 @@
+## 0.4.4 (July 14, 2017)
+
+ * Immediately switch version after installation
+ * Add uninstall command
+
 ## 0.4.3 (April 12, 2017)
 
  * Move temporary directory from /tmp to mktemp
