@@ -12,7 +12,7 @@
 set -e
 [ -n "${TFENV_DEBUG}" ] && set -x
 
-version="0.4.4"
+version="0.5.0"
 git_revision=""
 
 if cd "${BASH_SOURCE%/*}" 2>/dev/null && git remote -v 2>/dev/null | grep -q tfenv; then

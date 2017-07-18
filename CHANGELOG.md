@@ -1,4 +1,4 @@
-## 0.4.4 (July 14, 2017)
+## 0.5.0 (=0.4.4) (July 14, 2017)
 
  * Immediately switch version after installation
  * Add uninstall command
