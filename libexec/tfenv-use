@@ -25,7 +25,7 @@ elif [[ "${version_requested}" =~ ^latest$ ]]; then
   regex=""
 else
   version="${version_requested}"
-  regex="${version_requested}"
+  regex="^${version_requested}$"
 fi
 
 [ -d "${TFENV_ROOT}/versions" ] \

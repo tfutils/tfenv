@@ -32,7 +32,7 @@ elif [[ "${version_requested}" =~ ^latest$ ]]; then
   regex=""
 else
   version="${version_requested}"
-  regex="${version_requested}"
+  regex="^${version_requested}$"
 fi
 
 [ -n "${version}" ] || error_and_die "Version is not specified"

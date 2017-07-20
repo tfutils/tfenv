@@ -19,11 +19,11 @@ source $(dirname $0)/helpers.sh \
 echo "### Uninstall local versions"
 cleanup || error_and_die "Cleanup failed?!"
 
-v=0.1.0
+v=0.9.1
 (
   tfenv install ${v} || exit 1
   tfenv uninstall ${v} || exit 1
-  tfenv list | grep 0.1.0 && exit 1 || exit 0
+  tfenv list | grep ${v} && exit 1 || exit 0
 ) || error_and_proceed "Uninstall of version ${v} failed"
 
 echo "### Uninstall latest version"

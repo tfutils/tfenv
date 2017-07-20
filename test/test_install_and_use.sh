@@ -49,7 +49,7 @@ v=0.7.13
 echo "### Install specific .terraform-version"
 cleanup || error_and_die "Cleanup failed?!"
 
-v=0.8.8
+v=0.9.1
 echo ${v} > ./.terraform-version
 (
   tfenv install || exit 1
