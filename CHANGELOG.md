@@ -1,3 +1,8 @@
+## 0.5.1 (July 21, 2017)
+
+ * Fix version detection
+ * Add support for ARM architecture
+
 ## 0.5.0 (=0.4.4) (July 14, 2017)
 
  * Immediately switch version after installation
