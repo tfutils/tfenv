@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 set -e
 [ -n "${TFENV_DEBUG}" ] && set -x
+source ${TFENV_ROOT}/libexec/helpers
 
 if [ ${#} -ne 0 ];then
   echo "usage: tfenv list-remote" 1>&2
   exit 1
 fi
 
-curl --tlsv1.2 -sf https://releases.hashicorp.com/terraform/ | grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta)[0-9]+)?" | uniq
+curlw -sf https://releases.hashicorp.com/terraform/ | grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta)[0-9]+)?" | uniq
