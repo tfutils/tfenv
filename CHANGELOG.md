@@ -1,3 +1,7 @@
+## 0.5.2 (July 23, 2017)
+
+ * Switch TLS option for curl depending on the version of macOS
+
 ## 0.5.1 (July 21, 2017)
 
  * Fix version detection
