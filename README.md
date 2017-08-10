@@ -19,6 +19,14 @@ Install via Homebrew
   $ brew install tfenv
   ```
 
+Install via puppet
+
+Using puppet module [sergk-tfenv](https://github.com/SergK/puppet-tfenv)
+
+```sh
+include ::tfenv
+```
+
 ### Manual
 1. Check out tfenv into any path (here is `${HOME}/.tfenv`)
 
@@ -36,7 +44,7 @@ Install via Homebrew
 
   ```sh
   $ ln -s ~/.tfenv/bin/* /usr/local/bin
-  ``` 
+  ```
 
 ## Usage
 ### tfenv install
@@ -49,7 +57,7 @@ $ tfenv install latest
 $ tfenv install latest:^0.8
 ```
 
-If shasum is present in the path, tfenv will verify the download against Hashicorp's published sha256 hash. If [keybase](https://keybase.io/) is available in the path it will also verify the signature for those published hashes using hashicorp's published public key. 
+If shasum is present in the path, tfenv will verify the download against Hashicorp's published sha256 hash. If [keybase](https://keybase.io/) is available in the path it will also verify the signature for those published hashes using hashicorp's published public key.
 
 If you use [.terraform-version](#terraform-version), `tfenv install` (no argument) will install the version written in it.
 
@@ -158,4 +166,3 @@ $ rm -rf /some/path/to/tfenv
 - [tfenv itself](https://github.com/kamatama41/tfenv/blob/master/LICENSE)
 - [rbenv](https://github.com/rbenv/rbenv/blob/master/LICENSE)
   - tfenv partially uses rbenv's source code
-
