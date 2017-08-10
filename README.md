@@ -1,10 +1,13 @@
+# tfenv
+
 [![Build Status](https://travis-ci.org/kamatama41/tfenv.svg?branch=master)](https://travis-ci.org/kamatama41/tfenv)
 
-# tfenv
 [Terraform](https://www.terraform.io/) version manager inspired by [rbenv](https://github.com/rbenv/rbenv)
 
 ## Support
+
 Currently tfenv supports the following OSes
+
 - Mac OS X (64bit)
 - Linux
  - 64bit
@@ -12,7 +15,9 @@ Currently tfenv supports the following OSes
 - Windows (64bit) - only tested in git-bash
 
 ## Installation
+
 ### Automatic
+
 Install via Homebrew
 
   ```sh
@@ -21,13 +26,14 @@ Install via Homebrew
 
 Install via puppet
 
-Using puppet module [sergk-tfenv](https://github.com/SergK/puppet-tfenv)
+Using puppet module [puppet-tfenv](https://github.com/SergK/puppet-tfenv)
 
 ```sh
 include ::tfenv
 ```
 
 ### Manual
+
 1. Check out tfenv into any path (here is `${HOME}/.tfenv`)
 
   ```sh
@@ -47,10 +53,13 @@ include ::tfenv
   ```
 
 ## Usage
+
 ### tfenv install
+
 Install a specific version of Terraform  
 `latest` is a syntax to install latest version
 `latest:<regex>` is a syntax to install latest version matching regex (used by grep -e)
+
 ```sh
 $ tfenv install 0.7.0
 $ tfenv install latest
@@ -70,9 +79,11 @@ TFENV_ARCH=arm tfenv install 0.7.9
 ```
 
 ### tfenv use
+
 Switch a version to use
 `latest` is a syntax to use the latest installed version
 `latest:<regex>` is a syntax to use latest installed version matching regex (used by grep -e)
+
 ```sh
 $ tfenv use 0.7.0
 $ tfenv use latest
@@ -90,7 +101,9 @@ $ tfenv uninstall latest:^0.8
 ```
 
 ### tfenv list
+
 List installed versions
+
 ```sh
 % tfenv list
 0.9.0-beta2
@@ -104,7 +117,9 @@ List installed versions
 ```
 
 ### tfenv list-remote
+
 List installable versions
+
 ```sh
 % tfenv list-remote
 0.9.0-beta2
@@ -129,6 +144,7 @@ List installable versions
 ```
 
 ## .terraform-version
+
 If you put `.terraform-version` file on your project root, tfenv detects it and use the version written in it. If the version is `latest` or `latest:<regex>`, the latest matching version currently installed will be selected.
 
 ```sh
@@ -153,16 +169,19 @@ Terraform v0.8.8
 ```
 
 ## Upgrading
+
 ```sh
 $ git --git-dir=~/.tfenv/.git pull
 ```
 
 ## Uninstalling
+
 ```sh
 $ rm -rf /some/path/to/tfenv
 ```
 
 ## LICENSE
+
 - [tfenv itself](https://github.com/kamatama41/tfenv/blob/master/LICENSE)
 - [rbenv](https://github.com/rbenv/rbenv/blob/master/LICENSE)
   - tfenv partially uses rbenv's source code
