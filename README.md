@@ -26,7 +26,7 @@ Install via Homebrew
 
 Install via puppet
 
-Using puppet module [sergk-tfenv](https://github.com/SergK/puppet-tfenv)
+Using puppet module [puppet-tfenv](https://github.com/SergK/puppet-tfenv)
 
 ```sh
 include ::tfenv
