@@ -129,7 +129,7 @@ List installable versions
 ```
 
 ## .terraform-version
-If you put `.terraform-version` file on your project root, tfenv detects it and use the version written in it. If the version is `latest` or `latest:<regex>`, the latest matching version currently installed will be selected.
+If you put `.terraform-version` file on your project root, or in your home directory, tfenv detects it and use the version written in it. If the version is `latest` or `latest:<regex>`, the latest matching version currently installed will be selected.
 
 ```sh
 $ cat .terraform-version
