@@ -66,6 +66,38 @@ echo "latest:^0.8" > ./.terraform-version
   check_version ${v} || exit 1
 ) || error_and_proceed "Installing .terraform-version ${v}" 
 
+echo "### Install with ${HOME}/.terraform-version"
+cleanup || error_and_die "Cleanup failed?!"
+
+if [ -f ${HOME}/.terraform-version ]; then
+  mv ${HOME}/.terraform-version ${HOME}/.terraform-version.bup
+fi
+v=$(tfenv list-remote | head -n 2 | tail -n 1)
+echo "${v}" > ${HOME}/.terraform-version
+(
+  tfenv install || exit 1
+  check_version ${v} || exit 1
+) || error_and_proceed "Installing ${HOME}/.terraform-version ${v}"
+
+echo "### Install with parameter and use ~/.terraform-version"
+v=$(tfenv list-remote | head -n 1)
+(
+  tfenv install ${v} || exit 1
+  check_version ${v} || exit 1
+) || error_and_proceed "Use $HOME/.terraform-version ${v}"
+
+echo "### Use with parameter and  ~/.terraform-version"
+v=$(tfenv list-remote | head -n 2 | tail -n 1)
+(
+  tfenv use ${v} || exit 1
+  check_version ${v} || exit 1
+) || error_and_proceed "Use $HOME/.terraform-version ${v}"
+
+rm $HOME/.terraform-version
+if [ -f $HOME/.terraform-version.bup ]; then
+  mv $HOME/.terraform-version.bup $HOME/.terraform-version
+fi
+
 echo "### Install invalid specific version"
 cleanup || error_and_die "Cleanup failed?!"
 

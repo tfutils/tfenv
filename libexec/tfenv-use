@@ -38,6 +38,6 @@ target_path=${TFENV_ROOT}/versions/${version}
   || error_and_die "Version directory for ${version} is present, but the terraform binary is not executable! Manual intervention required. "
 
 info "Switching to v${version}"
-echo "${version}" > "${TFENV_ROOT}/version"
+echo "${version}" > "$(tfenv-version-file)" || error_and_die "'switch to v${version} failed'"
 terraform --version 1>/dev/null || error_and_die "'terraform --version' failed. Something is seriously wrong"
 info "Switching completed"
