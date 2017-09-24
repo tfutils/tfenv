@@ -22,7 +22,6 @@ cleanup || error_and_die "Cleanup failed?!"
 v=$(tfenv list-remote | head -n 1)
 (
   tfenv install latest || exit 1
-  tfenv use ${v} || exit 1
   check_version ${v} || exit 1
 ) || error_and_proceed "Installing latest version ${v}"
 
@@ -32,7 +31,6 @@ cleanup || error_and_die "Cleanup failed?!"
 v=$(tfenv list-remote | grep 0.8 | head -n 1)
 (
   tfenv install latest:^0.8 || exit 1
-  tfenv use latest:^0.8 || exit 1
   check_version ${v} || exit 1
 ) || error_and_proceed "Installing latest version ${v} with Regex"
 
@@ -42,7 +40,6 @@ cleanup || error_and_die "Cleanup failed?!"
 v=0.7.13
 (
   tfenv install ${v} || exit 1
-  tfenv use ${v} || exit 1
   check_version ${v} || exit 1
 ) || error_and_proceed "Installing specific version ${v}"
 
@@ -64,7 +61,7 @@ echo "latest:^0.8" > ./.terraform-version
 (
   tfenv install || exit 1
   check_version ${v} || exit 1
-) || error_and_proceed "Installing .terraform-version ${v}" 
+) || error_and_proceed "Installing .terraform-version ${v}"
 
 echo "### Install with ${HOME}/.terraform-version"
 cleanup || error_and_die "Cleanup failed?!"
