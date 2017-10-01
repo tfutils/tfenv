@@ -12,4 +12,14 @@ source ${TFENV_ROOT}/libexec/helpers
 [[ -x "${TFENV_ROOT}/versions" && -r "${TFENV_ROOT}/versions" ]] \
   || error_and_die "tfenv versions directory is inaccessible!"
 
-ls -1 "${TFENV_ROOT}/versions" | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3
+print_version () {
+    if [ "$1" == "$(tfenv-version-name)" ]; then
+        echo "* $1 (set by $(tfenv-version-file))"
+    else
+        echo "  $1"
+    fi
+}
+
+for local_version in $(ls -1 "${TFENV_ROOT}/versions" | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3); do
+    print_version ${local_version}
+done
