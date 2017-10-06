@@ -7,6 +7,15 @@ set -e
 find_local_version_file() {
   local root="${1}"
   while ! [[ "${root}" =~ ^//[^/]*$ ]]; do
+
+    if [ -e "${root}/backend.tf" ]; then
+      version=$(grep required_version "${root}"/backend.tf | tr -dcs '0-9.' '')
+
+      if [[ ! -z "$version" ]]; then
+        echo "$version" > "${root}/.terraform-version"
+      fi
+    fi
+
     if [ -e "${root}/.terraform-version" ]; then
       echo "${root}/.terraform-version"
       return 0
