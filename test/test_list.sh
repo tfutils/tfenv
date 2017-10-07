@@ -23,13 +23,13 @@ for v in 0.7.2 0.7.13 0.9.1 0.9.2 0.9.11; do
   tfenv install ${v} || error_and_proceed "Install of version ${v} failed"
 done
 
-result=$(tfenv list | sed 's/ //g;s/^*//;s/(.*)//')
+result=$(tfenv list)
 expected="$(cat << EOS
-0.9.11
-0.9.2
-0.9.1
-0.7.13
-0.7.2
+* 0.9.11 (set by $(tfenv version-file))
+  0.9.2
+  0.9.1
+  0.7.13
+  0.7.2
 EOS
 )"
 

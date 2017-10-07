@@ -28,7 +28,7 @@ else
 fi
 
 [ -n "${version}" ] || error_and_die "Version is not specified"
-version="$(tfenv-list | sed 's/ //g;s/^*//;s/(.*)//' | grep -e "${regex}" | head -n 1)"
+version="$(tfenv-list | sed -E 's/^(\*| )? //g; s/ \(set by .+\)$//' | grep -e "${regex}" | head -n 1)"
 [ -n "${version}" ] || error_and_die "No versions matching '${1}' found in local"
 
 dst_path="${TFENV_ROOT}/versions/${version}"
