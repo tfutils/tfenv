@@ -7,17 +7,6 @@ set -e
 find_local_version_file() {
   local root="${1}"
   while ! [[ "${root}" =~ ^//[^/]*$ ]]; do
-
-    # a version could be a range, ie 'required_version = "~> 0.9.11,<0.12.3"'
-    # we want to separate those, get rid of anything that is not a version and then use the first occurence
-    # if the user specifies the upper range first - it's their decision
-    versions=( $(grep -R required_version --include '*tf' ./* | tr ',' ' ' | tr -c -d '0-9. ' ) )
-    version=${versions[1]}
-
-    if [[ $version =~ [0-9.]+ ]]; then
-      echo "$version" > "${root}/.terraform-version"
-    fi
-
     if [ -e "${root}/.terraform-version" ]; then
       echo "${root}/.terraform-version"
       return 0
