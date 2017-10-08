@@ -117,14 +117,15 @@ $ tfenv uninstall latest:^0.8
 List installed versions
 ```sh
 % tfenv list
-0.9.0-beta2
-0.8.8
-0.8.4
-0.7.0
-0.7.0-rc4
-0.6.16
-0.6.2
-0.6.1
+* 0.10.7 (set by /opt/tfenv/version)
+  0.9.0-beta2
+  0.8.8
+  0.8.4
+  0.7.0
+  0.7.0-rc4
+  0.6.16
+  0.6.2
+  0.6.1
 ```
 
 ### tfenv list-remote
