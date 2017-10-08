@@ -25,11 +25,11 @@ done
 
 result=$(tfenv list)
 expected="$(cat << EOS
-0.9.11
-0.9.2
-0.9.1
-0.7.13
-0.7.2
+* 0.9.11 (set by $(tfenv version-file))
+  0.9.2
+  0.9.1
+  0.7.13
+  0.7.2
 EOS
 )"
 
