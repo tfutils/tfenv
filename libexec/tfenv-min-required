@@ -5,7 +5,7 @@ set -e
 [ -n "${TFENV_DEBUG}" ] && set -x
 
 bailout() {
-    echo "Error: Could not determine required_version based on your terraform sources.
+    >&2 echo "Error: Could not determine required_version based on your terraform sources.
 Make sure at least one of your *tf files includes a required version section like
 terraform {
   required_version = \">= 0.0.0\"
