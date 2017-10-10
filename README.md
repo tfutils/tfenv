@@ -48,7 +48,7 @@ include ::tfenv
 
 ## Usage
 ### tfenv install [version]
-Install and use a specific version of Terraform. Available options for version:
+Install a specific version of Terraform. Available options for version:
 - `i.j.k` exact version to install
 - `latest` is a syntax to install latest version
 - `latest:<regex>` is a syntax to install latest version matching regex (used by grep -e)
@@ -95,9 +95,15 @@ TFENV_ARCH=arm tfenv install 0.7.9
 
 ### tfenv use &lt;version>
 Switch a version to use
+
 `latest` is a syntax to use the latest installed version
+
 `latest:<regex>` is a syntax to use latest installed version matching regex (used by grep -e)
+
+`min-required` will switch to the version minimally required by your terraform sources (see above `tfenv install`)
+
 ```sh
+$ tfenv use min-required
 $ tfenv use 0.7.0
 $ tfenv use latest
 $ tfenv use latest:^0.8

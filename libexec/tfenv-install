@@ -18,33 +18,12 @@ fi
 
 if [[ "${version_requested}" =~ ^min-required$ ]]; then
   echo "Detecting minimal required version..."
-  # a version could be a range, ie 'required_version = "~> 0.9.11,<0.12.3"'
-  # we want to separate those, get rid of anything that is not a version and then use the first occurence
-  # if the user specifies the upper range first - it's their decision
-  versions=$(grep -R required_version --include '*tf' ./* | tr -c -d '0-9. ~=!<>' )
+  found_min_required="$(tfenv-min-required)"
 
-  if [[ $versions =~ ([~=!<>]{0,2}[[:blank:]]*[0-9]+[0-9.]+)[^0-9]* ]]; then
-    found_min_required=${BASH_REMATCH[1]}
-
-    if [[ $found_min_required =~ ^!=.+ ]]; then
-        echo "Error: Min required version is a negation ($found_min_required) - we cannot guess the desired one. Exiting."
-        exit 1
-    else
-        found_min_required=$(echo "$found_min_required" | tr -c -d '0-9.')
-
-        echo "Min required version is detected as ${found_min_required}"
-        version_requested=${found_min_required}
-    fi
+  if [[ $? -eq 0 ]]; then
+      echo "Min required version is detected as ${found_min_required}"
+      version_requested=${found_min_required}
   else
-    echo "Error: Could not determine required_version based on your terraform sources.
-Make sure at least one of your *tf files includes a required version section like
-terraform {
-  required_version = \">= 0.0.0\"
-}
-
-see https://www.terraform.io/docs/configuration/terraform.html for details
-
-"
     exit 1
   fi
 fi
