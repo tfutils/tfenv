@@ -1,3 +1,12 @@
+## 0.6.0 (November 1, 2017)
+
+ * Support msys2 bash.exe #75
+ * Version from sources #73
+ * run tfenv as a neighbour with full path (to keep vscode and whoever doesn't respect %path, happy) #72
+ * Add current version in list command #69
+ * Version file #67
+ * [DOC] Add link to puppet module for automatic tfenv installation #64
+
 ## 0.5.2 (July 23, 2017)
 
  * Switch TLS option for curl depending on the version of macOS
