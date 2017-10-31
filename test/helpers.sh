@@ -8,4 +8,5 @@ check_version() {
 cleanup() {
   rm -rf ./versions
   rm -rf ./.terraform-version
+  rm -rf ./min_required.tf
 }
