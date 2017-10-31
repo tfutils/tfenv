@@ -28,7 +28,7 @@ v=$(tfenv list-remote | head -n 1)
 echo "### Install latest version with Regex"
 cleanup || error_and_die "Cleanup failed?!"
 
-v=$(tfenv list-remote | grep 0.8 | head -n 1)
+v=0.8.8
 (
   tfenv install latest:^0.8 || exit 1
   check_version ${v} || exit 1

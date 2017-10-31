@@ -57,6 +57,9 @@ case "$(uname -s)" in
   MINGW64*)
     os="windows_${TFENV_ARCH}"
     ;;
+  MSYS_NT*)
+    os="windows_${TFENV_ARCH}"
+    ;;
   *)
     os="linux_${TFENV_ARCH}"
     ;;
