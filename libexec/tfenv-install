@@ -16,6 +16,18 @@ else
   version_requested="${1}"
 fi
 
+if [[ "${version_requested}" =~ ^min-required$ ]]; then
+  echo "Detecting minimal required version..."
+  found_min_required="$(tfenv-min-required)"
+
+  if [[ $? -eq 0 ]]; then
+      echo "Min required version is detected as ${found_min_required}"
+      version_requested=${found_min_required}
+  else
+    exit 1
+  fi
+fi
+
 if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
   version="${version_requested%%\:*}"
   regex="${version_requested##*\:}"

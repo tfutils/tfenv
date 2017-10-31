@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Usage: tfenv min-required
+# Summary: Detect the minimal required version from *tf files
+set -e
+[ -n "${TFENV_DEBUG}" ] && set -x
+
+bailout() {
+    >&2 echo "Error: Could not determine required_version based on your terraform sources.
+Make sure at least one of your *tf files includes a required version section like
+terraform {
+  required_version = \">= 0.0.0\"
+}
+
+see https://www.terraform.io/docs/configuration/terraform.html for details
+
+"
+
+    exit 1
+}
+
+find_min_required() {
+    local root="${1}"
+
+    versions=$(grep -h -R required_version --include '*tf' "$root"/* | tr -c -d '0-9. ~=!<>' )
+
+    if [[ $versions =~ ([~=!<>]{0,2}[[:blank:]]*[0-9]+[0-9.]+)[^0-9]* ]]; then
+        found_min_required=${BASH_REMATCH[1]}
+
+        if [[ $found_min_required =~ ^!=.+ ]]; then
+            echo "Error: Min required version is a negation ($found_min_required) - we cannot guess the desired one."
+
+            bailout
+        else
+            found_min_required=$(echo "$found_min_required" | tr -c -d '0-9.')
+
+    #        echo "Min required version is detected as ${found_min_required}"
+            echo "${found_min_required}"
+            exit 0
+        fi
+    fi
+
+    bailout
+}
+
+find_min_required "${TFENV_DIR}"
