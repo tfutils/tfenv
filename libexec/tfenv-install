@@ -60,6 +60,9 @@ case "$(uname -s)" in
   MSYS_NT*)
     os="windows_${TFENV_ARCH}"
     ;;
+  CYGWIN_NT*)
+    os="windows_${TFENV_ARCH}"
+    ;;
   *)
     os="linux_${TFENV_ARCH}"
     ;;
