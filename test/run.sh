@@ -11,7 +11,7 @@ errors=()
 if [ ${#} -ne 0 ];then
   targets="${@}"
 else
-  targets=$(\ls $(dirname ${0}) | grep 'test_')
+  targets=$(\ls $(dirname ${0}) | grep --color=never 'test_')
 fi
 
 for t in ${targets}; do

@@ -56,7 +56,7 @@ echo ${v} > ./.terraform-version
 echo "### Install latest:<regex> .terraform-version"
 cleanup || error_and_die "Cleanup failed?!"
 
-v=$(tfenv list-remote | grep -e '^0.8' | head -n 1)
+v=$(tfenv list-remote | grep --color=never -e '^0.8' | head -n 1)
 echo "latest:^0.8" > ./.terraform-version
 (
   tfenv install || exit 1
@@ -100,7 +100,7 @@ cleanup || error_and_die "Cleanup failed?!"
 
 v=9.9.9
 expected_error_message="No versions matching '${v}' found in remote"
-[ -z "$(tfenv install ${v} 2>&1 | grep "${expected_error_message}")" ] \
+[ -z "$(tfenv install ${v} 2>&1 | grep --color=never "${expected_error_message}")" ] \
   && error_and_proceed "Installing invalid version ${v}"
 
 echo "### Install invalid latest:<regex> version"
@@ -108,7 +108,7 @@ cleanup || error_and_die "Cleanup failed?!"
 
 v="latest:word"
 expected_error_message="No versions matching '${v}' found in remote"
-[ -z "$(tfenv install ${v} 2>&1 | grep "${expected_error_message}")" ] \
+[ -z "$(tfenv install ${v} 2>&1 | grep --color=never "${expected_error_message}")" ] \
   && error_and_proceed "Installing invalid version ${v}"
 
 if [ ${#errors[@]} -gt 0 ]; then

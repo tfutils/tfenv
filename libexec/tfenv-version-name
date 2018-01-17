@@ -15,7 +15,7 @@ if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
   [[ "${TFENV_VERSION}" =~ ^latest\:.*$ ]] && regex="${TFENV_VERSION##*\:}"
   version="$(\ls "${TFENV_ROOT}/versions" \
     | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
-    | grep -e "${regex}" \
+    | grep --color=never -e "${regex}" \
     | head -n 1
   )"
   [ -n "${version}" ] || error_and_die "No installed versions of terraform matched '${TFENV_VERSION}'"
