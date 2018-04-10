@@ -13,6 +13,11 @@ function info() {
   echo -e "\033[0;32m[INFO] ${1}\033[0;39m"
 }
 
+function notice_and_continue() {
+  # Something "lower" than info, but should not deserve as much attention as others
+  echo -e "\033[1;34m[NOTICE] ${1}\033[0;39m"
+}
+
 # Curl wrapper to switch TLS option for each OS
 function curlw () {
   local TLS_OPT="--tlsv1.2"
