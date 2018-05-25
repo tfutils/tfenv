@@ -3,7 +3,7 @@
 set -e
 
 [ -n "${TFENV_DEBUG}" ] && set -x
-source ${TFENV_ROOT}/libexec/helpers
+source "${TFENV_ROOT}/libexec/helpers"
 
 [ -d "${TFENV_ROOT}/versions" ] \
   || error_and_die "No versions of terraform installed. Please install one with: tfenv install"
