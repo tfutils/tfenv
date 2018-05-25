@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 [ -n "${TFENV_DEBUG}" ] && set -x
-source ${TFENV_ROOT}/libexec/helpers
+source "${TFENV_ROOT}/libexec/helpers"
 
 [ ${#} -gt 1 ] && error_and_die "usage: tfenv uninstall [<version>]"
 

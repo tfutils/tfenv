@@ -3,4 +3,6 @@ set -e
 [ -n "$TFENV_DEBUG" ] && set -x
 
 program="${0##*/}"
-exec "$(dirname `which $0`)"/tfenv exec "$@"
+which=$(which "$0")
+dir=$(dirname "$which")
+exec "$dir/tfenv" exec "$@"
