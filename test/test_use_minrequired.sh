@@ -19,22 +19,23 @@ source $(dirname $0)/helpers.sh \
 echo "### Install not min-required version"
 cleanup || error_and_die "Cleanup failed?!"
 
-v=0.2.0
+v=0.8.8
+minv=0.8.0
 (
   tfenv install ${v} || true
   tfenv use ${v} || exit 1
   check_version ${v} || exit 1
 ) || error_and_proceed "Installing specific version ${v}"
 
-echo 'terraform {
+echo "terraform {
 
-  required_version = ">=0.1.0"
-}' >> min_required.tf
+  required_version = \">=${minv}\"
+}" >> min_required.tf
 
 tfenv install min-required
 tfenv use min-required
 
-check_version '0.1.0' || error_and_proceed "Min required version doesn't match"
+check_version "${minv}" || error_and_proceed "Min required version doesn't match"
 
 cleanup || error_and_die "Cleanup failed?!"
 
