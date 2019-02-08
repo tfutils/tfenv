@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/kamatama41/tfenv.svg?branch=master)](https://travis-ci.org/kamatama41/tfenv)
+[![Build Status](https://travis-ci.org/tfutils/tfenv.svg?branch=master)](https://travis-ci.org/tfutils/tfenv)
 
 # tfenv
 [Terraform](https://www.terraform.io/) version manager inspired by [rbenv](https://github.com/rbenv/rbenv)
@@ -31,7 +31,7 @@ include ::tfenv
 1. Check out tfenv into any path (here is `${HOME}/.tfenv`)
 
   ```sh
-  $ git clone https://github.com/kamatama41/tfenv.git ~/.tfenv
+  $ git clone https://github.com/tfutils/tfenv.git ~/.tfenv
   ```
 
 2. Add `~/.tfenv/bin` to your `$PATH` any way you like
@@ -205,6 +205,6 @@ $ rm -rf /some/path/to/tfenv
 ```
 
 ## LICENSE
-- [tfenv itself](https://github.com/kamatama41/tfenv/blob/master/LICENSE)
+- [tfenv itself](https://github.com/tfutils/tfenv/blob/master/LICENSE)
 - [rbenv](https://github.com/rbenv/rbenv/blob/master/LICENSE)
   - tfenv partially uses rbenv's source code
