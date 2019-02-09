@@ -19,11 +19,20 @@ source $(dirname $0)/helpers.sh \
 echo "### Install latest version"
 cleanup || error_and_die "Cleanup failed?!"
 
-v=$(tfenv list-remote | head -n 1)
+v=$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | head -n 1)
 (
   tfenv install latest || exit 1
   check_version ${v} || exit 1
 ) || error_and_proceed "Installing latest version ${v}"
+
+echo "### Install latest possibly-unstable version"
+cleanup || error_and_die "Cleanup failed?!"
+
+v=$(tfenv list-remote | head -n 1)
+(
+  tfenv install latest: || exit 1
+  check_version ${v} || exit 1
+) || error_and_proceed "Installing latest possibly-unstable version ${v}"
 
 echo "### Install latest version with Regex"
 cleanup || error_and_die "Cleanup failed?!"
@@ -69,7 +78,7 @@ cleanup || error_and_die "Cleanup failed?!"
 if [ -f ${HOME}/.terraform-version ]; then
   mv ${HOME}/.terraform-version ${HOME}/.terraform-version.bup
 fi
-v=$(tfenv list-remote | head -n 2 | tail -n 1)
+v=$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | head -n 2 | tail -n 1)
 echo "${v}" > ${HOME}/.terraform-version
 (
   tfenv install || exit 1
@@ -77,14 +86,14 @@ echo "${v}" > ${HOME}/.terraform-version
 ) || error_and_proceed "Installing ${HOME}/.terraform-version ${v}"
 
 echo "### Install with parameter and use ~/.terraform-version"
-v=$(tfenv list-remote | head -n 1)
+v=$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | head -n 1)
 (
   tfenv install ${v} || exit 1
   check_version ${v} || exit 1
 ) || error_and_proceed "Use $HOME/.terraform-version ${v}"
 
 echo "### Use with parameter and  ~/.terraform-version"
-v=$(tfenv list-remote | head -n 2 | tail -n 1)
+v=$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | head -n 2 | tail -n 1)
 (
   tfenv use ${v} || exit 1
   check_version ${v} || exit 1
