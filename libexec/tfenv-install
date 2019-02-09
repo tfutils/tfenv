@@ -33,7 +33,7 @@ if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
   regex="${version_requested##*\:}"
 elif [[ "${version_requested}" =~ ^latest$ ]]; then
   version="${version_requested}"
-  regex=""
+  regex="^[0-9]\+\.[0-9]\+\.[0-9]\+$"
 else
   version="${version_requested}"
   regex="^${version_requested}$"
