@@ -72,7 +72,14 @@ keybase_bin="$(which keybase 2>/dev/null)"
 shasum_bin="$(which shasum 2>/dev/null)"
 
 version_url="https://releases.hashicorp.com/terraform/${version}"
-tarball_name="terraform_${version}_${os}.zip"
+
+# Thanks for the inconsistency in 0.12-alpha, Hashicorp(!)
+if [[ "${version}" =~ 0.12.0-alpha[3-9] ]]; then
+  tarball_name="terraform_${version}_terraform_${version}_${os}.zip";
+else
+  tarball_name="terraform_${version}_${os}.zip";
+fi;
+
 shasums_name="terraform_${version}_SHA256SUMS"
 
 info "Installing Terraform v${version}"
