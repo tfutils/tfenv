@@ -2,7 +2,7 @@
 
 check_version() {
   v="${1}"
-  [ -n "$(terraform --version | grep -E "^Terraform v${v}(-dev)?$")" ]
+  [ -n "$(terraform --version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ]
 }
 
 cleanup() {
