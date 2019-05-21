@@ -7,26 +7,7 @@ source ${TFENV_ROOT}/libexec/helpers
 
 declare version_requested version regex
 
-if [ -z "${1}" ]; then
-  version_file="$(tfenv-version-file)"
-  if [ "${version_file}" != "${TFENV_ROOT}/version" ]; then
-    version_requested="$(cat ${version_file} || true)"
-  fi
-else
-  version_requested="${1}"
-fi
-
-if [[ "${version_requested}" =~ ^min-required$ ]]; then
-  echo "Detecting minimal required version..."
-  found_min_required="$(tfenv-min-required)"
-
-  if [[ $? -eq 0 ]]; then
-      echo "Min required version is detected as ${found_min_required}"
-      version_requested=${found_min_required}
-  else
-    exit 1
-  fi
-fi
+get_version_requested "${1}"
 
 if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
   version="${version_requested%%\:*}"

@@ -7,21 +7,14 @@ source ${TFENV_ROOT}/libexec/helpers
 
 declare version_requested version regex
 
-if [ -z "${1}" ]; then
-  version_file="$(tfenv-version-file)"
-  if [ "${version_file}" != "${TFENV_ROOT}/version" ];then
-    version_requested="$(cat ${version_file} || true)"
-  fi
-else
-  version_requested="${1}"
-fi
+get_version_requested "${1}"
 
 if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
   version="${version_requested%%\:*}"
   regex="${version_requested##*\:}"
 elif [[ "${version_requested}" =~ ^latest$ ]]; then
   version="${version_requested}"
-  regex=""
+  regex="^[0-9]\+\.[0-9]\+\.[0-9]\+$"
 else
   version="${version_requested}"
   regex="^${version_requested}$"
@@ -32,7 +25,7 @@ version="$(tfenv-list | sed -E 's/^(\*| )? //g; s/ \(set by .+\)$//' | grep -e "
 [ -n "${version}" ] || error_and_die "No versions matching '${1}' found in local"
 
 dst_path="${TFENV_ROOT}/versions/${version}"
-if [ -f "${dst_path}/terraform" ]; then 
+if [ -f "${dst_path}/terraform" ]; then
   info "Uninstall Terraform v${version}"
   rm -r "${dst_path}"
   info "\033[0;32mTerraform v${version} is successfully uninstalled\033[0;39m"

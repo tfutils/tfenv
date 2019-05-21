@@ -62,6 +62,20 @@ echo ${v} > ./.terraform-version
   check_version ${v} || exit 1
 ) || error_and_proceed "Installing .terraform-version ${v}"
 
+echo "### Install with .terraform-version in path with spaces"
+cleanup || error_and_die "Cleanup failed?!"
+
+v=0.9.2
+workdir="project with spaces"
+mkdir "${workdir}"
+cd "${workdir}"
+echo ${v} > ./.terraform-version
+(
+  tfenv install || exit 1
+  check_version ${v} || exit 1
+) || error_and_proceed "Installing .terraform-version ${v} in path with spaces"
+cd .. ; rm -rf "${workdir}"
+
 echo "### Install latest:<regex> .terraform-version"
 cleanup || error_and_die "Cleanup failed?!"
 
