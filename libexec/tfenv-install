@@ -94,7 +94,12 @@ curlw -# -f -o "${download_tmp}/${tarball_name}" "${version_url}/${tarball_name}
 info "Downloading SHA hash file from ${version_url}/${shasums_name}"
 curlw -s -f -o "${download_tmp}/${shasums_name}" "${version_url}/${shasums_name}" || error_and_die "SHA256 hashes download failed"
 
-# Verify signature if keybase is present.
+download_signature() {
+  info "Downloading SHA hash signature file from ${version_url}/${shasums_name}.sig"
+  curlw -s -f -o "${download_tmp}/${shasums_name}.sig" "${version_url}/${shasums_name}.sig" || error_and_die "SHA256SUMS signature download failed"
+}
+
+# Verify signature if verification mechanism (keybase, gpg, etc) is present
 if [[ -n "${keybase_bin}" && -x "${keybase_bin}" ]]; then
   "${keybase_bin}" status | grep -Eq '^Logged in:[[:space:]]*yes'
   keybase_logged_in=$?
@@ -102,15 +107,43 @@ if [[ -n "${keybase_bin}" && -x "${keybase_bin}" ]]; then
   keybase_following_hc=$?
 
   if [[ "${keybase_logged_in}" -ne 0 || "${keybase_following_hc}" -ne 0 ]]; then
-    warn_and_continue "Unable to verify GPG signature unless logged into keybase and following hashicorp"
+    warn_and_continue "Unable to verify OpenPGP signature unless logged into keybase and following hashicorp"
   else
-    info "Downloading SHA hash signature file from ${version_url}/${shasums_name}.sig"
-    curlw -s -f -o "${download_tmp}/${shasums_name}.sig" "${version_url}/${shasums_name}.sig" || error_and_die "SHA256SUMS signature download failed"
+    download_signature
     "${keybase_bin}" pgp verify -S hashicorp -d "${download_tmp}/${shasums_name}.sig" -i "${download_tmp}/${shasums_name}" || error_and_die "SHA256SUMS signature does not match!"
+  fi
+
+elif [[ -f "${TFENV_ROOT}/use-gnupg" ]]; then
+  # GnuPG uses the user's keyring, and any web-of-trust or local signatures or
+  # anything else they have setup.  This is the crazy-powerful mode which is
+  # overly confusing to newcomers.  We don't support it without the user creating
+  # the file use-gnupg, optionally with directives in it.
+  gnupg_command="$(sed -E -n -e 's/^binary: *//p' <"${TFENV_ROOT}/use-gnupg")"
+  [[ -n "${gnupg_command}" ]] || gnupg_command=gpg
+
+  download_signature
+  # Deliberately unquoted command, in case caller has something fancier in "use-gnupg".
+  # Also, don't use batch mode.  If someone specifies GnuPG, let them deal with any prompting.
+  ${gnupg_command} --verify "${download_tmp}/${shasums_name}.sig" "${download_tmp}/${shasums_name}" || error_and_die "PGP signature rejected by GnuPG"
+
+elif [[ -f "${TFENV_ROOT}/use-gpgv" ]]; then
+  # gpgv is a much simpler interface to verification, but does require that the
+  # key have been downloaded and marked trusted.
+  # We don't force the caller to trust the tfenv repo's copy of their key, they
+  # have to choose to make that trust decision.
+  gpgv_command="$(sed -E -n -e 's/^binary: *//p' <"${TFENV_ROOT}/use-gpgv")"
+  trust_tfenv="$(sed -E -n -e 's/^trust.?tfenv: *//p' <"${TFENV_ROOT}/use-gpgv")"
+  [[ -n "${gpgv_command}" ]] || gpgv_command=gpgv
+
+  download_signature
+  if [[ "${trust_tfenv}" == "yes" ]]; then
+    ${gpgv_command} --keyring "${TFENV_ROOT}/share/hashicorp-keys.pgp" "${download_tmp}/${shasums_name}.sig" "${download_tmp}/${shasums_name}" || error_and_die "PGP signature rejected"
+  else
+    ${gpgv_command} "${download_tmp}/${shasums_name}.sig" "${download_tmp}/${shasums_name}" || error_and_die "PGP signature rejected"
   fi
 else
   # Warning about this avoids an unwarranted sense of confidence in the SHA check
-  warn_and_continue "No keybase install found, skipping GPG signature verification"
+  warn_and_continue "No keybase install found, skipping OpenPGP signature verification"
 fi
 
 if [[ -n "${shasum_bin}" && -x "${shasum_bin}" ]]; then
