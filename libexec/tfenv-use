@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 [ -n "${TFENV_DEBUG}" ] && set -x
-source ${TFENV_ROOT}/libexec/helpers
+source "${TFENV_ROOT}/libexec/helpers"
 
-[ ${#} -ne 1 ] && error_and_die "usage: tfenv use <version>"
+[ "${#}" -ne 1 ] && error_and_die "usage: tfenv use <version>"
 
 declare version_requested version regex
 
@@ -15,7 +15,7 @@ if [[ "${version_requested}" =~ ^min-required$ ]]; then
 
   if [[ $? -eq 0 ]]; then
       echo "Min required version is detected as ${found_min_required}"
-      version_requested=${found_min_required}
+      version_requested="${found_min_required}"
   else
     exit 1
   fi
@@ -43,10 +43,10 @@ version="$(\ls "${TFENV_ROOT}/versions" \
 
 [ -n "${version}" ] || error_and_die "No installed versions of terraform matched '${1}'"
 
-target_path=${TFENV_ROOT}/versions/${version}
-[ -f ${target_path}/terraform ] \
+target_path="${TFENV_ROOT}/versions/${version}"
+[ -f "${target_path}/terraform" ] \
   || error_and_die "Version directory for ${version} is present, but the terraform binary is not! Manual intervention required."
-[ -x ${target_path}/terraform ] \
+[ -x "${target_path}/terraform" ] \
   || error_and_die "Version directory for ${version} is present, but the terraform binary is not executable! Manual intervention required. "
 
 info "Switching to v${version}"

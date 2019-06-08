@@ -3,7 +3,7 @@
 set -e
 
 [ -n "${TFENV_DEBUG}" ] && set -x
-source ${TFENV_ROOT}/libexec/helpers
+source "${TFENV_ROOT}/libexec/helpers"
 
 [ -d "${TFENV_ROOT}/versions" ] \
   || error_and_die "No versions of terraform installed. Please install one with: tfenv install"
@@ -33,5 +33,5 @@ version_exists() {
 if version_exists "${TFENV_VERSION}"; then
   echo "${TFENV_VERSION}"
 else
-  error_and_die "version \`${TFENV_VERSION}' is not installed (set by ${TFENV_VERSION_FILE})"
+  error_and_die "version '${TFENV_VERSION}' is not installed (set by ${TFENV_VERSION_FILE})"
 fi
