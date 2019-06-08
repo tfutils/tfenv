@@ -1,26 +1,26 @@
 #!/usr/bin/env bash
 set -e
-if [ -n "$TFENV_DEBUG" ]; then
+if [ -n "${TFENV_DEBUG}" ]; then
   export PS4='+ [${BASH_SOURCE##*/}:${LINENO}] '
   set -x
 fi
 
 # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
 readlink_f() {
-  local target_file=$1
+  local target_file="${1}"
   local file_name
 
-  while [ "$target_file" != "" ]; do
-    cd $(dirname ${target_file})
-    file_name=$(basename ${target_file})
-    target_file=$(readlink ${file_name})
+  while [ "${target_file}" != "" ]; do
+    cd "$(dirname ${target_file})"
+    file_name="$(basename "${target_file}")"
+    target_file="$(readlink "${file_name}")"
   done
 
-  echo $(pwd -P)/${file_name}
+  echo "$(pwd -P)/${file_name}"
 }
 
 if [ -z "${TFENV_ROOT}" ]; then
-  TFENV_ROOT=$(cd $(dirname $(readlink_f $0))/.. && pwd)
+  TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)"
 else
   TFENV_ROOT="${TFENV_ROOT%/}"
 fi
@@ -30,15 +30,15 @@ export PATH
 export TFENV_DIR="${PWD}"
 
 abort() {
-  { if [ "$#" -eq 0 ]; then cat -
-    else echo "tfenv: $*"
+  { if [ "${#}" -eq 0 ]; then cat -
+    else echo "tfenv: ${*}"
     fi
   } >&2
   exit 1
 }
 
-command="$1"
-case "$command" in
+command="${1}"
+case "${command}" in
 "" )
   { tfenv---version
     tfenv-help
@@ -52,12 +52,12 @@ case "$command" in
   ;;
 * )
   command_path="$(command -v "tfenv-${command}" || true)"
-  if [ -z "$command_path" ];then
-    { echo "no such command '$command'"
+  if [ -z "${command_path}" ];then
+    { echo "no such command '${command}'"
       tfenv-help
     } | abort
   fi
   shift 1
-  exec "$command_path" "$@"
+  exec "${command_path}" "${@}"
   ;;
 esac

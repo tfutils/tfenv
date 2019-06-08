@@ -13,40 +13,40 @@ function error_and_die() {
 }
 
 [ -n "${TFENV_DEBUG}" ] && set -x
-source $(dirname $0)/helpers.sh \
-  || error_and_die "Failed to load test helpers: $(dirname $0)/helpers.sh"
+source "$(dirname "${0}")/helpers.sh" \
+  || error_and_die "Failed to load test helpers: $(dirname "${0}")/helpers.sh"
 
 echo "### Uninstall local versions"
 cleanup || error_and_die "Cleanup failed?!"
 
-v=0.9.1
+v="0.9.1"
 (
-  tfenv install ${v} || exit 1
-  tfenv uninstall ${v} || exit 1
-  check_version ${v} && exit 1 || exit 0
-) || error_and_proceed "Uninstall of version ${v} failed"
+  tfenv install "${v}" || exit 1
+  tfenv uninstall "${v}" || exit 1
+  check_version "${v}" && exit 1 || exit 0
+) || error_and_proceed "Uninstall of version "${v}" failed"
 
 echo "### Uninstall latest version"
 cleanup || error_and_die "Cleanup failed?!"
 
-v=$(tfenv list-remote | head -n 1)
+v="$(tfenv list-remote | head -n 1)"
 (
   tfenv install latest || exit 1
   tfenv uninstall latest || exit 1
-  check_version ${v} && exit 1 || exit 0
+  check_version "${v}" && exit 1 || exit 0
 ) || error_and_proceed "Uninstalling latest version ${v}"
 
 echo "### Uninstall latest version with Regex"
 cleanup || error_and_die "Cleanup failed?!"
 
-v=$(tfenv list-remote | grep 0.8 | head -n 1)
+v="$(tfenv list-remote | grep 0.8 | head -n 1)"
 (
   tfenv install latest:^0.8 || exit 1
   tfenv uninstall latest:^0.8 || exit 1
-  check_version ${v} && exit 1 || exit 0
-) || error_and_proceed "Uninstalling latest version ${v} with Regex"
+  check_version "${v}" && exit 1 || exit 0
+) || error_and_proceed "Uninstalling latest version "${v}" with Regex"
 
-if [ ${#errors[@]} -gt 0 ]; then
+if [ "${#errors[@]}" -gt 0 ]; then
   echo -e "\033[0;31m===== The following list tests failed =====\033[0;39m" >&2
   for error in "${errors[@]}"; do
     echo -e "\t${error}"

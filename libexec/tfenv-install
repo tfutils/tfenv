@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 [ -n "${TFENV_DEBUG}" ] && set -x
-source ${TFENV_ROOT}/libexec/helpers
+source "${TFENV_ROOT}/libexec/helpers"
 
 [ "${#}" -gt 1 ] && error_and_die "usage: tfenv install [<version>]"
 
@@ -10,7 +10,7 @@ declare version_requested version regex
 if [ -z "${1}" ]; then
   version_file="$(tfenv-version-file)"
   if [ "${version_file}" != "${TFENV_ROOT}/version" ]; then
-    version_requested="$(cat ${version_file} || true)"
+    version_requested="$(cat "${version_file}" || true)"
   fi
 else
   version_requested="${1}"
@@ -22,7 +22,7 @@ if [[ "${version_requested}" =~ ^min-required$ ]]; then
 
   if [[ $? -eq 0 ]]; then
       echo "Min required version is detected as ${found_min_required}"
-      version_requested=${found_min_required}
+      version_requested="${found_min_required}"
   else
     exit 1
   fi
@@ -49,7 +49,7 @@ if [ -f "${dst_path}/terraform" ]; then
   exit 0
 fi
 
-TFENV_ARCH=${TFENV_ARCH:-amd64}
+TFENV_ARCH="${TFENV_ARCH:-amd64}"
 case "$(uname -s)" in
   Darwin*)
     os="darwin_${TFENV_ARCH}"
@@ -96,21 +96,28 @@ curlw -s -f -o "${download_tmp}/${shasums_name}" "${version_url}/${shasums_name}
 
 download_signature() {
   info "Downloading SHA hash signature file from ${version_url}/${shasums_name}.sig"
-  curlw -s -f -o "${download_tmp}/${shasums_name}.sig" "${version_url}/${shasums_name}.sig" || error_and_die "SHA256SUMS signature download failed"
+  curlw -s -f \
+    -o "${download_tmp}/${shasums_name}.sig" \
+    "${version_url}/${shasums_name}.sig" \
+    || error_and_die "SHA256SUMS signature download failed"
 }
 
 # Verify signature if verification mechanism (keybase, gpg, etc) is present
 if [[ -n "${keybase_bin}" && -x "${keybase_bin}" ]]; then
   "${keybase_bin}" status | grep -Eq '^Logged in:[[:space:]]*yes'
-  keybase_logged_in=$?
+  keybase_logged_in="${?}"
   "${keybase_bin}" list-following | grep -Fq hashicorp
-  keybase_following_hc=$?
+  keybase_following_hc="${?}"
 
   if [[ "${keybase_logged_in}" -ne 0 || "${keybase_following_hc}" -ne 0 ]]; then
     warn_and_continue "Unable to verify OpenPGP signature unless logged into keybase and following hashicorp"
   else
     download_signature
-    "${keybase_bin}" pgp verify -S hashicorp -d "${download_tmp}/${shasums_name}.sig" -i "${download_tmp}/${shasums_name}" || error_and_die "SHA256SUMS signature does not match!"
+    "${keybase_bin}" pgp verify \
+      -S hashicorp \
+      -d "${download_tmp}/${shasums_name}.sig" \
+      -i "${download_tmp}/${shasums_name}" \
+      || error_and_die "SHA256SUMS signature does not match!"
   fi
 
 elif [[ -f "${TFENV_ROOT}/use-gnupg" ]]; then
@@ -124,7 +131,10 @@ elif [[ -f "${TFENV_ROOT}/use-gnupg" ]]; then
   download_signature
   # Deliberately unquoted command, in case caller has something fancier in "use-gnupg".
   # Also, don't use batch mode.  If someone specifies GnuPG, let them deal with any prompting.
-  ${gnupg_command} --verify "${download_tmp}/${shasums_name}.sig" "${download_tmp}/${shasums_name}" || error_and_die "PGP signature rejected by GnuPG"
+  ${gnupg_command} \
+    --verify "${download_tmp}/${shasums_name}.sig" \
+    "${download_tmp}/${shasums_name}" \
+    || error_and_die "PGP signature rejected by GnuPG"
 
 elif [[ -f "${TFENV_ROOT}/use-gpgv" ]]; then
   # gpgv is a much simpler interface to verification, but does require that the
@@ -137,9 +147,16 @@ elif [[ -f "${TFENV_ROOT}/use-gpgv" ]]; then
 
   download_signature
   if [[ "${trust_tfenv}" == "yes" ]]; then
-    ${gpgv_command} --keyring "${TFENV_ROOT}/share/hashicorp-keys.pgp" "${download_tmp}/${shasums_name}.sig" "${download_tmp}/${shasums_name}" || error_and_die "PGP signature rejected"
+    ${gpgv_command} \
+      --keyring "${TFENV_ROOT}/share/hashicorp-keys.pgp" \
+      "${download_tmp}/${shasums_name}.sig" \
+      "${download_tmp}/${shasums_name}" \
+      || error_and_die "PGP signature rejected"
   else
-    ${gpgv_command} "${download_tmp}/${shasums_name}.sig" "${download_tmp}/${shasums_name}" || error_and_die "PGP signature rejected"
+    ${gpgv_command} \
+      "${download_tmp}/${shasums_name}.sig" \
+      "${download_tmp}/${shasums_name}" \
+      || error_and_die "PGP signature rejected"
   fi
 else
   # Warning about this avoids an unwarranted sense of confidence in the SHA check
@@ -149,7 +166,10 @@ fi
 if [[ -n "${shasum_bin}" && -x "${shasum_bin}" ]]; then
   (
     cd "${download_tmp}"
-    "${shasum_bin}" -a 256 -s -c <(grep -F "${tarball_name}" "${shasums_name}") || error_and_die "SHA256 hash does not match!"
+    "${shasum_bin}" \
+      -a 256 \
+      -s \
+      -c <(grep -F "${tarball_name}" "${shasums_name}") || error_and_die "SHA256 hash does not match!"
   )
 else
   # Lack of shasum deserves a proper warning
@@ -160,4 +180,4 @@ mkdir -p "${dst_path}" || error_and_die "Failed to make directory ${dst_path}"
 unzip "${download_tmp}/${tarball_name}" -d "${dst_path}" || error_and_die "Tarball unzip failed"
 
 info "Installation of terraform v${version} successful"
-tfenv-use "$version"
+tfenv-use "${version}"
