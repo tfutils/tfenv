@@ -1,3 +1,10 @@
+## 1.0.0 (June 9, 2019)
+
+ * A number of bugfixes and basic script improvements
+ * latest keyword doesn't include unstable releases unless specified by regex
+ * Support GnuPG tools for signature verification #109
+ * Add support for Cygwin #81
+
 ## 0.6.0 (November 1, 2017)
 
  * Support msys2 bash.exe #75
