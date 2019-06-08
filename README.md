@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tfutils/tfenv.svg?branch=master)](https://travis-ci.org/tfutils/tfenv)
+[![Build Status](https://travis-ci.com/tfutils/tfenv.svg?branch=master)](https://travis-ci.com/tfutils/tfenv)
 
 # tfenv
 [Terraform](https://www.terraform.io/) version manager inspired by [rbenv](https://github.com/rbenv/rbenv)
