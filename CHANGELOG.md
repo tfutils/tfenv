@@ -1,4 +1,4 @@
-## 1.0.1 (unreleased)
+## 1.0.1 (June 22, 2019)
 
  * Fix '--version' flag to return version from CHANGELOG.md when not running from a git checkout.
 
