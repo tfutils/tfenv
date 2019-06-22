@@ -1,3 +1,7 @@
+## 1.0.1 (unreleased)
+
+ * Fix '--version' flag to return version from CHANGELOG.md when not running from a git checkout.
+
 ## 1.0.0 (June 9, 2019)
 
  * A number of bugfixes and basic script improvements
