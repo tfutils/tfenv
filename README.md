@@ -356,6 +356,22 @@ List installable versions
 
 If you put a `.terraform-version` file on your project root, or in your home directory, tfenv detects it and uses the version written in it. If the version is `latest` or `latest:<regex>`, the latest matching version currently installed will be selected.
 
+### tfenv local
+
+Sets a local directory Terraform version by writing the version
+name to a `.terraform-version` file in the current directory. This version
+overrides the global version.
+
+```console
+% tfenv local 0.12.2
+```
+
+You can also unset the local version.
+
+```console
+% tfenv local --unset
+```
+
 ```console
 $ cat .terraform-version
 0.6.16
@@ -366,12 +382,12 @@ Terraform v0.6.16
 Your version of Terraform is out of date! The latest version
 is 0.7.3. You can update by downloading from www.terraform.io
 
-$ echo 0.7.3 > .terraform-version
+$ tfenv local 0.7.3
 
 $ terraform --version
 Terraform v0.7.3
 
-$ echo latest:^0.8 > .terraform-version
+$ tfenv local latest:^0.8
 
 $ terraform --version
 Terraform v0.8.8
