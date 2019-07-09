@@ -68,8 +68,8 @@ case "$(uname -s)" in
     ;;
 esac
 
-keybase_bin="$(which keybase 2>/dev/null)"
-shasum_bin="$(which shasum 2>/dev/null)"
+keybase_bin="$(command -v keybase 2>/dev/null)"
+shasum_bin="$(command -v shasum 2>/dev/null)"
 
 version_url="https://releases.hashicorp.com/terraform/${version}"
 
