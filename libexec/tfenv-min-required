@@ -32,7 +32,7 @@ find_min_required() {
       found_min_required_version="$(echo "$version_constraint" | tr -c -d '0-9.')"
 
       if [[ "${version_constraint}" == \>\=* ]]; then
-        found_min_required_version="$(tfenv-list-remote | sed '1q;d')" >> "debug.txt"
+        found_min_required_version="$(tfenv-list-remote | sed '1q;d')"
       fi
 
       #echo "Min required version is detected as ${found_min_required_version}"
