@@ -23,15 +23,22 @@ find_min_required() {
   versions="$(grep -h -R required_version --include '*tf' "$root"/* | tr -c -d '0-9. ~=!<>' )"
 
   if [[ "${versions}" =~ ([~=!<>]{0,2}[[:blank:]]*[0-9]+[0-9.]+)[^0-9]* ]]; then
-    found_min_required="${BASH_REMATCH[1]}"
+    version_constraint="${BASH_REMATCH[1]}"
 
-    if [[ "${found_min_required}" =~ ^!=.+ ]]; then
-      echo "Error: Min required version is a negation ($found_min_required) - we cannot guess the desired one."
+    if [[ "${version_constraint}" =~ ^!=.+ ]]; then
+      echo "Error: Min required version is a negation ($version_constraint) - we cannot guess the desired one."
       bailout
     else
-      found_min_required="$(echo "$found_min_required" | tr -c -d '0-9.')"
-      #echo "Min required version is detected as ${found_min_required}"
-      echo "${found_min_required}"
+      found_min_required_version="$(echo "$version_constraint" | tr -c -d '0-9.')"
+
+      if [[ "${version_constraint}" == \>\=* ]]; then
+        remote_versions="$(tfenv-list-remote)"
+
+        found_min_required_version="$(tfenv-list-remote | sed '1q;d')" >> "debug.txt"
+      fi
+
+      #echo "Min required version is detected as ${found_min_required_version}"
+      echo "${found_min_required_version}"
       exit 0
     fi
   fi
