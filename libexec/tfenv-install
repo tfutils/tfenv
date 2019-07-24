@@ -71,7 +71,8 @@ esac
 keybase_bin="$(command -v keybase 2>/dev/null)"
 shasum_bin="$(command -v shasum 2>/dev/null)"
 
-version_url="https://releases.hashicorp.com/terraform/${version}"
+TFENV_REMOTE="${TFENV_REMOTE:-https://releases.hashicorp.com}"
+version_url="${TFENV_REMOTE}/terraform/${version}"
 
 # Thanks for the inconsistency in 0.12-alpha, Hashicorp(!)
 if [[ "${version}" =~ 0.12.0-alpha[3-9] ]]; then
