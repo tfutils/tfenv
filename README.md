@@ -119,6 +119,14 @@ Architecture other than the default amd64 can be specified with the `TFENV_ARCH`
 TFENV_ARCH=arm tfenv install 0.7.9
 ```
 
+### Customize remote
+
+Installing from a remote other than the default https://releases.hashicorp.com can be done by specifying the `TFENV_REMOTE` environment varible
+
+```console
+TFENV_REMOTE=https://example.jfrog.io/artifactory/hashicorp
+```
+
 ### tfenv use &lt;version>
 Switch a version to use
 
