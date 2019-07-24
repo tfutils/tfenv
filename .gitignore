@@ -4,3 +4,4 @@ version
 bin/terraform-*
 /use-gnupg
 /use-gpgv
+.*.swp
