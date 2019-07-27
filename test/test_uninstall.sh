@@ -46,6 +46,18 @@ v="$(tfenv list-remote | grep 0.8 | head -n 1)"
   check_version "${v}" && exit 1 || exit 0
 ) || error_and_proceed "Uninstalling latest version "${v}" with Regex"
 
+echo "### Uninstall removes versions directory"
+cleanup || error_and_die "Cleanup failed?!"
+(
+  tfenv install 0.12.1 || exit 1
+  tfenv install 0.12.2 || exit 1
+  [ -d "./versions" ] || exit 1
+  tfenv uninstall 0.12.1 || exit 1
+  [ -d "./versions" ] || exit 1
+  tfenv uninstall 0.12.2 || exit 1
+  [ -d "./versions" ] && exit 1 || exit 0
+) || error_and_proceed "Removing last version deletes versions directory"
+
 if [ "${#errors[@]}" -gt 0 ]; then
   echo -e "\033[0;31m===== The following list tests failed =====\033[0;39m" >&2
   for error in "${errors[@]}"; do
