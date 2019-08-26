@@ -63,6 +63,9 @@ case "$(uname -s)" in
   CYGWIN_NT*)
     os="windows_${TFENV_ARCH}"
     ;;
+  FreeBSD*)
+    os="freebsd_${TFENV_ARCH}"
+    ;;
   *)
     os="linux_${TFENV_ARCH}"
     ;;
