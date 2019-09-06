@@ -17,6 +17,10 @@ set -e
 [ -n "${TFENV_DEBUG}" ] && set -x
 
 export TFENV_VERSION="$(tfenv-version-name)"
+if [ -z ${TFENV_VERSION} ]; then
+  "${TFENV_ROOT}/bin/tfenv" install latest
+  export TFENV_VERSION="$(tfenv-version-name)"
+fi
 TF_BIN_PATH="${TFENV_ROOT}/versions/${TFENV_VERSION}/terraform"
 export PATH="${TF_BIN_PATH}:${PATH}"
 exec "${TF_BIN_PATH}" "${@}"
