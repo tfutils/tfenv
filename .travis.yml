@@ -2,6 +2,7 @@ language: generic
 matrix:
   include:
     - os: windows
+      language: shell
     - os: linux
       dist: trusty
     - os: osx
