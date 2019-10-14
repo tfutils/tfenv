@@ -34,6 +34,9 @@ if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
 elif [[ "${version_requested}" =~ ^latest$ ]]; then
   version="${version_requested}"
   regex="^[0-9]\+\.[0-9]\+\.[0-9]\+$"
+elif [[ "{version_requested}" =~ ^0.11.5$ ]]; then
+  version="0.11.15-oci"
+  regex="^0.11.15-oci$"
 else
   version="${version_requested}"
   regex="^${version_requested}$"
