@@ -91,7 +91,7 @@ see web-of-trust status; beware that a lack of trust path will not cause a
 validation failure.
 
 #### .terraform-version
-If you use [.terraform-version](#terraform-version), `tfenv install` (no argument) will install the version written in it.
+If you use a [.terraform-version file](#terraform-version-file), `tfenv install` (no argument) will install the version written in it.
 
 #### min-required
 
@@ -193,8 +193,8 @@ List installable versions
 ...
 ```
 
-## .terraform-version
-If you put `.terraform-version` file on your project root, or in your home directory, tfenv detects it and use the version written in it. If the version is `latest` or `latest:<regex>`, the latest matching version currently installed will be selected.
+## .terraform-version file
+If you put a `.terraform-version` file on your project root, or in your home directory, tfenv detects it and uses the version written in it. If the version is `latest` or `latest:<regex>`, the latest matching version currently installed will be selected.
 
 ```console
 $ cat .terraform-version
