@@ -1,6 +1,40 @@
 #!/usr/bin/env bash
-set -e
-[ -n "${TFENV_DEBUG}" ] && set -x
+set -uo pipefail;
 
-program="${0##*/}"
-exec "$(dirname "$(command -v "${0}")")/tfenv" exec "${@}"
+# Ensure we can execute standalone
+if [ -n "${TFENV_ROOT:-""}" ]; then
+  if [ -n "${TFENV_DEBUG:-""}" ]; then
+    [ -n "${TFENV_HELPERS:-""}" ] \
+      && log 'debug' "TFENV_ROOT already defined as ${TFENV_ROOT}" \
+      || echo "[DEBUG] TFENV_ROOT already defined as ${TFENV_ROOT}" >&2;
+  fi;
+else
+  export TFENV_ROOT="$(cd "$(dirname "${0}")/.." && pwd)";
+  if [ -n "${TFENV_DEBUG:-""}" ]; then
+    [ -n "${TFENV_HELPERS:-""}" ] \
+      && log 'debug' "TFENV_ROOT declared as ${TFENV_ROOT}" \
+      || echo "[DEBUG] TFENV_ROOT declared as ${TFENV_ROOT}" >&2;
+  fi;
+fi;
+
+if [ -n "${TFENV_HELPERS:-""}" ]; then
+  log 'debug' 'TFENV_HELPERS is set, not sourcing helpers again';
+else
+  [ -n "${TFENV_DEBUG:-""}" ] && echo "[DEBUG] Sourcing helpers from ${TFENV_ROOT}/lib/helpers.sh" >&2;
+  if source "${TFENV_ROOT}/lib/helpers.sh"; then
+    log 'debug' 'Helpers sourced successfully';
+  else
+    echo "[ERROR] Failed to source helpers from ${TFENV_ROOT}/lib/helpers.sh" >&2;
+    exit 1;
+  fi;
+fi;
+
+log 'debug' "program=\"${0##*/}\"";
+
+declare tfenv_path="$(dirname "$(command -v "${0}")")/tfenv";
+
+log 'debug' "Exec: \"${tfenv_path}\" exec \"${@}\"";
+exec "${tfenv_path}" exec "${@}" \
+  || log 'error' "Failed to exec: \"${tfenv_path}\" exec \"${@}\"";
+
+log 'error' 'This line should not be reachable. Something catastrophic has occurred';

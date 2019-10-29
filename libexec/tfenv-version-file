@@ -1,20 +1,58 @@
 #!/usr/bin/env bash
 # Usage: tfenv version-file
 # Summary: Detect the file that sets the current tfenv version
-set -e
-[ -n "${TFENV_DEBUG}" ] && set -x
+
+set -uo pipefail;
+
+# Ensure we can execute standalone
+if [ -n "${TFENV_ROOT:-""}" ]; then
+  if [ "${TFENV_DEBUG:-0}" -gt 1 ]; then
+    [ -n "${TFENV_HELPERS:-""}" ] \
+      && log 'debug' "TFENV_ROOT already defined as ${TFENV_ROOT}" \
+      || echo "[DEBUG] TFENV_ROOT already defined as ${TFENV_ROOT}" >&2;
+  fi;
+else
+  export TFENV_ROOT="$(cd "$(dirname "${0}")/.." && pwd)";
+  if [ "${TFENV_DEBUG:-0}" -gt 1 ]; then
+    [ -n "${TFENV_HELPERS:-""}" ] \
+      && log 'debug' "TFENV_ROOT declared as ${TFENV_ROOT}" \
+      || echo "[DEBUG] TFENV_ROOT declared as ${TFENV_ROOT}" >&2;
+  fi;
+fi;
+
+if [ -n "${TFENV_HELPERS:-""}" ]; then
+  log 'debug' 'TFENV_HELPERS is set, not sourcing helpers again';
+else
+  [ "${TFENV_DEBUG:-0}" -gt 1 ] && echo "[DEBUG] Sourcing helpers from ${TFENV_ROOT}/lib/helpers.sh" >&2;
+  if source "${TFENV_ROOT}/lib/helpers.sh"; then
+    log 'debug' 'Helpers sourced successfully';
+  else
+    echo "[ERROR] Failed to source helpers from ${TFENV_ROOT}/lib/helpers.sh" >&2;
+    exit 1;
+  fi;
+fi;
 
 find_local_version_file() {
-  local root="${1}"
+  log 'debug' "Looking for a version file in ${1}";
+  local root="${1}";
   while ! [[ "${root}" =~ ^//[^/]*$ ]]; do
     if [ -e "${root}/.terraform-version" ]; then
-      echo "${root}/.terraform-version"
-      return 0
-    fi
-    [ -n "${root}" ] || break
-    root="${root%/*}"
-  done
-  return 1
+      log 'debug' "Found at ${root}/.terraform-version";
+      echo "${root}/.terraform-version";
+      return 0;
+    else
+      log 'debug' "Not found at ${root}/.terraform-version";
+    fi;
+    [ -n "${root}" ] || break;
+    root="${root%/*}";
+  done;
+  log 'debug' "No version file found in ${1}";
+  return 1;
 }
 
-find_local_version_file "${TFENV_DIR}" || find_local_version_file "${HOME}" || echo "${TFENV_ROOT}/version"
+if ! find_local_version_file "${TFENV_DIR:-${PWD}}"; then
+  if ! find_local_version_file "${HOME}"; then
+    log 'debug' "No version file found in search paths. Defaulting to TFENV_ROOT: ${TFENV_ROOT}/version";
+    echo "${TFENV_ROOT}/version";
+  fi;
+fi;

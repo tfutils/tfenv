@@ -9,15 +9,48 @@
 # where `num_commits` is the number of commits since `version` was
 # tagged.
 
-set -e
-[ -n "${TFENV_DEBUG}" ] && set -x
+set -uo pipefail;
 
-version=$(awk '/^##/{ print $2; exit}' "${TFENV_ROOT}"/CHANGELOG.md)
-git_revision=""
+# Ensure we can execute standalone
+if [ -n "${TFENV_ROOT:-""}" ]; then
+  if [ "${TFENV_DEBUG:-0}" -gt 1 ]; then
+    [ -n "${TFENV_HELPERS:-""}" ] \
+      && log 'debug' "TFENV_ROOT already defined as ${TFENV_ROOT}" \
+      || echo "[DEBUG] TFENV_ROOT already defined as ${TFENV_ROOT}" >&2;
+  fi;
+else
+  export TFENV_ROOT="$(cd "$(dirname "${0}")/.." && pwd)";
+  if [ "${TFENV_DEBUG:-0}" -gt 1 ]; then
+    [ -n "${TFENV_HELPERS:-""}" ] \
+      && log 'debug' "TFENV_ROOT declared as ${TFENV_ROOT}" \
+      || echo "[DEBUG] TFENV_ROOT declared as ${TFENV_ROOT}" >&2;
+  fi;
+fi;
+
+if [ -n "${TFENV_HELPERS:-""}" ]; then
+  log 'debug' 'TFENV_HELPERS is set, not sourcing helpers again';
+else
+  [ "${TFENV_DEBUG:-0}" -gt 1 ] && echo "[DEBUG] Sourcing helpers from ${TFENV_ROOT}/lib/helpers.sh" >&2;
+  if source "${TFENV_ROOT}/lib/helpers.sh"; then
+    log 'debug' 'Helpers sourced successfully';
+  else
+    echo "[ERROR] Failed to source helpers from ${TFENV_ROOT}/lib/helpers.sh" >&2;
+    exit 1;
+  fi;
+fi;
+
+log 'debug' 'Scraping tfenv version from CHANGELOG.md';
+version="$(awk '/^##/{ print $2; exit}' "${TFENV_ROOT}/CHANGELOG.md")" \
+  || log 'error' 'Failed to scrape version from CHANGELOG.md';
+git_revision="";
 
 if cd "${BASH_SOURCE%/*}" 2>/dev/null && git remote -v 2>/dev/null | grep -q tfenv; then
-  git_revision="$(git describe --tags HEAD 2>/dev/null || true)"
-  git_revision="${git_revision#v}"
-fi
+  log 'debug' 'Getting git revision...';
+  git_revision="$(git describe --tags HEAD 2>/dev/null || true)";
+  log 'debug' "Stripping git revision string ${git_revision}";
+  git_revision="${git_revision#v}";
+fi;
 
-echo "tfenv ${git_revision:-$version}"
+echo "tfenv ${git_revision:-$version}";
+
+exit 0;

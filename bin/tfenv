@@ -1,63 +1,90 @@
 #!/usr/bin/env bash
-set -e
-if [ -n "${TFENV_DEBUG}" ]; then
-  export PS4='+ [${BASH_SOURCE##*/}:${LINENO}] '
-  set -x
-fi
+set -euo pipefail;
 
-# http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
-readlink_f() {
-  local target_file="${1}"
-  local file_name
+declare arg="${1:-""}";
 
-  while [ "${target_file}" != "" ]; do
-    cd "$(dirname ${target_file})"
-    file_name="$(basename "${target_file}")"
-    target_file="$(readlink "${file_name}")"
-  done
+if [ -z "${TFENV_ROOT:-""}" ]; then
+  # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
+  readlink_f() {
+    local target_file="${1}";
+    local file_name;
 
-  echo "$(pwd -P)/${file_name}"
-}
+    while [ "${target_file}" != "" ]; do
+      cd "$(dirname ${target_file})";
+      file_name="$(basename "${target_file}")";
+      target_file="$(readlink "${file_name}")";
+    done;
 
-if [ -z "${TFENV_ROOT}" ]; then
-  TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)"
+    echo "$(pwd -P)/${file_name}";
+  }
+
+  TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)";
 else
   TFENV_ROOT="${TFENV_ROOT%/}"
 fi
-export TFENV_ROOT
-PATH="${TFENV_ROOT}/libexec:${PATH}"
-export PATH
+export TFENV_ROOT;
+
+if [ -n "${TFENV_HELPERS:-""}" ]; then
+  log 'debug' 'TFENV_HELPERS is set, not sourcing helpers again';
+else
+  [ -n "${TFENV_DEBUG:-""}" ] && echo "[DEBUG] Sourcing helpers from ${TFENV_ROOT}/lib/helpers.sh" >&2;
+  if source "${TFENV_ROOT}/lib/helpers.sh"; then
+    log 'debug' 'Helpers sourced successfully';
+  else
+    echo "[ERROR] Failed to source helpers from ${TFENV_ROOT}/lib/helpers.sh" >&2;
+    exit 1;
+  fi;
+fi;
+
+log 'debug' "Prepending ${TFENV_ROOT}/libexec to PATH";
+PATH="${TFENV_ROOT}/libexec:${PATH}";
+export PATH;
+
+log 'debug' "Setting TFENV_DIR to ${PWD}";
 export TFENV_DIR="${PWD}"
 
 abort() {
-  { if [ "${#}" -eq 0 ]; then cat -
-    else echo "tfenv: ${*}"
-    fi
-  } >&2
-  exit 1
+  log 'debug' 'Aborting...';
+  {
+    if [ "${#}" -eq 0 ]; then
+      cat -;
+    else
+      echo "tfenv: ${*}";
+    fi;
+  } >&2;
+  exit 1;
 }
 
-command="${1}"
-case "${command}" in
-"" )
-  { tfenv---version
-    tfenv-help
-  } | abort
-  ;;
--v | --version )
-  exec tfenv---version
-  ;;
--h | --help )
-  exec tfenv-help
-  ;;
-* )
-  command_path="$(command -v "tfenv-${command}" || true)"
-  if [ -z "${command_path}" ];then
-    { echo "no such command '${command}'"
-      tfenv-help
-    } | abort
-  fi
-  shift 1
-  exec "${command_path}" "${@}"
-  ;;
-esac
+case "${arg}" in
+  "")
+    log 'debug' 'No argument provided, dumping version and help and aborting';
+    {
+      tfenv---version;
+      tfenv-help;
+    } | abort;
+    ;;
+  -v | --version )
+    log 'debug' 'tfenv version requested...';
+    exec tfenv---version;
+    ;;
+  -h | --help )
+    log 'debug' 'tfenv help requested...';
+    exec tfenv-help;
+    ;;
+  *)
+    log 'debug' "Long argument provided: ${arg}";
+    command_path="$(command -v "tfenv-${arg}" || true)";
+    log 'debug' "Resulting command-path: ${command_path}";
+    if [ -z "${command_path}" ]; then
+      {
+        echo "No such command '${arg}'";
+        tfenv-help;
+      } | abort;
+    fi;
+    shift 1;
+    log 'debug' "Exec: \"${command_path}\" \"${@}\"";
+    exec "${command_path}" "${@}";
+    ;;
+esac;
+
+log 'error' 'This line should not be reachable. Something catastrophic has occurred';

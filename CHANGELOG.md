@@ -1,3 +1,9 @@
+## 2.0.0-alpha1 (November 24, 2019)
+
+ * New logging library
+ * New bash4 dependency
+ * Massive testing, logging and loading refactoring
+
 ## 1.0.2 (October 29, 2019)
 
  * Fix failing 0.11.15-oci version, Add additional tests for 0.11.15-oci and alphas, betas and rcs #145
