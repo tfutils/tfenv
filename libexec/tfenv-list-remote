@@ -10,5 +10,5 @@ fi
 
 TFENV_REMOTE="${TFENV_REMOTE:-https://releases.hashicorp.com}"
 curlw -sf "${TFENV_REMOTE}/terraform/" \
-  | grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha)[0-9]+)?" \
+  | grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)[0-9]*)?" \
   | uniq

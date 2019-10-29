@@ -34,6 +34,51 @@ v="$(tfenv list-remote | head -n 1)"
   check_version "${v}" || exit 1
 ) || error_and_proceed "Installing latest possibly-unstable version ${v}"
 
+echo "### Install latest alpha"
+cleanup || error_and_die "Cleanup failed?!"
+
+v="$(tfenv list-remote | grep 'alpha' | head -n 1)"
+(
+  tfenv install latest:alpha || exit 1
+  check_version "${v}" || exit 1
+) || error_and_proceed "Installing latest alpha ${v}"
+
+echo "### Install latest beta"
+cleanup || error_and_die "Cleanup failed?!"
+
+v="$(tfenv list-remote | grep 'beta' | head -n 1)"
+(
+  tfenv install latest:beta || exit 1
+  check_version "${v}" || exit 1
+) || error_and_proceed "Installing latest beta ${v}"
+
+echo "### Install latest rc"
+cleanup || error_and_die "Cleanup failed?!"
+
+v="$(tfenv list-remote | grep 'rc' | head -n 1)"
+(
+  tfenv install latest:rc || exit 1
+  check_version "${v}" || exit 1
+) || error_and_proceed "Installing latest rc ${v}"
+
+echo "### Install latest possibly-unstable version from 0.11"
+cleanup || error_and_die "Cleanup failed?!"
+
+v="$(tfenv list-remote | grep '^0\.11\.' | head -n 1)"
+(
+  tfenv install latest:^0.11. || exit 1
+  check_version "${v}" || exit 1
+) || error_and_proceed "Installing latest possibly-unstable version from 0.11: ${v}"
+
+echo "### Install 0.11.15-oci"
+cleanup || error_and_die "Cleanup failed?!"
+
+v="0.11.15-oci"
+(
+  tfenv install 0.11.15-oci || exit 1
+  check_version "${v}" || exit 1
+) || error_and_proceed "Installing version ${v}"
+
 echo "### Install latest version with Regex"
 cleanup || error_and_die "Cleanup failed?!"
 
