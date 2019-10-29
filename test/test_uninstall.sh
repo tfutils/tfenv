@@ -19,6 +19,13 @@ source "$(dirname "${0}")/helpers.sh" \
 echo "### Uninstall local versions"
 cleanup || error_and_die "Cleanup failed?!"
 
+v="0.11.15-oci"
+(
+  tfenv install "${v}" || exit 1
+  tfenv uninstall "${v}" || exit 1
+  check_version "${v}" && exit 1 || exit 0
+) || error_and_proceed "Uninstall of version "${v}" failed"
+
 v="0.9.1"
 (
   tfenv install "${v}" || exit 1
