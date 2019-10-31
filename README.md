@@ -45,17 +45,17 @@ include ::tfenv
   ```console
   $ ln -s ~/.tfenv/bin/* /usr/local/bin
   ```
-  
+
   On Ubuntu/Debian touching `/usr/local/bin` might require sudo access, but you can create `${HOME}/bin` or `${HOME}/.local/bin` and on next login it will get added to the session `$PATH`
   or by running `. ${HOME}/.profile` it will get added to the current shell session's `$PATH`.
-  
+
   ```console
   $ mkdir -p ~/.local/bin/
   $ . ~/.profile
   $ ln -s ~/.tfenv/bin/* ~/.local/bin
   $ which tfenv
   ```
-  
+
 
 ## Usage
 ### tfenv install [version]
