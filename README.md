@@ -127,6 +127,14 @@ Installing from a remote other than the default https://releases.hashicorp.com c
 TFENV_REMOTE=https://example.jfrog.io/artifactory/hashicorp
 ```
 
+### Color output
+
+Output is colored by default. Specify the `TFENV_NO_COLOR` environment variable to disable coloring.
+
+```console
+TFENV_NO_COLOR=true tfenv install 0.7.9
+```
+
 ### tfenv use &lt;version>
 Switch a version to use
 

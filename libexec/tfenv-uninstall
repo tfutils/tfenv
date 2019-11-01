@@ -35,5 +35,5 @@ dst_path="${TFENV_ROOT}/versions/${version}"
 if [ -f "${dst_path}/terraform" ]; then 
   info "Uninstall Terraform v${version}"
   rm -r "${dst_path}"
-  info "\033[0;32mTerraform v${version} is successfully uninstalled\033[0;39m"
+  info "Terraform v${version} is successfully uninstalled"
 fi

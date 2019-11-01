@@ -1,16 +1,30 @@
 #!/usr/bin/env bash
 
+function color_echo() {
+  local color_code="${1}"
+  if [ -z "${TFENV_NO_COLOR}" ]
+  then
+    echo -en "\033[${color_code}m"
+    echo -n "${2}"
+    echo -e "\033[0;39m"
+  else
+    echo "${2}"
+  fi
+}
+
 function error_and_die() {
-  echo -e "tfenv: $(basename ${0}): \033[0;31m[ERROR] ${1}\033[0;39m" >&2
+  echo -n "tfenv: $(basename ${0}): " >&2
+  color_echo "0;31" "[ERROR] ${1}" >&2
   exit 1
 }
 
 function warn_and_continue() {
-  echo -e "tfenv: $(basename ${0}): \033[0;33m[WARN] ${1}\033[0;39m" >&2
+  echo -n "tfenv: $(basename ${0}): " >&2
+  color_echo "0;33" "[WARN] ${1}" >&2
 }
 
 function info() {
-  echo -e "\033[0;32m[INFO] ${1}\033[0;39m"
+  color_echo "0;32" "[INFO] ${1}"
 }
 
 # Curl wrapper to switch TLS option for each OS
