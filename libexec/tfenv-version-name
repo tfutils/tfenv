@@ -13,7 +13,8 @@ TFENV_VERSION="$(cat "${TFENV_VERSION_FILE}" || true)"
 
 if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
   [[ "${TFENV_VERSION}" =~ ^latest\:.*$ ]] && regex="${TFENV_VERSION##*\:}"
-  version="$(\ls "${TFENV_ROOT}/versions" \
+  version="$(find "${TFENV_ROOT}/versions" -type d -exec basename {} \; \
+    | tail -n +2 \
     | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
     | grep -e "${regex}" \
     | head -n 1

@@ -35,7 +35,8 @@ fi
 [ -d "${TFENV_ROOT}/versions" ] \
   || error_and_die "No versions of terraform installed. Please install one with: tfenv install"
 
-version="$(\ls "${TFENV_ROOT}/versions" \
+version="$(find "${TFENV_ROOT}/versions" -type d -exec basename {} \; \
+  | tail -n +2 \
   | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
   | grep -e "${regex}" \
   | head -n 1
