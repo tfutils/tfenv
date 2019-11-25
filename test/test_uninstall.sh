@@ -2,33 +2,51 @@
 
 set -uo pipefail;
 
-# Ensure we can execute standalone
-if [ -n "${TFENV_ROOT:-""}" ]; then
-  if [ "${TFENV_DEBUG:-0}" -gt 1 ]; then
-    [ -n "${TFENV_HELPERS:-""}" ] \
-      && log 'debug' "TFENV_ROOT already defined as ${TFENV_ROOT}" \
-      || echo "[DEBUG] TFENV_ROOT already defined as ${TFENV_ROOT}" >&2;
-  fi;
+####################################
+# Ensure we can execute standalone #
+####################################
+
+function early_death() {
+  echo "[FATAL] ${0}: ${1}" >&2;
+  exit 1;
+};
+
+if [ -z "${TFENV_ROOT:-""}" ]; then
+  # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
+  readlink_f() {
+    local target_file="${1}";
+    local file_name;
+
+    while [ "${target_file}" != "" ]; do
+      cd "$(dirname ${target_file})" || early_death "Failed to 'cd \$(dirname ${target_file})' while trying to determine TFENV_ROOT";
+      file_name="$(basename "${target_file}")" || early_death "Failed to 'basename \"${target_file}\"' while trying to determine TFENV_ROOT";
+      target_file="$(readlink "${file_name}")";
+    done;
+
+    echo "$(pwd -P)/${file_name}";
+  };
+
+  TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)";
+  [ -n ${TFENV_ROOT} ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TFENV_ROOT";
 else
-  export TFENV_ROOT="$(cd "$(dirname "${0}")/.." && pwd)";
-  if [ "${TFENV_DEBUG:-0}" -gt 1 ]; then
-    [ -n "${TFENV_HELPERS:-""}" ] \
-      && log 'debug' "TFENV_ROOT declared as ${TFENV_ROOT}" \
-      || echo "[DEBUG] TFENV_ROOT declared as ${TFENV_ROOT}" >&2;
-  fi;
+  TFENV_ROOT="${TFENV_ROOT%/}";
 fi;
+export TFENV_ROOT;
 
 if [ -n "${TFENV_HELPERS:-""}" ]; then
   log 'debug' 'TFENV_HELPERS is set, not sourcing helpers again';
 else
-  [ "${TFENV_DEBUG:-0}" -gt 1 ] && echo "[DEBUG] Sourcing helpers from ${TFENV_ROOT}/lib/helpers.sh" >&2;
+  [ "${TFENV_DEBUG:-0}" -gt 0 ] && echo "[DEBUG] Sourcing helpers from ${TFENV_ROOT}/lib/helpers.sh";
   if source "${TFENV_ROOT}/lib/helpers.sh"; then
     log 'debug' 'Helpers sourced successfully';
   else
-    echo "[ERROR] Failed to source helpers from ${TFENV_ROOT}/lib/helpers.sh" >&2;
-    exit 1;
+    early_death "Failed to source helpers from ${TFENV_ROOT}/lib/helpers.sh";
   fi;
 fi;
+
+#####################
+# Begin Script Body #
+#####################
 
 declare -a errors=();
 
@@ -50,7 +68,7 @@ tests['0.11.15-oci']='0.11.15-oci';
 tests['latest']="$(tfenv list-remote | head -n1)";
 tests['latest:^0.8']="$(tfenv list-remote | grep -e "^0.8" | head -n1)";
 
-declare test_num=1;
+declare -i test_num=1;
 for k in "${!tests[@]}"; do
   log 'info' "Test ${test_num}/${#tests[@]}: Testing uninstall of version ${tests[${k}]} via keyword ${k}";
   test_uninstall "${k}" "${tests[${k}]}" \

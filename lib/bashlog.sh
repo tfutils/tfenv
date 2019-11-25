@@ -147,7 +147,7 @@ function log() {
     'error')
       echo -e "${std_line}" >&2;
       if [ "${debug_level}" -gt 1 ]; then
-        echo -e "Here's a shell to debug with. 'exit 0' to continue. Other exit codes will abort - parent shell will terminate.";
+        echo -e "Here's a shell for debugging the current environment. 'exit 0' to resume script from here. Non-zero exit code will abort - parent shell will terminate." >&2;
         bash || exit "${?}";
       else
         exit 1;
