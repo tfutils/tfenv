@@ -41,13 +41,14 @@ fi;
 
 log 'debug' 'Scraping tfenv version from CHANGELOG.md';
 version="$(awk '/^##/{ print $2; exit}' "${TFENV_ROOT}/CHANGELOG.md")" \
+  && log 'debug' "Found version '${version}' in CHANGELOG.md" \
   || log 'error' 'Failed to scrape version from CHANGELOG.md';
-git_revision="";
 
-if cd "${BASH_SOURCE%/*}" 2>/dev/null && git remote -v 2>/dev/null | grep -q tfenv; then
-  log 'debug' 'Getting git revision...';
+git_revision="";
+if cd "$(dirname ${0})" 2>/dev/null && git remote -v 2>/dev/null | grep -q tfenv; then
+  log 'debug' 'Git configuration found. Overriding CHANGELOG version from git revision...';
   git_revision="$(git describe --tags HEAD 2>/dev/null || true)";
-  log 'debug' "Stripping git revision string ${git_revision}";
+  log 'debug' "Stripping git revision string from ${git_revision}";
   git_revision="${git_revision#v}";
 fi;
 
