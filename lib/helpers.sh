@@ -2,6 +2,28 @@
 
 set -uo pipefail;
 
+if [ -z "${TFENV_ROOT:-""}" ]; then
+  # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
+  readlink_f() {
+    local target_file="${1}";
+    local file_name;
+
+    while [ "${target_file}" != "" ]; do
+      cd "$(dirname ${target_file})" || early_death "Failed to 'cd \$(dirname ${target_file})' while trying to determine TFENV_ROOT";
+      file_name="$(basename "${target_file}")" || early_death "Failed to 'basename \"${target_file}\"' while trying to determine TFENV_ROOT";
+      target_file="$(readlink "${file_name}")";
+    done;
+
+    echo "$(pwd -P)/${file_name}";
+  };
+
+  TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)";
+  [ -n ${TFENV_ROOT} ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TFENV_ROOT";
+else
+  TFENV_ROOT="${TFENV_ROOT%/}";
+fi;
+export TFENV_ROOT;
+
 if [ "${TFENV_DEBUG:-0}" -gt 0 ]; then
   [ "${DEBUG:-0}" -gt "${TFENV_DEBUG:-0}" ] || export DEBUG="${TFENV_DEBUG:-0}";
   if [[ "${TFENV_DEBUG}" -gt 2 ]]; then
@@ -10,7 +32,6 @@ if [ "${TFENV_DEBUG:-0}" -gt 0 ]; then
   fi;
 fi;
 
-[ -n "${TFENV_ROOT:-""}" ] || export TFENV_ROOT="$(cd "$(dirname "${0}")/.." && pwd)"
 source "${TFENV_ROOT}/lib/bashlog.sh";
 
 # Curl wrapper to switch TLS option for each OS
@@ -28,7 +49,7 @@ export -f curlw;
 
 check_version() {
   v="${1}";
-  [ -n "$(terraform --version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
+  [ -n "$(${TFENV_ROOT}/bin/terraform --version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
 }
 export -f check_version;
 
