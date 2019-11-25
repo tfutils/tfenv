@@ -9,8 +9,6 @@ matrix:
       dist: xenial
     - os: linux
       dist: trusty
-    - os: linux
-      dist: precise
     - os: osx
       osx_image: xcode11.2
     - os: osx
