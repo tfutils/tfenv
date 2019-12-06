@@ -67,8 +67,13 @@ TFENV_VERSION_FILE="$(tfenv-version-file)" \
   && log 'debug' "TFENV_VERSION_FILE retrieved from tfenv-version-file: ${TFENV_VERSION_FILE}" \
   || log 'error' 'Failed to retrieve TFENV_VERSION_FILE from tfenv-version-file';
 
-TFENV_VERSION="$(cat "${TFENV_VERSION_FILE}" || true)" \
-  && log 'debug' "TFENV_VERSION specified in TFENV_VERSION_FILE: ${TFENV_VERSION}";
+if test -z "${TFENV_VERSION:-}"; then
+  TFENV_VERSION="$(cat "${TFENV_VERSION_FILE}" || true)" \
+    && log 'debug' "TFENV_VERSION specified in TFENV_VERSION_FILE: ${TFENV_VERSION}";
+else
+  log 'debug' "TFENV_VERSION specified from existing env var: ${TFENV_VERSION}";
+fi
+
 
 if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
   log 'debug' 'TFENV_VERSION uses "latest" keyword';
