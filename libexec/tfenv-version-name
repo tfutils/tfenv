@@ -71,11 +71,14 @@ TFENV_VERSION="$(cat "${TFENV_VERSION_FILE}" || true)" \
   && log 'debug' "TFENV_VERSION specified in TFENV_VERSION_FILE: ${TFENV_VERSION}";
 
 if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
-  log 'debug' 'TFENV_VERSION uses "latest" keyword';
+  log 'debug' "TFENV_VERSION uses 'latest' keyword: ${TFENV_VERSION}";
 
   if [[ "${TFENV_VERSION}" =~ ^latest\:.*$ ]]; then
     regex="${TFENV_VERSION##*\:}";
-    log 'debug' "\"latest\" keyword uses regex: ${regex}";
+    log 'debug' "'latest' keyword uses regex: ${regex}";
+  else
+    regex='.*'; # Just saves a seperate command below without the grep
+    log 'debug' "'latest' keyword does not use regex";
   fi;
 
   version="$(\ls "${TFENV_ROOT}/versions" \

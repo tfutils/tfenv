@@ -56,7 +56,7 @@ function test_uninstall() {
   tfenv install "${v}" || return 1;
   tfenv uninstall "${v}" || return 1;
   log 'info' 'Confirming uninstall success; an error indicates success:';
-  check_version "${v}" && return 1 || return 0;
+  check_active_version "${v}" && return 1 || return 0;
 }
 
 log 'info' '### Test Suite: Uninstall Local Versions'

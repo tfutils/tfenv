@@ -53,9 +53,20 @@ test_install_and_use() {
   local k="${2-""}";
   local v="${1}";
   tfenv install "${k}" || return 1;
-  check_version "${v}" || return 1;
+  check_installed_version "${v}" || return 1;
+  check_active_version "${v}" || return 1;
   return 0;
 };
+
+test_install_and_use_overridden() {
+  # Takes a static version and the optional keyword to install it with
+  local k="${2-""}";
+  local v="${1}";
+  tfenv install "${k}" || return 1;
+  check_installed_version "${v}" || return 1;
+  check_default_version "${v}" || return 1;
+  return 0;
+}
 
 declare -a errors=();
 
@@ -120,14 +131,14 @@ test_install_and_use "${v1}" \
   || error_and_proceed "## \${HOME}/.terraform-version Test 1/1: ( ${v1} ) failed";
 
 log 'info' "## \${HOME}/.terraform-version Test 2/3: Override Install with Parameter ( ${v2} )";
-test_install_and_use "${v2}" "${v2}" \
+test_install_and_use_overridden "${v2}" "${v2}" \
   && log info "## \${HOME}/.terraform-version Test 2/3: ( ${v2} ) succeeded" \
   || error_and_proceed "## \${HOME}/.terraform-version Test 2/3: ( ${v2} ) failed";
 
 log 'info' "## \${HOME}/.terraform-version Test 3/3: Override Use with Parameter ( ${v2} )";
 (
   tfenv use "${v2}" || exit 1;
-  check_version "${v2}" || exit 1;
+  check_default_version "${v2}" || exit 1;
 ) && log info "## \${HOME}/.terraform-version Test 3/3: ( ${v2} ) succeeded" \
   || error_and_proceed "## \${HOME}/.terraform-version Test 3/3: ( ${v2} ) failed";
 

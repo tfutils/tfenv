@@ -47,11 +47,25 @@ function curlw () {
 }
 export -f curlw;
 
-check_version() {
-  v="${1}";
+check_active_version() {
+  local v="${1}";
   [ -n "$(${TFENV_ROOT}/bin/terraform --version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
 }
-export -f check_version;
+export -f check_active_version;
+
+check_installed_version() {
+  local v="${1}";
+  local bin="${TFENV_ROOT}/versions/${v}/terraform";
+  [ -n "$(${bin} --version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
+};
+export -f check_installed_version;
+
+check_default_version() {
+  local v="${1}";
+  local def="$(cat "${TFENV_ROOT}/version")";
+  [ "${def}" == "${v}" ];
+};
+export -f check_default_version;
 
 cleanup() {
   log 'info' 'Performing cleanup';
