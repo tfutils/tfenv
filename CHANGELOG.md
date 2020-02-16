@@ -1,8 +1,9 @@
-## 2.0.0-alpha1 (November 24, 2019)
+## 2.0.0 (Unreleased)
 
  * New logging library
  * New bash4 dependency
  * Massive testing, logging and loading refactoring
+ * Fix to 'use' logic: don't overwrite .terraform-version files
 
 ## 1.0.2 (October 29, 2019)
 
