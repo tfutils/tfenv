@@ -1,5 +1,7 @@
-before_install:
-  - 'if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install bash; fi' # Bash4 Required
+addons:
+  homebrew:
+    update: true
+    brewfile: true
 language: generic
 matrix:
   include:
