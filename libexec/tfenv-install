@@ -274,7 +274,7 @@ fi;
 
 mkdir -p "${dst_path}" || log 'error' "Failed to make directory ${dst_path}";
 
-declare unzip_output="$(unzip "${download_tmp}/${tarball_name}" -d "${dst_path}" || log 'error' 'Tarball unzip failed')";
+declare unzip_output="$(unzip -o "${download_tmp}/${tarball_name}" -d "${dst_path}" || log 'error' 'Tarball unzip failed')";
 while IFS= read -r unzip_line; do
  log 'info' "${unzip_line}";
 done < <(printf '%s\n' "${unzip_output}");
