@@ -1,3 +1,15 @@
+## 2.0.0 (Unreleased)
+
+ * New logging library
+ * New bash4 dependency
+ * Massive testing, logging and loading refactoring
+ * Fix to 'use' logic: don't overwrite .terraform-version files
+
+## 1.0.2 (October 29, 2019)
+
+ * Fix failing 0.11.15-oci version, Add additional tests for 0.11.15-oci and alphas, betas and rcs #145
+ * Fix to README section link for .terraform-version file #146
+
 ## 1.0.1 (June 22, 2019)
 
  * Fix '--version' flag to return version from CHANGELOG.md when not running from a git checkout.

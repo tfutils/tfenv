@@ -1,78 +1,151 @@
 #!/usr/bin/env bash
 
-[ -n "${TFENV_DEBUG}" ] && set -x
-source "${TFENV_ROOT}/libexec/helpers"
+set -uo pipefail;
 
-[ "${#}" -gt 1 ] && error_and_die "usage: tfenv install [<version>]"
+####################################
+# Ensure we can execute standalone #
+####################################
 
-declare version_requested version regex
+function early_death() {
+  echo "[FATAL] ${0}: ${1}" >&2;
+  exit 1;
+};
 
-if [ -z "${1}" ]; then
-  version_file="$(tfenv-version-file)"
-  if [ "${version_file}" != "${TFENV_ROOT}/version" ]; then
-    version_requested="$(cat "${version_file}" || true)"
-  fi
+if [ -z "${TFENV_ROOT:-""}" ]; then
+  # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
+  readlink_f() {
+    local target_file="${1}";
+    local file_name;
+
+    while [ "${target_file}" != "" ]; do
+      cd "$(dirname ${target_file})" || early_death "Failed to 'cd \$(dirname ${target_file})' while trying to determine TFENV_ROOT";
+      file_name="$(basename "${target_file}")" || early_death "Failed to 'basename \"${target_file}\"' while trying to determine TFENV_ROOT";
+      target_file="$(readlink "${file_name}")";
+    done;
+
+    echo "$(pwd -P)/${file_name}";
+  };
+
+  TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)";
+  [ -n ${TFENV_ROOT} ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TFENV_ROOT";
 else
-  version_requested="${1}"
-fi
+  TFENV_ROOT="${TFENV_ROOT%/}";
+fi;
+export TFENV_ROOT;
+
+if [ -n "${TFENV_HELPERS:-""}" ]; then
+  log 'debug' 'TFENV_HELPERS is set, not sourcing helpers again';
+else
+  [ "${TFENV_DEBUG:-0}" -gt 0 ] && echo "[DEBUG] Sourcing helpers from ${TFENV_ROOT}/lib/helpers.sh";
+  if source "${TFENV_ROOT}/lib/helpers.sh"; then
+    log 'debug' 'Helpers sourced successfully';
+  else
+    early_death "Failed to source helpers from ${TFENV_ROOT}/lib/helpers.sh";
+  fi;
+fi;
+
+# Ensure libexec and bin are in $PATH
+for dir in libexec bin; do
+  case ":${PATH}:" in
+    *:${TFENV_ROOT}/${dir}:*) log 'debug' "\$PATH already contains '${TFENV_ROOT}/${dir}', not adding it again";;
+    *) 
+      log 'debug' "\$PATH does not contain '${TFENV_ROOT}/${dir}', prepending and exporting it now";
+      export PATH="${TFENV_ROOT}/${dir}:${PATH}";
+      ;;
+  esac;
+done;
+
+#####################
+# Begin Script Body #
+#####################
+
+[ "${#}" -gt 1 ] && log 'error' 'usage: tfenv install [<version>]';
+
+declare version_requested version regex;
+declare arg="${1:-""}";
+
+if [ -z "${arg}" ]; then
+  version_file="$(tfenv-version-file)";
+  log 'debug' "Version File: ${version_file}";
+  if [ "${version_file}" != "${TFENV_ROOT}/version" ]; then
+    log 'debug' "Version File (${version_file}) is not the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version)";
+    version_requested="$(cat "${version_file}")" \
+      || log 'error' "Failed to open ${version_file}";
+  elif [ -f "${version_file}" ]; then
+    log 'debug' "Version File is the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version)";
+    version_requested="$(cat "${version_file}")" \
+      || log 'error' "Failed to open ${version_file}";
+  else
+    log 'debug' "Version File is the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version) but it doesn't exist";
+    log 'info' 'No version requested on the command line or in the version file search path. Installing "latest"';
+    version_requested='latest';
+  fi;
+else
+  version_requested="${arg}";
+fi;
+
+log 'debug' "Version Requested: ${version_requested}";
 
 if [[ "${version_requested}" =~ ^min-required$ ]]; then
-  echo "Detecting minimal required version..."
-  found_min_required="$(tfenv-min-required)"
+  log 'info' 'Detecting minimal required version...';
+  found_min_required="$(tfenv-min-required)";
 
   if [[ $? -eq 0 ]]; then
-      echo "Min required version is detected as ${found_min_required}"
-      version_requested="${found_min_required}"
+      log 'info' "Min required version is detected as ${found_min_required}";
+      version_requested="${found_min_required}";
   else
-    exit 1
-  fi
-fi
+    exit 1;
+  fi;
+fi;
 
 if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
-  version="${version_requested%%\:*}"
-  regex="${version_requested##*\:}"
+  version="${version_requested%%\:*}";
+  regex="${version_requested##*\:}";
 elif [[ "${version_requested}" =~ ^latest$ ]]; then
-  version="${version_requested}"
-  regex="^[0-9]\+\.[0-9]\+\.[0-9]\+$"
+  version="${version_requested}";
+  regex="^[0-9]\+\.[0-9]\+\.[0-9]\+$";
 else
-  version="${version_requested}"
-  regex="^${version_requested}$"
-fi
+  version="${version_requested}";
+  regex="^${version_requested}$";
+fi;
 
-[ -n "${version}" ] || error_and_die "Version is not specified"
-version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)"
-[ -n "${version}" ] || error_and_die "No versions matching '${1}' found in remote"
+[ -n "${version}" ] || log 'error' 'Version is not specified. This should not be possible as we default to latest';
 
-dst_path="${TFENV_ROOT}/versions/${version}"
+log 'debug' "Processing install for version ${version}, using regex ${regex}";
+
+version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
+[ -n "${version}" ] || log 'error' "No versions matching '${arg}' found in remote";
+
+dst_path="${TFENV_ROOT}/versions/${version}";
 if [ -f "${dst_path}/terraform" ]; then
-  echo "Terraform v${version} is already installed"
-  exit 0
-fi
+  echo "Terraform v${version} is already installed";
+  exit 0;
+fi;
 
-TFENV_ARCH="${TFENV_ARCH:-amd64}"
+TFENV_ARCH="${TFENV_ARCH:-amd64}";
 case "$(uname -s)" in
   Darwin*)
-    os="darwin_${TFENV_ARCH}"
+    os="darwin_${TFENV_ARCH}";
     ;;
   MINGW64*)
-    os="windows_${TFENV_ARCH}"
+    os="windows_${TFENV_ARCH}";
     ;;
   MSYS_NT*)
-    os="windows_${TFENV_ARCH}"
+    os="windows_${TFENV_ARCH}";
     ;;
   CYGWIN_NT*)
-    os="windows_${TFENV_ARCH}"
+    os="windows_${TFENV_ARCH}";
     ;;
   *)
-    os="linux_${TFENV_ARCH}"
+    os="linux_${TFENV_ARCH}";
     ;;
-esac
+esac;
 
-keybase_bin="$(command -v keybase 2>/dev/null)"
-shasum_bin="$(command -v shasum 2>/dev/null)"
+keybase_bin="$(command -v keybase 2>/dev/null)";
+shasum_bin="$(command -v shasum 2>/dev/null)";
 
-TFENV_REMOTE="${TFENV_REMOTE:-https://releases.hashicorp.com}"
-version_url="${TFENV_REMOTE}/terraform/${version}"
+TFENV_REMOTE="${TFENV_REMOTE:-https://releases.hashicorp.com}";
+version_url="${TFENV_REMOTE}/terraform/${version}";
 
 # Thanks for the inconsistency in 0.12-alpha, Hashicorp(!)
 if [[ "${version}" =~ 0.12.0-alpha[3-9] ]]; then
@@ -81,104 +154,130 @@ else
   tarball_name="terraform_${version}_${os}.zip";
 fi;
 
-shasums_name="terraform_${version}_SHA256SUMS"
+shasums_name="terraform_${version}_SHA256SUMS";
 
-info "Installing Terraform v${version}"
+log 'info' "Installing Terraform v${version}";
 
 # Create a local temporary directory for downloads
-download_tmp="$(mktemp -d tfenv_download.XXXXXX)" || error_and_die "Unable to create temporary download directory in $(pwd)"
+download_tmp="$(mktemp -d tfenv_download.XXXXXX)" || log 'error' "Unable to create temporary download directory in $(pwd)";
 # Clean it up in case of error
 trap "rm -rf ${download_tmp}" EXIT;
 
-info "Downloading release tarball from ${version_url}/${tarball_name}"
-curlw -# -f -o "${download_tmp}/${tarball_name}" "${version_url}/${tarball_name}" || error_and_die "Tarball download failed"
-info "Downloading SHA hash file from ${version_url}/${shasums_name}"
-curlw -s -f -o "${download_tmp}/${shasums_name}" "${version_url}/${shasums_name}" || error_and_die "SHA256 hashes download failed"
+declare curl_progress="";
+case "${TFENV_CURL_OUTPUT:-2}" in
+  '2')
+    log 'debug' 'Setting curl progress bar with "-#"';
+    curl_progress="-#";
+    ;;
+  '1')
+    log 'debug' 'Using default curl output';
+    curl_progress="";
+    ;;
+  '0')
+    log 'debug' 'Running curl silently with "-s"';
+    curl_progress="-s";
+    ;;
+  *)
+    log 'error' 'TFENV_CURL_OUTPUT specified, but not with a support value ([0,1,2])';
+    ;;
+esac;
+
+log 'info' "Downloading release tarball from ${version_url}/${tarball_name}";
+curlw ${curl_progress} -f -o "${download_tmp}/${tarball_name}" "${version_url}/${tarball_name}" || log 'error' 'Tarball download failed';
+log 'info' "Downloading SHA hash file from ${version_url}/${shasums_name}";
+curlw -s -f -o "${download_tmp}/${shasums_name}" "${version_url}/${shasums_name}" || log 'error' 'SHA256 hashes download failed';
 
 download_signature() {
-  info "Downloading SHA hash signature file from ${version_url}/${shasums_name}.sig"
+  log 'info' "Downloading SHA hash signature file from ${version_url}/${shasums_name}.sig";
   curlw -s -f \
     -o "${download_tmp}/${shasums_name}.sig" \
     "${version_url}/${shasums_name}.sig" \
-    || error_and_die "SHA256SUMS signature download failed"
-}
+    && log 'debug' "SHA256SUMS signature file downloaded successfully to ${download_tmp}/${shasums_name}.sig" \
+    || log 'error' 'SHA256SUMS signature download failed';
+};
 
 # Verify signature if verification mechanism (keybase, gpg, etc) is present
 if [[ -n "${keybase_bin}" && -x "${keybase_bin}" ]]; then
-  "${keybase_bin}" status | grep -Eq '^Logged in:[[:space:]]*yes'
-  keybase_logged_in="${?}"
-  "${keybase_bin}" list-following | grep -Fq hashicorp
-  keybase_following_hc="${?}"
+  "${keybase_bin}" status | grep -Eq '^Logged in:[[:space:]]*yes';
+  keybase_logged_in="${?}";
+  "${keybase_bin}" list-following | grep -Fq hashicorp;
+  keybase_following_hc="${?}";
 
   if [[ "${keybase_logged_in}" -ne 0 || "${keybase_following_hc}" -ne 0 ]]; then
-    warn_and_continue "Unable to verify OpenPGP signature unless logged into keybase and following hashicorp"
+    log 'warn' 'Unable to verify OpenPGP signature unless logged into keybase and following hashicorp';
   else
-    download_signature
+    download_signature;
     "${keybase_bin}" pgp verify \
       -S hashicorp \
       -d "${download_tmp}/${shasums_name}.sig" \
       -i "${download_tmp}/${shasums_name}" \
-      || error_and_die "SHA256SUMS signature does not match!"
-  fi
+      && log 'debug' 'SHA256SUMS signature matched' \
+      || log 'error' 'SHA256SUMS signature does not match!';
+  fi;
 
 elif [[ -f "${TFENV_ROOT}/use-gnupg" ]]; then
   # GnuPG uses the user's keyring, and any web-of-trust or local signatures or
   # anything else they have setup.  This is the crazy-powerful mode which is
   # overly confusing to newcomers.  We don't support it without the user creating
   # the file use-gnupg, optionally with directives in it.
-  gnupg_command="$(sed -E -n -e 's/^binary: *//p' <"${TFENV_ROOT}/use-gnupg")"
-  [[ -n "${gnupg_command}" ]] || gnupg_command=gpg
+  gnupg_command="$(sed -E -n -e 's/^binary: *//p' <"${TFENV_ROOT}/use-gnupg")";
+  [[ -n "${gnupg_command}" ]] || gnupg_command=gpg;
 
-  download_signature
+  download_signature;
   # Deliberately unquoted command, in case caller has something fancier in "use-gnupg".
   # Also, don't use batch mode.  If someone specifies GnuPG, let them deal with any prompting.
   ${gnupg_command} \
     --verify "${download_tmp}/${shasums_name}.sig" \
     "${download_tmp}/${shasums_name}" \
-    || error_and_die "PGP signature rejected by GnuPG"
+    || log 'error' 'PGP signature rejected by GnuPG';
 
 elif [[ -f "${TFENV_ROOT}/use-gpgv" ]]; then
   # gpgv is a much simpler interface to verification, but does require that the
   # key have been downloaded and marked trusted.
   # We don't force the caller to trust the tfenv repo's copy of their key, they
   # have to choose to make that trust decision.
-  gpgv_command="$(sed -E -n -e 's/^binary: *//p' <"${TFENV_ROOT}/use-gpgv")"
-  trust_tfenv="$(sed -E -n -e 's/^trust.?tfenv: *//p' <"${TFENV_ROOT}/use-gpgv")"
-  [[ -n "${gpgv_command}" ]] || gpgv_command=gpgv
+  gpgv_command="$(sed -E -n -e 's/^binary: *//p' <"${TFENV_ROOT}/use-gpgv")";
+  trust_tfenv="$(sed -E -n -e 's/^trust.?tfenv: *//p' <"${TFENV_ROOT}/use-gpgv")";
+  [[ -n "${gpgv_command}" ]] || gpgv_command=gpgv;
 
-  download_signature
-  if [[ "${trust_tfenv}" == "yes" ]]; then
+  download_signature;
+  if [[ "${trust_tfenv}" == 'yes' ]]; then
     ${gpgv_command} \
       --keyring "${TFENV_ROOT}/share/hashicorp-keys.pgp" \
       "${download_tmp}/${shasums_name}.sig" \
       "${download_tmp}/${shasums_name}" \
-      || error_and_die "PGP signature rejected"
+      || log 'error' 'PGP signature rejected';
   else
     ${gpgv_command} \
       "${download_tmp}/${shasums_name}.sig" \
       "${download_tmp}/${shasums_name}" \
-      || error_and_die "PGP signature rejected"
-  fi
+      || log 'error' 'PGP signature rejected';
+  fi;
 else
   # Warning about this avoids an unwarranted sense of confidence in the SHA check
-  warn_and_continue "No keybase install found, skipping OpenPGP signature verification"
-fi
+  log 'warn' 'No keybase install found, skipping OpenPGP signature verification';
+fi;
 
 if [[ -n "${shasum_bin}" && -x "${shasum_bin}" ]]; then
   (
-    cd "${download_tmp}"
+    cd "${download_tmp}";
     "${shasum_bin}" \
       -a 256 \
       -s \
-      -c <(grep -F "${tarball_name}" "${shasums_name}") || error_and_die "SHA256 hash does not match!"
-  )
+      -c <(grep -F "${tarball_name}" "${shasums_name}") \
+      || log 'error' 'SHA256 hash does not match!';
+  );
 else
   # Lack of shasum deserves a proper warning
-  warn_and_continue "No shasum tool available. Skipping SHA256 hash validation"
-fi
+  log 'warn' 'No shasum tool available. Skipping SHA256 hash validation';
+fi;
 
-mkdir -p "${dst_path}" || error_and_die "Failed to make directory ${dst_path}"
-unzip "${download_tmp}/${tarball_name}" -d "${dst_path}" || error_and_die "Tarball unzip failed"
+mkdir -p "${dst_path}" || log 'error' "Failed to make directory ${dst_path}";
 
-info "Installation of terraform v${version} successful"
-tfenv-use "${version}"
+declare unzip_output="$(unzip "${download_tmp}/${tarball_name}" -d "${dst_path}" || log 'error' 'Tarball unzip failed')";
+while IFS= read -r unzip_line; do
+ log 'info' "${unzip_line}";
+done < <(printf '%s\n' "${unzip_output}");
+
+log 'info' "Installation of terraform v${version} successful";
+tfenv-use "${version}";

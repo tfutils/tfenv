@@ -13,10 +13,82 @@
 # is equivalent to:
 #   PATH="$TFENV_ROOT/versions/0.7.0/bin:$PATH" terraform plan
 
-set -e
-[ -n "${TFENV_DEBUG}" ] && set -x
+set -uo pipefail;
 
-export TFENV_VERSION="$(tfenv-version-name)"
-TF_BIN_PATH="${TFENV_ROOT}/versions/${TFENV_VERSION}/terraform"
-export PATH="${TF_BIN_PATH}:${PATH}"
-exec "${TF_BIN_PATH}" "${@}"
+####################################
+# Ensure we can execute standalone #
+####################################
+
+function early_death() {
+  echo "[FATAL] ${0}: ${1}" >&2;
+  exit 1;
+};
+
+if [ -z "${TFENV_ROOT:-""}" ]; then
+  # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
+  readlink_f() {
+    local target_file="${1}";
+    local file_name;
+
+    while [ "${target_file}" != "" ]; do
+      cd "$(dirname ${target_file})" || early_death "Failed to 'cd \$(dirname ${target_file})' while trying to determine TFENV_ROOT";
+      file_name="$(basename "${target_file}")" || early_death "Failed to 'basename \"${target_file}\"' while trying to determine TFENV_ROOT";
+      target_file="$(readlink "${file_name}")";
+    done;
+
+    echo "$(pwd -P)/${file_name}";
+  };
+
+  TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)";
+  [ -n ${TFENV_ROOT} ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TFENV_ROOT";
+else
+  TFENV_ROOT="${TFENV_ROOT%/}";
+fi;
+export TFENV_ROOT;
+
+if [ -n "${TFENV_HELPERS:-""}" ]; then
+  log 'debug' 'TFENV_HELPERS is set, not sourcing helpers again';
+else
+  [ "${TFENV_DEBUG:-0}" -gt 0 ] && echo "[DEBUG] Sourcing helpers from ${TFENV_ROOT}/lib/helpers.sh";
+  if source "${TFENV_ROOT}/lib/helpers.sh"; then
+    log 'debug' 'Helpers sourced successfully';
+  else
+    early_death "Failed to source helpers from ${TFENV_ROOT}/lib/helpers.sh";
+  fi;
+fi;
+
+# Ensure libexec and bin are in $PATH
+for dir in libexec bin; do
+  case ":${PATH}:" in
+    *:${TFENV_ROOT}/${dir}:*) log 'debug' "\$PATH already contains '${TFENV_ROOT}/${dir}', not adding it again";;
+    *) 
+      log 'debug' "\$PATH does not contain '${TFENV_ROOT}/${dir}', prepending and exporting it now";
+      export PATH="${TFENV_ROOT}/${dir}:${PATH}";
+      ;;
+  esac;
+done;
+
+#####################
+# Begin Script Body #
+#####################
+
+log 'debug' 'Getting version from tfenv-version-name';
+TFENV_VERSION="$(tfenv-version-name)" \
+  && log 'debug' "TFENV_VERSION is ${TFENV_VERSION}" \
+  || {
+    # Errors will be logged from tfenv-version name,
+    # we don't need to trouble STDERR with repeat information here
+    log 'debug' 'Failed to get version from tfenv-version-name';
+    exit 1;
+  };
+export TFENV_VERSION;
+
+TF_BIN_PATH="${TFENV_ROOT}/versions/${TFENV_VERSION}/terraform";
+export PATH="${TF_BIN_PATH}:${PATH}";
+log 'debug' "TF_BIN_PATH added to PATH: ${TF_BIN_PATH}";
+log 'debug' "Executing: ${TF_BIN_PATH} ${@}";
+
+exec "${TF_BIN_PATH}" "${@}" \
+  || log 'error' "Failed to execute: ${TF_BIN_PATH} ${@}";
+
+exit 0;
