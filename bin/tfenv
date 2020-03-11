@@ -37,6 +37,12 @@ abort() {
   exit 1
 }
 
+envexec() {
+  exec \
+    env GREP_OPTIONS='--color=never' \
+    $@
+}
+
 command="${1}"
 case "${command}" in
 "" )
@@ -45,10 +51,10 @@ case "${command}" in
   } | abort
   ;;
 -v | --version )
-  exec tfenv---version
+  envexec tfenv---version
   ;;
 -h | --help )
-  exec tfenv-help
+  envexec tfenv-help
   ;;
 * )
   command_path="$(command -v "tfenv-${command}" || true)"
@@ -58,6 +64,6 @@ case "${command}" in
     } | abort
   fi
   shift 1
-  exec "${command_path}" "${@}"
+  envexec "${command_path}" "${@}"
   ;;
 esac
