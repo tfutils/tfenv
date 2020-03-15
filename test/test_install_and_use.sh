@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -uo pipefail;
 
 ####################################
@@ -54,6 +53,7 @@ test_install_and_use() {
   local v="${1}";
   tfenv install "${k}" || return 1;
   check_installed_version "${v}" || return 1;
+  tfenv use "${k}" || return 1;
   check_active_version "${v}" || return 1;
   return 0;
 };
@@ -64,6 +64,7 @@ test_install_and_use_overridden() {
   local v="${1}";
   tfenv install "${k}" || return 1;
   check_installed_version "${v}" || return 1;
+  tfenv use "${k}" || return 1;
   check_default_version "${v}" || return 1;
   return 0;
 }
@@ -116,8 +117,11 @@ done;
 
 cleanup || log 'error' 'Cleanup failed?!';
 log 'info' '## ${HOME}/.terraform-version Test Preparation';
-declare v1="$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | head -n 2 | tail -n 1)";
-declare v2="$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | head -n 1)";
+
+# 0.12.22 reports itself as 0.12.21 and breaks testing
+declare v1="$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | grep -v '0.12.22' | head -n 2 | tail -n 1)";
+declare v2="$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | grep -v '0.12.22' | head -n 1)";
+
 if [ -f "${HOME}/.terraform-version" ]; then
   log 'info' "Backing up ${HOME}/.terraform-version to ${HOME}/.terraform-version.bup";
   mv "${HOME}/.terraform-version" "${HOME}/.terraform-version.bup";

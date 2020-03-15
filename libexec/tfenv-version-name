@@ -103,5 +103,5 @@ fi;
 if [ -d "${TFENV_ROOT}/versions/${TFENV_VERSION}" ]; then
   echo "${TFENV_VERSION}";
 else
-  log 'error' "version '${TFENV_VERSION}' is not installed (set by ${TFENV_VERSION_FILE})";
+  log 'warn' "version '${TFENV_VERSION}' is not installed (set by ${TFENV_VERSION_FILE})";
 fi;
