@@ -100,8 +100,9 @@ fi;
 [ -z "${TFENV_VERSION}" ] \
   && log 'error' "Version could not be resolved (set by ${TFENV_VERSION_FILE} or tfenv use <version>)";
 
-if [ -d "${TFENV_ROOT}/versions/${TFENV_VERSION}" ]; then
-  echo "${TFENV_VERSION}";
-else
-  log 'error' "version '${TFENV_VERSION}' is not installed (set by ${TFENV_VERSION_FILE})";
+if [ ! -d "${TFENV_ROOT}/versions/${TFENV_VERSION}" ]; then
+  log 'debug' "version '${TFENV_VERSION}' is not installed (set by ${TFENV_VERSION_FILE})";
 fi;
+
+echo "${TFENV_VERSION}";
+

@@ -60,6 +60,8 @@ for v in 0.7.2 0.7.13 0.9.1 0.9.2 0.9.11; do
     || error_and_proceed "Install of version ${v} failed";
 done;
 
+tfenv use 0.9.11
+
 log 'info' '## Comparing "tfenv list" to expectations';
 result="$(tfenv list)";
 expected="$(cat << EOS

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -uo pipefail;
 
 ####################################
@@ -59,40 +58,21 @@ done;
 # Begin Script Body #
 #####################
 
-[ "${#}" -ne 1 ] && log 'error' 'usage: tfenv use <version>';
-
-declare version_requested version regex min_required version_file;
-
-version_requested="${1}";
-
-if [[ "${version_requested}" =~ ^min-required$ ]]; then
-  log 'info' 'Detecting minimum required version...';
-  min_required="$(tfenv-min-required)" \
-    || log 'error' 'tfenv-min-required failed';
-
-  log 'info' "Minimum required version detected: ${min_required}";
-  version_requested="${min_required}";
-fi;
-
-if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
-  version="${version_requested%%\:*}";
-  regex="${version_requested##*\:}";
-  log 'debug' "Version uses latest keyword with regex: ${regex}";
-elif [[ "${version_requested}" =~ ^latest$ ]]; then
-  version="${version_requested}";
-  regex="^[0-9]\+\.[0-9]\+\.[0-9]\+$";
-  log 'debug' "Version uses latest keyword alone. Forcing regex to match stable versions only: ${regex}";
-else
-  version="${version_requested}";
-  regex="^${version_requested}$";
-  log 'debug' "Version is explicit: ${version}. Regex enforces the version: ${regex}";
-fi;
+[ "${#}" -gt 1 ] && log 'error' 'usage: tfenv use [<version>]';
 
 [ -d "${TFENV_ROOT}/versions" ] \
   || log 'error' 'No versions of terraform installed. Please install one with: tfenv install';
 
+declare requested="${1:-""}";
+
+log debug "Resolving version with: tfenv-resolve-version ${requested}";
+declare resolved="$(tfenv-resolve-version ${requested})";
+
+declare version="${resolved%%\:*}";
+declare regex="${resolved##*\:}";
+
 log 'debug' "Searching ${TFENV_ROOT}/versions for latest version matching ${regex}";
-version="$(\ls "${TFENV_ROOT}/versions" \
+declare version="$(\ls "${TFENV_ROOT}/versions" \
   | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
   | grep -e "${regex}" \
   | head -n 1
