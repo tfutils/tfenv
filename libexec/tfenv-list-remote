@@ -48,7 +48,7 @@ fi;
 for dir in libexec bin; do
   case ":${PATH}:" in
     *:${TFENV_ROOT}/${dir}:*) log 'debug' "\$PATH already contains '${TFENV_ROOT}/${dir}', not adding it again";;
-    *) 
+    *)
       log 'debug' "\$PATH does not contain '${TFENV_ROOT}/${dir}', prepending and exporting it now";
       export PATH="${TFENV_ROOT}/${dir}:${PATH}";
       ;;
@@ -64,10 +64,16 @@ if [ "${#}" -ne 0 ];then
   exit 1;
 fi
 
-TFENV_REMOTE="${TFENV_REMOTE:-https://releases.hashicorp.com}"
-log 'debug' "TFENV_REMOTE: ${TFENV_REMOTE}";
-declare remote_versions="$(curlw -sf "${TFENV_REMOTE}/terraform/")";
+download_versions () {
+    TFENV_REMOTE="${TFENV_REMOTE:-https://releases.hashicorp.com}"
+    log 'debug' "TFENV_REMOTE: ${TFENV_REMOTE}";
+
+    curlw -sSf "${TFENV_REMOTE}/terraform/" \
+        || log 'error' "Failed to download versions";
+}
+
+declare remote_versions="$(download_versions)"
 #log 'debug' "Remote versions available: ${remote_versions}"; # Even in debug mode this is too verbose
-curlw -sf "${TFENV_REMOTE}/terraform/" \
+echo "$remote_versions" \
   | grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)[0-9]*)?" \
   | uniq;
