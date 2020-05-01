@@ -104,8 +104,8 @@ exit 1;
       } | abort && exit 1;
     fi;
     shift 1;
-    log 'debug' "Exec: \"${command_path}\" \"${@}\"";
-    exec "${command_path}" "${@}";
+    log 'debug' "Exec: \"${command_path}\" \"$*\"";
+    exec "${command_path}" "$@";
     ;;
 esac;
 
