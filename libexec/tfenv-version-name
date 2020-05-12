@@ -60,9 +60,6 @@ done;
 # Begin Script Body #
 #####################
 
-[ -d "${TFENV_ROOT}/versions" ] \
-  || log 'error' 'No versions of terraform installed. Please install one with: tfenv install';
-
 TFENV_VERSION_FILE="$(tfenv-version-file)" \
   && log 'debug' "TFENV_VERSION_FILE retrieved from tfenv-version-file: ${TFENV_VERSION_FILE}" \
   || log 'error' 'Failed to retrieve TFENV_VERSION_FILE from tfenv-version-file';
