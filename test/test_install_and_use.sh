@@ -67,11 +67,11 @@ test_install_and_use_overridden() {
   tfenv use "${k}" || return 1;
   check_default_version "${v}" || return 1;
   return 0;
-}
+};
 
 declare -a errors=();
 
-log 'info' '### Test Suite: Install and Use'
+log 'info' '### Test Suite: Install and Use';
 
 tests__desc=(
   'latest version'
@@ -84,6 +84,7 @@ tests__desc=(
   'latest version matching regex'
   'specific version'
 );
+
 tests__kv=(
   "$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | head -n 1),latest"
   "$(tfenv list-remote | head -n 1),latest:"
@@ -95,13 +96,14 @@ tests__kv=(
   '0.8.8,latest:^0.8'
   "0.7.13,0.7.13"
 );
-tests_count=${#tests__desc[@]}
+
+tests_count=${#tests__desc[@]};
 
 declare desc kv k v;
 
 for ((test_num=0; test_num<${tests_count}; ++test_num )) ; do
   cleanup || log 'error' 'Cleanup failed?!';
-  desc=${tests__desc[${test_num}]}
+  desc=${tests__desc[${test_num}]};
   kv="${tests__kv[${test_num}]}";
   v="${kv%,*}";
   k="${kv##*,}";
@@ -113,7 +115,7 @@ done;
 
 for ((test_num=0; test_num<${tests_count}; ++test_num )) ; do
   cleanup || log 'error' 'Cleanup failed?!';
-  desc=${tests__desc[${test_num}]}
+  desc=${tests__desc[${test_num}]};
   kv="${tests__kv[${test_num}]}";
   v="${kv%,*}";
   k="${kv##*,}";
@@ -167,16 +169,17 @@ fi;
 log 'info' 'Install invalid specific version';
 cleanup || log 'error' 'Cleanup failed?!';
 
-
 neg_tests__desc=(
   'specific version'
   'latest:word'
 );
+
 neg_tests__kv=(
   '9.9.9'
   "latest:word"
 );
-neg_tests_count=${#neg_tests__desc[@]}
+
+neg_tests_count=${#neg_tests__desc[@]};
 
 for ((test_num=0; test_num<${neg_tests_count}; ++test_num )) ; do
   cleanup || log 'error' 'Cleanup failed?!';
