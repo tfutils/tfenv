@@ -66,7 +66,11 @@ include ::tfenv
 
 ### tfenv install [version]
 
-Install a specific version of Terraform. Available options for version:
+Install a specific version of Terraform.
+
+If no parameter is passed, the version to use is resolved automatically via .terraform-version files, defaulting to 'latest' if none are found.
+
+If a parameter is passed, available options:
 
 - `i.j.k` exact version to install
 - `latest` is a syntax to install latest version
@@ -74,11 +78,11 @@ Install a specific version of Terraform. Available options for version:
 - `min-required` is a syntax to recursively scan your Terraform files to detect which version is minimally required. See [required_version](https://www.terraform.io/docs/configuration/terraform.html) docs. Also [see min-required](#min-required) section below.
 
 ```console
+$ tfenv install
 $ tfenv install 0.7.0
 $ tfenv install latest
 $ tfenv install latest:^0.8
 $ tfenv install min-required
-$ tfenv install
 ```
 
 If `shasum` is present in the path, tfenv will verify the download against Hashicorp's published sha256 hash.
@@ -134,6 +138,16 @@ Specify architecture. Architecture other than the default amd64 can be specified
 TFENV_ARCH=arm tfenv install 0.7.9
 ```
 
+##### `TFENV_AUTO_INSTALL`
+
+String (Default: true)
+
+Should tfenv automatically install terraform if the version specified by defaults or a .terraform-version file is not currently installed.
+
+```console
+TFENV_AUTO_INSTALL=false terraform plan
+```
+
 ##### `TFENV_CURL_OUTPUT`
 
 Integer (Default: 2)
@@ -145,6 +159,15 @@ Set the mechanism used for displaying download progress when downloading terrafo
 * 0: Pass `-s` to curl
 
 ##### `TFENV_DEBUG`
+
+Integer (Default: 0)
+
+Set the debug level for TFENV.
+
+* 0: No debug output
+* 1: Simple debug output
+* 2: Extended debug output, with source file names and interactive debug shells on error
+* 3: Debug level 2 + Bash execution tracing
 
 ##### `TFENV_REMOTE`
 
@@ -279,9 +302,11 @@ Defaults to the PID of the calling process.
 
 
 
-### tfenv use &lt;version>
+### tfenv use [version]
 
 Switch a version to use
+
+If no parameter is passed, the version to use is resolved automatically via .terraform-version files, defaulting to 'latest' if none are found.
 
 `latest` is a syntax to use the latest installed version
 
@@ -290,6 +315,7 @@ Switch a version to use
 `min-required` will switch to the version minimally required by your terraform sources (see above `tfenv install`)
 
 ```console
+$ tfenv use
 $ tfenv use min-required
 $ tfenv use 0.7.0
 $ tfenv use latest

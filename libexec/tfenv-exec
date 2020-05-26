@@ -83,12 +83,21 @@ TFENV_VERSION="$(tfenv-version-name)" \
   };
 export TFENV_VERSION;
 
+if [ ! -d "${TFENV_ROOT}/versions/${TFENV_VERSION}" ]; then
+  if [ "${TFENV_AUTO_INSTALL:-true}" == "true" ]; then
+    log 'info' "version '${TFENV_VERSION}' is not installed (set by $(tfenv-version-file)). Installing now as TFENV_AUTO_INSTALL==true";
+    tfenv-install;
+  else
+    log 'error' "version '${TFENV_VERSION}' was requested, but not installed and TFENV_AUTO_INSTALL is not 'true'";
+  fi;
+fi;
+
 TF_BIN_PATH="${TFENV_ROOT}/versions/${TFENV_VERSION}/terraform";
 export PATH="${TF_BIN_PATH}:${PATH}";
 log 'debug' "TF_BIN_PATH added to PATH: ${TF_BIN_PATH}";
-log 'debug' "Executing: ${TF_BIN_PATH} ${@}";
+log 'debug' "Executing: ${TF_BIN_PATH} $@";
 
-exec "${TF_BIN_PATH}" "${@}" \
-  || log 'error' "Failed to execute: ${TF_BIN_PATH} ${@}";
+exec "${TF_BIN_PATH}" "$@" \
+  || log 'error' "Failed to execute: ${TF_BIN_PATH} $*";
 
 exit 0;
