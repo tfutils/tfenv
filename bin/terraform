@@ -62,8 +62,8 @@ log 'debug' "program=\"${0##*/}\"";
 
 declare tfenv_path="${TFENV_ROOT}/bin/tfenv";
 
-log 'debug' "Exec: \"${tfenv_path}\" exec \"${@}\"";
-exec "${tfenv_path}" exec "${@}" \
-  || log 'error' "Failed to exec: \"${tfenv_path}\" exec \"${@}\"";
+log 'debug' "Exec: \"${tfenv_path}\" exec \"$*\"";
+exec "${tfenv_path}" exec "$@" \
+  || log 'error' "Failed to exec: \"${tfenv_path}\" exec \"$*\"";
 
 log 'error' 'This line should not be reachable. Something catastrophic has occurred';
