@@ -67,7 +67,7 @@ log 'info' '## Using 0.8.2';
 ${TFENV_BIN_DIR}/tfenv use 0.8.2 || error_and_proceed 'Use failed';
 
 log 'info' '## Check-Version for 0.8.2';
-check_version 0.8.2 || error_and_proceed 'Version check failed';
+check_active_version 0.8.2 || error_and_proceed 'Version check failed';
 
 if [ "${#errors[@]}" -gt 0 ]; then
   log 'warn' '===== The following symlink tests failed =====';

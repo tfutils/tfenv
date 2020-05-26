@@ -56,25 +56,35 @@ function test_uninstall() {
   tfenv install "${v}" || return 1;
   tfenv uninstall "${v}" || return 1;
   log 'info' 'Confirming uninstall success; an error indicates success:';
-  check_version "${v}" && return 1 || return 0;
-}
+  check_active_version "${v}" && return 1 || return 0;
+};
 
-log 'info' '### Test Suite: Uninstall Local Versions'
+log 'info' '### Test Suite: Uninstall Local Versions';
 cleanup || log 'error' 'Cleanup failed?!';
 
-declare -A tests;
-tests['0.9.1']='0.9.1';
-tests['0.11.15-oci']='0.11.15-oci';
-tests['latest']="$(tfenv list-remote | head -n1)";
-tests['latest:^0.8']="$(tfenv list-remote | grep -e "^0.8" | head -n1)";
+tests__keywords=(
+  '0.9.1'
+  '0.11.15-oci'
+  'latest'
+  'latest:^0.8'
+);
 
-declare -i test_num=1;
-for k in "${!tests[@]}"; do
-  log 'info' "Test ${test_num}/${#tests[@]}: Testing uninstall of version ${tests[${k}]} via keyword ${k}";
-  test_uninstall "${k}" "${tests[${k}]}" \
-    && log info "Test uninstall of version ${tests[${k}]} succeeded" \
-    || error_and_proceed "Test uninstall of version ${tests[${k}]} failed";
-  test_num+=1;
+tests__versions=(
+  '0.9.1'
+  '0.11.15-oci'
+  "$(tfenv list-remote | head -n1)"
+  "$(tfenv list-remote | grep -e "^0.8" | head -n1)"
+);
+
+tests_count=${#tests__keywords[@]};
+
+for ((test_num=0; test_num<${tests_count}; ++test_num )) ; do
+  keyword=${tests__keywords[${test_num}]};
+  version=${tests__versions[${test_num}]};
+  log 'info' "Test $(( ${test_num} + 1 ))/${tests_count}: Testing uninstall of version ${version} via keyword ${keyword}";
+  test_uninstall "${keyword}" "${version}" \
+    && log info "Test uninstall of version ${version} (via ${keyword}) succeeded" \
+    || error_and_proceed "Test uninstall of version ${version} (via ${keyword}) failed";
 done;
 
 if [ "${#errors[@]}" -gt 0 ]; then

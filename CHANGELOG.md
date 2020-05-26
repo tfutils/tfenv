@@ -1,8 +1,13 @@
-## 2.0.0-alpha1 (November 24, 2019)
+## 2.0.0 (Unreleased)
 
- * New logging library
- * New bash4 dependency
+ * New logging and debugging library
  * Massive testing, logging and loading refactoring
+ * Fix to 'use' logic: don't overwrite .terraform-version files
+ * Fix #167 - Never invoke use automatically on install - multiple code and testing changes for new logic
+ * Fix to not use 0.12.22 during testing which reports its version incorrectly
+ * Introduce tfenv-resolve-version to deduplicate translation of requested version into actual version
+ * README.md updates
+ * Fix #176 - New parameter TFENV_AUTO_INSTALL to handle the version specified by `use` or a `.terraform-version` file not being installed
 
 ## 1.0.2 (October 29, 2019)
 

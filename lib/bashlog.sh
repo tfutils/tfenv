@@ -8,7 +8,7 @@ function _log_exception() {
     BASHLOG_JSON=0;
     BASHLOG_SYSLOG=0;
 
-    log 'error' "Logging Exception: ${@}";
+    log 'error' "Logging Exception: $*";
   );
 };
 export -f _log_exception;
@@ -39,7 +39,7 @@ function log() {
 
   shift 1;
 
-  local line="${@}";
+  local line="$@";
 
   # RFC 5424
   #
@@ -55,17 +55,17 @@ function log() {
   #    6       Informational: informational messages
   #    7       Debug: debug-level messages
 
-  local -A severities;
-  severities['DEBUG']=7;
-  severities['INFO']=6;
-  severities['NOTICE']=5; # Unused
-  severities['WARN']=4;
-  severities['ERROR']=3;
-  severities['CRIT']=2;   # Unused
-  severities['ALERT']=1;  # Unused
-  severities['EMERG']=0;  # Unused
+  local severities_DEBUG=7;
+  local severities_INFO=6;
+  local severities_NOTICE=5; # Unused
+  local severities_WARN=4;
+  local severities_ERROR=3;
+  local severities_CRIT=2;   # Unused
+  local severities_ALERT=1;  # Unused
+  local severities_EMERG=0;  # Unused
 
-  local severity="${severities[${upper}]:-3}"
+  local severity_var="severities_${upper}"
+  local severity="${!severity_var:-3}"
 
   if [ "${debug_level}" -gt 0 ] || [ "${severity}" -lt 7 ]; then
 
@@ -99,19 +99,19 @@ function log() {
 
   fi;
 
-  local -A colours;
-  colours['DEBUG']='\033[34m'  # Blue
-  colours['INFO']='\033[32m'   # Green
-  colours['NOTICE']=''         # Unused
-  colours['WARN']='\033[33m'   # Yellow
-  colours['ERROR']='\033[31m'  # Red
-  colours['CRIT']=''           # Unused
-  colours['ALERT']=''          # Unused
-  colours['EMERG']=''          # Unused
-  colours['DEFAULT']='\033[0m' # Default
+  local colours_DEBUG='\033[34m'  # Blue
+  local colours_INFO='\033[32m'   # Green
+  local colours_NOTICE=''         # Unused
+  local colours_WARN='\033[33m'   # Yellow
+  local colours_ERROR='\033[31m'  # Red
+  local colours_CRIT=''           # Unused
+  local colours_ALERT=''          # Unused
+  local colours_EMERG=''          # Unused
+  local colours_DEFAULT='\033[0m' # Default
 
-  local norm="${colours['DEFAULT']}";
-  local colour="${colours[${upper}]:-\033[31m}";
+  local norm="${colours_DEFAULT}";
+  local colour_var="colours_${upper}"
+  local colour="${!colour_var:-\033[31m}";
 
   local std_line;
   if [ "${debug_level}" -le 1 ]; then
@@ -154,7 +154,7 @@ function log() {
       fi;
       ;;
     *)
-      log 'error' "Undefined log level trying to log: ${@}";
+      log 'error' "Undefined log level trying to log: $*";
       ;;
   esac
 };

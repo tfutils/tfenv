@@ -34,6 +34,66 @@ fi;
 
 source "${TFENV_ROOT}/lib/bashlog.sh";
 
+resolve_version () {
+  declare version_requested version regex min_required version_file;
+
+  declare arg="${1:-""}";
+
+  if [ -z "${arg}" ]; then
+    version_file="$(tfenv-version-file)";
+    log 'debug' "Version File: ${version_file}";
+
+    if [ "${version_file}" != "${TFENV_ROOT}/version" ]; then
+      log 'debug' "Version File (${version_file}) is not the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version)";
+      version_requested="$(cat "${version_file}")" \
+        || log 'error' "Failed to open ${version_file}";
+
+    elif [ -f "${version_file}" ]; then
+      log 'debug' "Version File is the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version)";
+      version_requested="$(cat "${version_file}")" \
+        || log 'error' "Failed to open ${version_file}";
+
+      # Absolute fallback
+      if [ -z "${version_requested}" ]; then
+        log 'debug' 'Version file had no content. Falling back to "latest"';
+        version_requested='latest';
+      fi;
+
+    else
+      log 'debug' "Version File is the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version) but it doesn't exist";
+      log 'info' 'No version requested on the command line or in the version file search path. Installing "latest"';
+      version_requested='latest';
+    fi;
+  else
+    version_requested="${arg}";
+  fi;
+
+  log 'debug' "Version Requested: ${version_requested}";
+
+  if [[ "${version_requested}" =~ ^min-required$ ]]; then
+    log 'info' 'Detecting minimum required version...';
+    min_required="$(tfenv-min-required)" \
+      || log 'error' 'tfenv-min-required failed';
+
+    log 'info' "Minimum required version detected: ${min_required}";
+    version_requested="${min_required}";
+  fi;
+
+  if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
+    version="${version_requested%%\:*}";
+    regex="${version_requested##*\:}";
+    log 'debug' "Version uses latest keyword with regex: ${regex}";
+  elif [[ "${version_requested}" =~ ^latest$ ]]; then
+    version="${version_requested}";
+    regex="^[0-9]\+\.[0-9]\+\.[0-9]\+$";
+    log 'debug' "Version uses latest keyword alone. Forcing regex to match stable versions only: ${regex}";
+  else
+    version="${version_requested}";
+    regex="^${version_requested}$";
+    log 'debug' "Version is explicit: ${version}. Regex enforces the version: ${regex}";
+  fi;
+}
+
 # Curl wrapper to switch TLS option for each OS
 function curlw () {
   local TLS_OPT="--tlsv1.2";
@@ -47,11 +107,25 @@ function curlw () {
 }
 export -f curlw;
 
-check_version() {
-  v="${1}";
+check_active_version() {
+  local v="${1}";
   [ -n "$(${TFENV_ROOT}/bin/terraform --version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
 }
-export -f check_version;
+export -f check_active_version;
+
+check_installed_version() {
+  local v="${1}";
+  local bin="${TFENV_ROOT}/versions/${v}/terraform";
+  [ -n "$(${bin} --version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
+};
+export -f check_installed_version;
+
+check_default_version() {
+  local v="${1}";
+  local def="$(cat "${TFENV_ROOT}/version")";
+  [ "${def}" == "${v}" ];
+};
+export -f check_default_version;
 
 cleanup() {
   log 'info' 'Performing cleanup';
