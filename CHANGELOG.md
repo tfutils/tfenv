@@ -7,6 +7,7 @@
  * Fix to not use 0.12.22 during testing which reports its version incorrectly
  * Introduce tfenv-resolve-version to deduplicate translation of requested version into actual version
  * README.md updates
+ * Fix #176 - New parameter TFENV_AUTO_INSTALL to handle the version specified by `use` or a `.terraform-version` file not being installed
 
 ## 1.0.2 (October 29, 2019)
 

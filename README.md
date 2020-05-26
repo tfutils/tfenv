@@ -138,6 +138,16 @@ Specify architecture. Architecture other than the default amd64 can be specified
 TFENV_ARCH=arm tfenv install 0.7.9
 ```
 
+##### `TFENV_AUTO_INSTALL`
+
+String (Default: true)
+
+Should tfenv automatically install terraform if the version specified by defaults or a .terraform-version file is not currently installed.
+
+```console
+TFENV_AUTO_INSTALL=false terraform plan
+```
+
 ##### `TFENV_CURL_OUTPUT`
 
 Integer (Default: 2)
