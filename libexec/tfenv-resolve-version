@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Usage: tfenv resolve-version [<version>]
+# Summary: Resolve the version to action based on the environment and optional input token
 
 set -uo pipefail;
 
@@ -59,22 +61,30 @@ done;
 # Begin Script Body #
 #####################
 
-[ "${#}" -gt 1 ] && log 'error' 'usage: tfenv uninstall [<version>]';
+declare version_requested version regex min_required version_file;
 
-declare version_requested version regex;
 declare arg="${1:-""}";
 
-if [ -z "${arg:-""}" ]; then
+if [ -z "${arg}" ]; then
   version_file="$(tfenv-version-file)";
   log 'debug' "Version File: ${version_file}";
+
   if [ "${version_file}" != "${TFENV_ROOT}/version" ]; then
     log 'debug' "Version File (${version_file}) is not the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version)";
     version_requested="$(cat "${version_file}")" \
       || log 'error' "Failed to open ${version_file}";
+
   elif [ -f "${version_file}" ]; then
     log 'debug' "Version File is the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version)";
     version_requested="$(cat "${version_file}")" \
       || log 'error' "Failed to open ${version_file}";
+
+    # Absolute fallback
+    if [ -z "${version_requested}" ]; then
+      log 'debug' 'Version file had no content. Falling back to "latest"';
+      version_requested='latest';
+    fi;
+
   else
     log 'debug' "Version File is the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version) but it doesn't exist";
     log 'info' 'No version requested on the command line or in the version file search path. Installing "latest"';
@@ -87,34 +97,26 @@ fi;
 log 'debug' "Version Requested: ${version_requested}";
 
 if [[ "${version_requested}" =~ ^min-required$ ]]; then
-  log 'error' 'min-required is an unsupported option for uninstall';
+  log 'info' 'Detecting minimum required version...';
+  min_required="$(tfenv-min-required)" \
+    || log 'error' 'tfenv-min-required failed';
+
+  log 'info' "Minimum required version detected: ${min_required}";
+  version_requested="${min_required}";
 fi;
 
 if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
   version="${version_requested%%\:*}";
   regex="${version_requested##*\:}";
+  log 'debug' "Version uses latest keyword with regex: ${regex}";
 elif [[ "${version_requested}" =~ ^latest$ ]]; then
   version="${version_requested}";
-  regex="";
+  regex="^[0-9]\+\.[0-9]\+\.[0-9]\+$";
+  log 'debug' "Version uses latest keyword alone. Forcing regex to match stable versions only: ${regex}";
 else
   version="${version_requested}";
   regex="^${version_requested}$";
+  log 'debug' "Version is explicit: ${version}. Regex enforces the version: ${regex}";
 fi;
 
-[ -z "${version:-""}" ] && log 'error' "Version not specified on the command line or on version file search path.";
-
-log 'debug' "Processing uninstall for version ${version}, using regex ${regex}";
-
-version="$(tfenv-list | sed -E 's/^(\*| )? //g; s/ \(set by .+\)$//' | grep -e "${regex}" | head -n 1)";
-[ -n "${version}" ] || log 'error' "No versions matching '${regex}' found in local";
-
-dst_path="${TFENV_ROOT}/versions/${version}";
-if [ -f "${dst_path}/terraform" ]; then 
-  log 'info' "Uninstall Terraform v${version}";
-  rm -r "${dst_path}";
-  
-  # If no versions remain, remove the versions directory
-  rmdir "${TFENV_ROOT}/versions" 2>/dev/null;
-  
-  log 'info' "Terraform v${version} is successfully uninstalled";
-fi;
+echo "${version}:${regex}";

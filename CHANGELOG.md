@@ -1,3 +1,19 @@
+## 2.0.0 (Unreleased)
+
+ * New logging and debugging library
+ * Massive testing, logging and loading refactoring
+ * Fix to 'use' logic: don't overwrite .terraform-version files
+ * Fix #167 - Never invoke use automatically on install - multiple code and testing changes for new logic
+ * Fix to not use 0.12.22 during testing which reports its version incorrectly
+ * Introduce tfenv-resolve-version to deduplicate translation of requested version into actual version
+ * README.md updates
+ * Fix #176 - New parameter TFENV_AUTO_INSTALL to handle the version specified by `use` or a `.terraform-version` file not being installed
+
+## 1.0.2 (October 29, 2019)
+
+ * Fix failing 0.11.15-oci version, Add additional tests for 0.11.15-oci and alphas, betas and rcs #145
+ * Fix to README section link for .terraform-version file #146
+
 ## 1.0.1 (June 22, 2019)
 
  * Fix '--version' flag to return version from CHANGELOG.md when not running from a git checkout.

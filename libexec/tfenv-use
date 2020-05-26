@@ -1,55 +1,103 @@
 #!/usr/bin/env bash
+set -uo pipefail;
 
-[ -n "${TFENV_DEBUG}" ] && set -x
-source "${TFENV_ROOT}/libexec/helpers"
+####################################
+# Ensure we can execute standalone #
+####################################
 
-[ "${#}" -ne 1 ] && error_and_die "usage: tfenv use <version>"
+function early_death() {
+  echo "[FATAL] ${0}: ${1}" >&2;
+  exit 1;
+};
 
-declare version_requested version regex
+if [ -z "${TFENV_ROOT:-""}" ]; then
+  # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
+  readlink_f() {
+    local target_file="${1}";
+    local file_name;
 
-version_requested="${1}"
+    while [ "${target_file}" != "" ]; do
+      cd "$(dirname ${target_file})" || early_death "Failed to 'cd \$(dirname ${target_file})' while trying to determine TFENV_ROOT";
+      file_name="$(basename "${target_file}")" || early_death "Failed to 'basename \"${target_file}\"' while trying to determine TFENV_ROOT";
+      target_file="$(readlink "${file_name}")";
+    done;
 
-if [[ "${version_requested}" =~ ^min-required$ ]]; then
-  echo "Detecting minimal required version..."
-  found_min_required="$(tfenv-min-required)"
+    echo "$(pwd -P)/${file_name}";
+  };
 
-  if [[ $? -eq 0 ]]; then
-      echo "Min required version is detected as ${found_min_required}"
-      version_requested="${found_min_required}"
-  else
-    exit 1
-  fi
-fi
-
-if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
-  version="${version_requested%%\:*}"
-  regex="${version_requested##*\:}"
-elif [[ "${version_requested}" =~ ^latest$ ]]; then
-  version="${version_requested}"
-  regex="^[0-9]\+\.[0-9]\+\.[0-9]\+$"
+  TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)";
+  [ -n ${TFENV_ROOT} ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TFENV_ROOT";
 else
-  version="${version_requested}"
-  regex="^${version_requested}$"
-fi
+  TFENV_ROOT="${TFENV_ROOT%/}";
+fi;
+export TFENV_ROOT;
+
+if [ -n "${TFENV_HELPERS:-""}" ]; then
+  log 'debug' 'TFENV_HELPERS is set, not sourcing helpers again';
+else
+  [ "${TFENV_DEBUG:-0}" -gt 0 ] && echo "[DEBUG] Sourcing helpers from ${TFENV_ROOT}/lib/helpers.sh";
+  if source "${TFENV_ROOT}/lib/helpers.sh"; then
+    log 'debug' 'Helpers sourced successfully';
+  else
+    early_death "Failed to source helpers from ${TFENV_ROOT}/lib/helpers.sh";
+  fi;
+fi;
+
+# Ensure libexec and bin are in $PATH
+for dir in libexec bin; do
+  case ":${PATH}:" in
+    *:${TFENV_ROOT}/${dir}:*) log 'debug' "\$PATH already contains '${TFENV_ROOT}/${dir}', not adding it again";;
+    *) 
+      log 'debug' "\$PATH does not contain '${TFENV_ROOT}/${dir}', prepending and exporting it now";
+      export PATH="${TFENV_ROOT}/${dir}:${PATH}";
+      ;;
+  esac;
+done;
+
+#####################
+# Begin Script Body #
+#####################
+
+[ "${#}" -gt 1 ] && log 'error' 'usage: tfenv use [<version>]';
 
 [ -d "${TFENV_ROOT}/versions" ] \
-  || error_and_die "No versions of terraform installed. Please install one with: tfenv install"
+  || log 'error' 'No versions of terraform installed. Please install one with: tfenv install';
 
-version="$(\ls "${TFENV_ROOT}/versions" \
+declare requested="${1:-""}";
+
+log debug "Resolving version with: tfenv-resolve-version ${requested}";
+declare resolved="$(tfenv-resolve-version ${requested})";
+
+declare version="${resolved%%\:*}";
+declare regex="${resolved##*\:}";
+
+log 'debug' "Searching ${TFENV_ROOT}/versions for latest version matching ${regex}";
+declare version="$(\ls "${TFENV_ROOT}/versions" \
   | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
   | grep -e "${regex}" \
   | head -n 1
-)"
+)";
 
-[ -n "${version}" ] || error_and_die "No installed versions of terraform matched '${1}'"
+[ -n "${version}" ] \
+  && log 'debug' "Found version: ${version}" \
+  || log 'error' "No installed versions of terraform matched '${1}'";
 
-target_path="${TFENV_ROOT}/versions/${version}"
+target_path="${TFENV_ROOT}/versions/${version}";
 [ -f "${target_path}/terraform" ] \
-  || error_and_die "Version directory for ${version} is present, but the terraform binary is not! Manual intervention required."
+  || log 'error' "Version directory for ${version} is present, but the terraform binary is not! Manual intervention required.";
 [ -x "${target_path}/terraform" ] \
-  || error_and_die "Version directory for ${version} is present, but the terraform binary is not executable! Manual intervention required. "
+  || log 'error' "Version directory for ${version} is present, but the terraform binary is not executable! Manual intervention required.";
 
-info "Switching to v${version}"
-echo "${version}" > "$(tfenv-version-file)" || error_and_die "'switch to v${version} failed'"
-terraform --version 1>/dev/null || error_and_die "'terraform --version' failed. Something is seriously wrong"
-info "Switching completed"
+log 'info' "Switching default version to v${version}";
+version_file="${TFENV_ROOT}/version";
+log 'debug' "Writing \"${version}\" to \"${version_file}\"";
+echo "${version}" > "${version_file}" \
+  || log 'error' "Switch to v${version} failed";
+
+if [ "${version_file}" != "$(tfenv-version-file)" ]; then
+  log 'warn' "Default version file overridden by $(tfenv-version-file), changing the default version has no effect";
+fi;
+
+terraform --version 1>/dev/null \
+  || log 'error' "'terraform --version' failed. Something is seriously wrong";
+log 'info' "Switching completed";

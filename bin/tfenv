@@ -1,63 +1,112 @@
 #!/usr/bin/env bash
-set -e
-if [ -n "${TFENV_DEBUG}" ]; then
-  export PS4='+ [${BASH_SOURCE##*/}:${LINENO}] '
-  set -x
-fi
+set -uo pipefail;
 
-# http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
-readlink_f() {
-  local target_file="${1}"
-  local file_name
+####################################
+# Ensure we can execute standalone #
+####################################
 
-  while [ "${target_file}" != "" ]; do
-    cd "$(dirname ${target_file})"
-    file_name="$(basename "${target_file}")"
-    target_file="$(readlink "${file_name}")"
-  done
+function early_death() {
+  echo "[FATAL] ${0}: ${1}" >&2;
+  exit 1;
+};
 
-  echo "$(pwd -P)/${file_name}"
-}
+if [ -z "${TFENV_ROOT:-""}" ]; then
+  # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
+  readlink_f() {
+    local target_file="${1}";
+    local file_name;
 
-if [ -z "${TFENV_ROOT}" ]; then
-  TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)"
+    while [ "${target_file}" != "" ]; do
+      cd "$(dirname ${target_file})" || early_death "Failed to 'cd \$(dirname ${target_file})' while trying to determine TFENV_ROOT";
+      file_name="$(basename "${target_file}")" || early_death "Failed to 'basename \"${target_file}\"' while trying to determine TFENV_ROOT";
+      target_file="$(readlink "${file_name}")";
+    done;
+
+    echo "$(pwd -P)/${file_name}";
+  };
+
+  TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)";
+  [ -n ${TFENV_ROOT} ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TFENV_ROOT";
 else
-  TFENV_ROOT="${TFENV_ROOT%/}"
-fi
-export TFENV_ROOT
-PATH="${TFENV_ROOT}/libexec:${PATH}"
-export PATH
+  TFENV_ROOT="${TFENV_ROOT%/}";
+fi;
+export TFENV_ROOT;
+
+if [ -n "${TFENV_HELPERS:-""}" ]; then
+  log 'debug' 'TFENV_HELPERS is set, not sourcing helpers again';
+else
+  [ "${TFENV_DEBUG:-0}" -gt 0 ] && echo "[DEBUG] Sourcing helpers from ${TFENV_ROOT}/lib/helpers.sh";
+  if source "${TFENV_ROOT}/lib/helpers.sh"; then
+    log 'debug' 'Helpers sourced successfully';
+  else
+    early_death "Failed to source helpers from ${TFENV_ROOT}/lib/helpers.sh";
+  fi;
+fi;
+
+# Ensure libexec and bin are in $PATH
+for dir in libexec bin; do
+  case ":${PATH}:" in
+    *:${TFENV_ROOT}/${dir}:*) log 'debug' "\$PATH already contains '${TFENV_ROOT}/${dir}', not adding it again";;
+    *) 
+      log 'debug' "\$PATH does not contain '${TFENV_ROOT}/${dir}', prepending and exporting it now";
+      export PATH="${TFENV_ROOT}/${dir}:${PATH}";
+      ;;
+  esac;
+done;
+
+#####################
+# Begin Script Body #
+#####################
+
+declare arg="${1:-""}";
+
+log 'debug' "Setting TFENV_DIR to ${PWD}";
 export TFENV_DIR="${PWD}"
 
 abort() {
-  { if [ "${#}" -eq 0 ]; then cat -
-    else echo "tfenv: ${*}"
-    fi
-  } >&2
-  exit 1
-}
+  log 'debug' 'Aborting...';
+  {
+    if [ "${#}" -eq 0 ]; then
+      cat -;
+    else
+      echo "tfenv: ${*}";
+    fi;
+  } >&2;
+};
 
-command="${1}"
-case "${command}" in
-"" )
-  { tfenv---version
-    tfenv-help
-  } | abort
-  ;;
--v | --version )
-  exec tfenv---version
-  ;;
--h | --help )
-  exec tfenv-help
-  ;;
-* )
-  command_path="$(command -v "tfenv-${command}" || true)"
-  if [ -z "${command_path}" ];then
-    { echo "no such command '${command}'"
-      tfenv-help
-    } | abort
-  fi
-  shift 1
-  exec "${command_path}" "${@}"
-  ;;
-esac
+log 'debug' "tfenv argument is: ${arg}";
+
+case "${arg}" in
+  "")
+    log 'debug' 'No argument provided, dumping version and help and aborting';
+    {
+      tfenv---version;
+      tfenv-help;
+    } | abort && exit 1;
+exit 1;
+    ;;
+  -v | --version )
+    log 'debug' 'tfenv version requested...';
+    exec tfenv---version;
+    ;;
+  -h | --help )
+    log 'debug' 'tfenv help requested...';
+    exec tfenv-help;
+    ;;
+  *)
+    log 'debug' "Long argument provided: ${arg}";
+    command_path="$(command -v "tfenv-${arg}" || true)";
+    log 'debug' "Resulting command-path: ${command_path}";
+    if [ -z "${command_path}" ]; then
+      {
+        echo "No such command '${arg}'";
+        tfenv-help;
+      } | abort && exit 1;
+    fi;
+    shift 1;
+    log 'debug' "Exec: \"${command_path}\" \"$*\"";
+    exec "${command_path}" "$@";
+    ;;
+esac;
+
+log 'error' 'This line should not be reachable. Something catastrophic has occurred';
