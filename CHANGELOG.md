@@ -1,4 +1,4 @@
-## 2.0.0 (Unreleased)
+## 2.0.0 (April 20, 2020)
 
  * New logging and debugging library
  * Massive testing, logging and loading refactoring
