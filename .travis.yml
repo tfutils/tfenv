@@ -3,6 +3,8 @@ env:
   - CLICOLOR=1
 matrix:
   include:
+    - os: windows
+      language: shell
     - os: linux
       dist: bionic
     - os: linux
