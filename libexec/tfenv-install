@@ -26,7 +26,7 @@ if [ -z "${TFENV_ROOT:-""}" ]; then
   };
 
   TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)";
-  [ -n ${TFENV_ROOT} ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TFENV_ROOT";
+  [ -n "${TFENV_ROOT}" ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TFENV_ROOT";
 else
   TFENV_ROOT="${TFENV_ROOT%/}";
 fi;
@@ -95,6 +95,9 @@ case "$(uname -s)" in
   CYGWIN_NT*)
     os="windows_${TFENV_ARCH}";
     ;;
+  FreeBSD*)
+    os="freebsd_${TFENV_ARCH}"
+    ;;
   *)
     os="linux_${TFENV_ARCH}";
     ;;
@@ -102,6 +105,7 @@ esac;
 
 keybase_bin="$(command -v keybase 2>/dev/null)";
 shasum_bin="$(command -v shasum 2>/dev/null)";
+sha256sum_bin="$(command -v sha256sum 2>/dev/null)";
 
 TFENV_REMOTE="${TFENV_REMOTE:-https://releases.hashicorp.com}";
 version_url="${TFENV_REMOTE}/terraform/${version}";
@@ -223,6 +227,13 @@ if [[ -n "${shasum_bin}" && -x "${shasum_bin}" ]]; then
     "${shasum_bin}" \
       -a 256 \
       -s \
+      -c <(grep -F "${tarball_name}" "${shasums_name}") \
+      || log 'error' 'SHA256 hash does not match!';
+  );
+elif [[ -n "${sha256sum_bin}" && -x "${sha256sum_bin}" ]]; then
+  (
+    cd "${download_tmp}";
+    "${sha256sum_bin}" \
       -c <(grep -F "${tarball_name}" "${shasums_name}") \
       || log 'error' 'SHA256 hash does not match!';
   );
