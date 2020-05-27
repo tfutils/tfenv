@@ -51,7 +51,7 @@ export PATH="${TFENV_ROOT}/bin:${PATH}";
 
 errors=();
 if [ "${#}" -ne 0 ]; then
-  targets="${@}";
+  targets="$@";
 else
   targets="$(\ls "$(dirname "${0}")" | grep 'test_')";
 fi;

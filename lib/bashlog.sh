@@ -8,7 +8,7 @@ function _log_exception() {
     BASHLOG_JSON=0;
     BASHLOG_SYSLOG=0;
 
-    log 'error' "Logging Exception: ${@}";
+    log 'error' "Logging Exception: $*";
   );
 };
 export -f _log_exception;
@@ -39,7 +39,7 @@ function log() {
 
   shift 1;
 
-  local line="${@}";
+  local line="$@";
 
   # RFC 5424
   #
@@ -154,7 +154,7 @@ function log() {
       fi;
       ;;
     *)
-      log 'error' "Undefined log level trying to log: ${@}";
+      log 'error' "Undefined log level trying to log: $*";
       ;;
   esac
 };
