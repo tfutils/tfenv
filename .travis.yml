@@ -11,18 +11,14 @@ matrix:
       dist: xenial
     - os: linux
       dist: trusty
-    - os: linux
-      dist: xenial
-    - os: linux
-      dist: bionic
+    - os: osx
+      osx_image: xcode11.4
     - os: osx
       osx_image: xcode11.2 # OS X 10.14
     - os: osx
-      osx_image: xcode10.1 # OS X 10.13
-    - os: osx
-      osx_image: xcode11.3
-    - os: osx
       osx_image: xcode10.3
+    - os: osx
+      osx_image: xcode10.1 # OS X 10.13
     - os: osx
       osx_image: xcode9.4
 script:
