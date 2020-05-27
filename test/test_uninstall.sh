@@ -87,6 +87,18 @@ for ((test_num=0; test_num<${tests_count}; ++test_num )) ; do
     || error_and_proceed "Test uninstall of version ${version} (via ${keyword}) failed";
 done;
 
+echo "### Uninstall removes versions directory"
+cleanup || error_and_die "Cleanup failed?!"
+(
+  tfenv install 0.12.1 || exit 1
+  tfenv install 0.12.2 || exit 1
+  [ -d "./versions" ] || exit 1
+  tfenv uninstall 0.12.1 || exit 1
+  [ -d "./versions" ] || exit 1
+  tfenv uninstall 0.12.2 || exit 1
+  [ -d "./versions" ] && exit 1 || exit 0
+) || error_and_proceed "Removing last version deletes versions directory"
+
 if [ "${#errors[@]}" -gt 0 ]; then
   log 'warn' "===== The following list tests failed =====";
   for error in "${errors[@]}"; do
