@@ -26,7 +26,7 @@ if [ -z "${TFENV_ROOT:-""}" ]; then
   };
 
   TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)";
-  [ -n ${TFENV_ROOT} ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TFENV_ROOT";
+  [ -n "${TFENV_ROOT}" ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TFENV_ROOT";
 else
   TFENV_ROOT="${TFENV_ROOT%/}";
 fi;
@@ -95,6 +95,9 @@ case "$(uname -s)" in
   CYGWIN_NT*)
     os="windows_${TFENV_ARCH}";
     ;;
+  FreeBSD*)
+    os="freebsd_${TFENV_ARCH}"
+    ;;
   *)
     os="linux_${TFENV_ARCH}";
     ;;
@@ -102,6 +105,7 @@ esac;
 
 keybase_bin="$(command -v keybase 2>/dev/null)";
 shasum_bin="$(command -v shasum 2>/dev/null)";
+sha256sum_bin="$(command -v sha256sum 2>/dev/null)";
 
 TFENV_REMOTE="${TFENV_REMOTE:-https://releases.hashicorp.com}";
 version_url="${TFENV_REMOTE}/terraform/${version}";
@@ -137,7 +141,7 @@ case "${TFENV_CURL_OUTPUT:-2}" in
     curl_progress="-s";
     ;;
   *)
-    log 'error' 'TFENV_CURL_OUTPUT specified, but not with a support value ([0,1,2])';
+    log 'error' 'TFENV_CURL_OUTPUT specified, but not with a supported value ([0,1,2])';
     ;;
 esac;
 
@@ -226,6 +230,13 @@ if [[ -n "${shasum_bin}" && -x "${shasum_bin}" ]]; then
       -c <(grep -F "${tarball_name}" "${shasums_name}") \
       || log 'error' 'SHA256 hash does not match!';
   );
+elif [[ -n "${sha256sum_bin}" && -x "${sha256sum_bin}" ]]; then
+  (
+    cd "${download_tmp}";
+    "${sha256sum_bin}" \
+      -c <(grep -F "${tarball_name}" "${shasums_name}") \
+      || log 'error' 'SHA256 hash does not match!';
+  );
 else
   # Lack of shasum deserves a proper warning
   log 'warn' 'No shasum tool available. Skipping SHA256 hash validation';
@@ -233,7 +244,8 @@ fi;
 
 mkdir -p "${dst_path}" || log 'error' "Failed to make directory ${dst_path}";
 
-declare unzip_output="$(unzip -o "${download_tmp}/${tarball_name}" -d "${dst_path}" || log 'error' 'Tarball unzip failed')";
+declare unzip_output;
+unzip_output="$(unzip -o "${download_tmp}/${tarball_name}" -d "${dst_path}")" || log 'error' 'Tarball unzip failed';
 while IFS= read -r unzip_line; do
  log 'info' "${unzip_line}";
 done < <(printf '%s\n' "${unzip_output}");
