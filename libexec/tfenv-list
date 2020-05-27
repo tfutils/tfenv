@@ -87,7 +87,8 @@ print_version () {
 };
 
 log 'debug' 'Listing versions...';
-local_versions=($(ls -1 "${TFENV_ROOT}/versions" \
+local_versions=($(\find "${TFENV_ROOT}/versions" -type d -exec basename {} \; \
+  | tail -n +2 \
   | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3));
 
 log 'debug' "Local versions: ${local_versions[@]}";
