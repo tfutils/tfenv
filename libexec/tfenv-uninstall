@@ -112,5 +112,9 @@ dst_path="${TFENV_ROOT}/versions/${version}";
 if [ -f "${dst_path}/terraform" ]; then 
   log 'info' "Uninstall Terraform v${version}";
   rm -r "${dst_path}";
+  
+  # If no versions remain, remove the versions directory
+  rmdir "${TFENV_ROOT}/versions" 2>/dev/null;
+  
   log 'info' "Terraform v${version} is successfully uninstalled";
 fi;
