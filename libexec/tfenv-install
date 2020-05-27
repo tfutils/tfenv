@@ -137,7 +137,7 @@ case "${TFENV_CURL_OUTPUT:-2}" in
     curl_progress="-s";
     ;;
   *)
-    log 'error' 'TFENV_CURL_OUTPUT specified, but not with a support value ([0,1,2])';
+    log 'error' 'TFENV_CURL_OUTPUT specified, but not with a supported value ([0,1,2])';
     ;;
 esac;
 
@@ -233,7 +233,8 @@ fi;
 
 mkdir -p "${dst_path}" || log 'error' "Failed to make directory ${dst_path}";
 
-declare unzip_output="$(unzip "${download_tmp}/${tarball_name}" -d "${dst_path}" || log 'error' 'Tarball unzip failed')";
+declare unzip_output;
+unzip_output="$(unzip "${download_tmp}/${tarball_name}" -d "${dst_path}")" || log 'error' 'Tarball unzip failed';
 while IFS= read -r unzip_line; do
  log 'info' "${unzip_line}";
 done < <(printf '%s\n' "${unzip_output}");
