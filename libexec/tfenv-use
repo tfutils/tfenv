@@ -60,7 +60,7 @@ done;
 
 [ "${#}" -gt 1 ] && log 'error' 'usage: tfenv use [<version>]';
 
-[ -d "${TFENV_ROOT}/versions" ] \
+[ -d "${TFENV_CONFIG_DIR}/versions" ] \
   || log 'error' 'No versions of terraform installed. Please install one with: tfenv install';
 
 declare requested="${1:-""}";
@@ -71,8 +71,8 @@ declare resolved="$(tfenv-resolve-version ${requested})";
 declare version="${resolved%%\:*}";
 declare regex="${resolved##*\:}";
 
-log 'debug' "Searching ${TFENV_ROOT}/versions for latest version matching ${regex}";
-declare version="$(\find "${TFENV_ROOT}/versions" -type d -exec basename {} \; \
+log 'debug' "Searching ${TFENV_CONFIG_DIR}/versions for latest version matching ${regex}";
+declare version="$(\find "${TFENV_CONFIG_DIR}/versions" -type d -exec basename {} \; \
   | tail -n +2 \
   | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
   | grep -e "${regex}" \
@@ -83,14 +83,14 @@ declare version="$(\find "${TFENV_ROOT}/versions" -type d -exec basename {} \; \
   && log 'debug' "Found version: ${version}" \
   || log 'error' "No installed versions of terraform matched '${1}'";
 
-target_path="${TFENV_ROOT}/versions/${version}";
+target_path="${TFENV_CONFIG_DIR}/versions/${version}";
 [ -f "${target_path}/terraform" ] \
   || log 'error' "Version directory for ${version} is present, but the terraform binary is not! Manual intervention required.";
 [ -x "${target_path}/terraform" ] \
   || log 'error' "Version directory for ${version} is present, but the terraform binary is not executable! Manual intervention required.";
 
 log 'info' "Switching default version to v${version}";
-version_file="${TFENV_ROOT}/version";
+version_file="${TFENV_CONFIG_DIR}/version";
 log 'debug' "Writing \"${version}\" to \"${version_file}\"";
 echo "${version}" > "${version_file}" \
   || log 'error' "Switch to v${version} failed";

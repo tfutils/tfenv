@@ -179,6 +179,16 @@ To install from a remote other than the default
 TFENV_REMOTE=https://example.jfrog.io/artifactory/hashicorp
 ```
 
+##### `TFENV_CONFIG_DIR`
+
+Path (Default: `$TFENV_ROOT`)
+
+The path to a directory where the local terraform versions and configuration files exist.
+
+```console
+TFENV_CONFIG_DIR="$XDG_CONFIG_HOME/tfenv"
+```
+
 #### Bashlog Logging Library
 
 ##### `BASHLOG_COLOURS`
