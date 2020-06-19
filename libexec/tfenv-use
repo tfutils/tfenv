@@ -99,6 +99,6 @@ if [ "${version_file}" != "$(tfenv-version-file)" ]; then
   log 'warn' "Default version file overridden by $(tfenv-version-file), changing the default version has no effect";
 fi;
 
-terraform --version 1>/dev/null \
-  || log 'error' "'terraform --version' failed. Something is seriously wrong";
+terraform version 1>/dev/null \
+  || log 'error' "'terraform version' failed. Something is seriously wrong";
 log 'info' "Switching completed";
