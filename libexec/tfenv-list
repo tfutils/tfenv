@@ -77,9 +77,11 @@ version_file="$(tfenv-version-file)" \
   || log 'error' "tfenv-version-file failed";
 export version_file;
 
+default_set=0
 print_version () {
   if [ "${1}" == "${version_name}" ]; then
     echo "* ${1} (set by ${version_file})";
+    export default_set=1
   else
     echo "  ${1}";
   fi;
@@ -96,3 +98,4 @@ log 'debug' 'Printing versions...';
 for local_version in ${local_versions[@]}; do
   print_version "${local_version}";
 done;
+! ((default_set)) && log 'info' "No default set. Set with 'tfenv use <version>'"
