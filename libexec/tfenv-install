@@ -122,7 +122,7 @@ shasums_name="terraform_${version}_SHA256SUMS";
 log 'info' "Installing Terraform v${version}";
 
 # Create a local temporary directory for downloads
-download_tmp="$(mktemp -d tfenv_download.XXXXXX)" || log 'error' "Unable to create temporary download directory in $(pwd)";
+download_tmp="$(mktemp -d -t tfenv_download.XXXXXX)" || log 'error' "Unable to create temporary download directory in $(pwd)";
 # Clean it up in case of error
 trap "rm -rf ${download_tmp}" EXIT;
 
