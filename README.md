@@ -27,7 +27,7 @@ Install via Homebrew
 Install via Arch User Repository (AUR)
    
   ```console
-  yay tfenv
+  $ yay --sync tfenv
   ```
 
 Install via puppet
