@@ -73,8 +73,9 @@ see https://www.terraform.io/docs/configuration/terraform.html for details';
 
 find_min_required() {
   local root="${1}";
-
-  versions="$(grep -h -R required_version --include '*tf' "${root}"/* | tr -c -d '0-9. ~=!<>' )";
+  
+  # Only grep recursively if we cannot a required version in base of directory
+  versions="$(grep -h required_version --include '*tf' "${root}"/* || grep -R -h required_version --include '*tf' "${root}"/* | tr -c -d '0-9. ~=!<>' )";
 
   if [[ "${versions}" =~ ([~=!<>]{0,2}[[:blank:]]*[0-9]+[0-9.]+)[^0-9]* ]]; then
     found_min_required="${BASH_REMATCH[1]}";
