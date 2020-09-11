@@ -161,9 +161,9 @@ download_signature() {
 
 # Verify signature if verification mechanism (keybase, gpg, etc) is present
 if [[ -n "${keybase_bin}" && -x "${keybase_bin}" ]]; then
-  "${keybase_bin}" status | grep -Eq '^Logged in:[[:space:]]*yes';
+  grep -Eq '^Logged in:[[:space:]]*yes' <("${keybase_bin}" status);
   keybase_logged_in="${?}";
-  "${keybase_bin}" list-following | grep -Fq hashicorp;
+  grep -Fq hashicorp <("${keybase_bin}" list-following);
   keybase_following_hc="${?}";
 
   if [[ "${keybase_logged_in}" -ne 0 || "${keybase_following_hc}" -ne 0 ]]; then
