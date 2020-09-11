@@ -73,6 +73,38 @@ check_active_version "${minv}" || error_and_proceed 'Min required version does n
 
 cleanup || log 'error' 'Cleanup failed?!';
 
+############################
+# Test Incomplete Versions #
+############################
+
+minv='0.12';
+
+echo "terraform {
+
+  required_version = \">=${minv}\"
+}" >> min_required.tf;
+
+tfenv install min-required;
+tfenv use min-required;
+
+check_active_version "${minv}.0" || error_and_proceed "Min required version does not match for incomplete version ${minv}";
+
+cleanup || log 'error' 'Cleanup failed?!';
+
+minv='0.13';
+
+echo "terraform {
+
+  required_version = \">=${minv}\"
+}" >> min_required.tf;
+
+tfenv install min-required;
+tfenv use min-required;
+
+check_active_version "${minv}.0" || error_and_proceed "Min required version does not match for incomplete version ${minv}";
+
+cleanup || log 'error' 'Cleanup failed?!';
+
 if [ "${#errors[@]}" -gt 0 ]; then
   log 'warn' '===== The following use_minrequired tests failed =====';
   for error in "${errors[@]}"; do
