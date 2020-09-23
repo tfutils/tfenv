@@ -83,6 +83,7 @@ tests__desc=(
   '0.11.15-oci'
   'latest version matching regex'
   'specific version'
+  'latest version matching regex, without latest word'
 );
 
 tests__kv=(
@@ -95,6 +96,7 @@ tests__kv=(
   '0.11.15-oci,0.11.15-oci'
   '0.8.8,latest:^0.8'
   "0.7.13,0.7.13"
+  '0.8.8,:^0.8'
 );
 
 tests_count=${#tests__desc[@]};
