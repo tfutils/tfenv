@@ -79,7 +79,12 @@ resolve_version () {
     version_requested="${min_required}";
   fi;
 
-  if [[ "${version_requested}" =~ ^latest\:.*$ || "${version_requested}" =~ ^\:.*$ ]]; then
+  # Support for short version of latest
+  if [[ "${version_requested}" =~ ^\:.*$ ]]; then
+    version_requested="latest${version_requested}"
+  fi
+
+  if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
     version="${version_requested%%\:*}";
     regex="${version_requested##*\:}";
     log 'debug' "Version uses latest keyword with regex: ${regex}";
