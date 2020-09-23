@@ -73,7 +73,7 @@ TFENV_VERSION="$(cat "${TFENV_VERSION_FILE}" || true)" \
 if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
   log 'debug' "TFENV_VERSION uses 'latest' keyword: ${TFENV_VERSION}";
 
-  if [[ "${TFENV_VERSION}" =~ ^latest\:.*$ ]]; then
+  if [[ "${TFENV_VERSION}" =~ ^latest\:.*$ || "${TFENV_VERSION}" =~ ^\:.*$ ]]; then
     regex="${TFENV_VERSION##*\:}";
     log 'debug' "'latest' keyword uses regex: ${regex}";
   else
