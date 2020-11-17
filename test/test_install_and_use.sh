@@ -58,6 +58,17 @@ test_install_and_use() {
   return 0;
 };
 
+test_install_and_use_with_env() {
+  # Takes a static version and the optional keyword to install it with
+  local k="${2-""}";
+  local v="${1}";
+  TFENV_TERRAFORM_VERSION="${k}" tfenv install || return 1;
+  check_installed_version "${v}" || return 1;
+  TFENV_TERRAFORM_VERSION="${k}" tfenv use || return 1;
+  TFENV_TERRAFORM_VERSION="${k}" check_active_version "${v}" || return 1;
+  return 0;
+};
+
 test_install_and_use_overridden() {
   # Takes a static version and the optional keyword to install it with
   local k="${2-""}";
@@ -125,6 +136,20 @@ for ((test_num=0; test_num<${tests_count}; ++test_num )) ; do
   test_install_and_use "${v}" \
     && log info "## ./.terraform-version Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) succeeded" \
     || error_and_proceed "## ./.terraform-version Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) failed";
+done;
+
+for ((test_num=0; test_num<${tests_count}; ++test_num )) ; do
+  cleanup || log 'error' 'Cleanup failed?!';
+  desc=${tests__desc[${test_num}]};
+  kv="${tests__kv[${test_num}]}";
+  v="${kv%,*}";
+  k="${kv##*,}";
+  log 'info' "## TFENV_TERRAFORM_VERSION Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} )";
+  log 'info' "Writing 0.0.0 to ./.terraform-version";
+  echo "0.0.0" > ./.terraform-version;
+  test_install_and_use_with_env "${v}" "${k}" \
+    && log info "## TFENV_TERRAFORM_VERSION Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) succeeded" \
+    || error_and_proceed "## TFENV_TERRAFORM_VERSION Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) failed";
 done;
 
 cleanup || log 'error' 'Cleanup failed?!';
