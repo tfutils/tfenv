@@ -24,6 +24,12 @@ Install via Homebrew
   $ brew install tfenv
   ```
 
+Install via Arch User Repository (AUR)
+   
+  ```console
+  $ yay --sync tfenv
+  ```
+
 Install via puppet
 
 Using puppet module [sergk-tfenv](https://github.com/SergK/puppet-tfenv)
