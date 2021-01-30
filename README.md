@@ -408,7 +408,7 @@ Note, that [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_ver
 $ cat .terraform-version
 0.6.16
 
-$ terraform --version
+$ terraform version
 Terraform v0.6.16
 
 Your version of Terraform is out of date! The latest version
@@ -416,12 +416,12 @@ is 0.7.3. You can update by downloading from www.terraform.io
 
 $ echo 0.7.3 > .terraform-version
 
-$ terraform --version
+$ terraform version
 Terraform v0.7.3
 
 $ echo latest:^0.8 > .terraform-version
 
-$ terraform --version
+$ terraform version
 Terraform v0.8.8
 
 $ TFENV_TERRAFORM_VERSION=0.7.3 terraform --version

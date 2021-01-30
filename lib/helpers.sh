@@ -112,14 +112,14 @@ export -f curlw;
 
 check_active_version() {
   local v="${1}";
-  [ -n "$(${TFENV_ROOT}/bin/terraform --version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
+  [ -n "$(${TFENV_ROOT}/bin/terraform version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
 }
 export -f check_active_version;
 
 check_installed_version() {
   local v="${1}";
   local bin="${TFENV_ROOT}/versions/${v}/terraform";
-  [ -n "$(${bin} --version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
+  [ -n "$(${bin} version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
 };
 export -f check_installed_version;
 
