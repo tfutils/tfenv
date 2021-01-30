@@ -39,7 +39,7 @@ resolve_version () {
 
   declare arg="${1:-""}";
 
-  if [ -z "${arg}" ]; then
+  if [ -z "${arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
     version_file="$(tfenv-version-file)";
     log 'debug' "Version File: ${version_file}";
 
@@ -64,6 +64,9 @@ resolve_version () {
       log 'info' 'No version requested on the command line or in the version file search path. Installing "latest"';
       version_requested='latest';
     fi;
+  elif [ -n "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+    version_requested="${TFENV_TERRAFORM_VERSION}";
+    log 'debug' "TFENV_TERRAFORM_VERSION is set: ${TFENV_TERRAFORM_VERSION}";
   else
     version_requested="${arg}";
   fi;
