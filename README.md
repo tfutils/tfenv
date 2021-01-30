@@ -24,6 +24,12 @@ Install via Homebrew
   $ brew install tfenv
   ```
 
+Install via Arch User Repository (AUR)
+   
+  ```console
+  $ yay --sync tfenv
+  ```
+
 Install via puppet
 
 Using puppet module [sergk-tfenv](https://github.com/SergK/puppet-tfenv)
@@ -68,7 +74,7 @@ include ::tfenv
 
 Install a specific version of Terraform.
 
-If no parameter is passed, the version to use is resolved automatically via .terraform-version files, defaulting to 'latest' if none are found.
+If no parameter is passed, the version to use is resolved automatically via [.terraform-version files](#terraform-version-file) or [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_version) (TFENV\_TERRAFORM\_VERSION takes precedence), defaulting to 'latest' if none are found.
 
 If a parameter is passed, available options:
 
@@ -177,6 +183,20 @@ To install from a remote other than the default
 
 ```console
 TFENV_REMOTE=https://example.jfrog.io/artifactory/hashicorp
+```
+
+##### `TFENV_TERRAFORM_VERSION`
+
+String (Default: "")
+
+If not empty string, this variable overrides Terraform version, specified in [.terraform-version files](#terraform-version-file).
+`latest` and `latest:<regex>` syntax are also supported.
+[`tfenv install`](#tfenv-install-version) and [`tfenv use`](#tfenv-use-version) command also respects this variable.
+
+e.g.
+
+```console
+TFENV_TERRAFORM_VERSION=latest:^0.11. terraform --version
 ```
 
 #### Bashlog Logging Library
@@ -306,7 +326,7 @@ Defaults to the PID of the calling process.
 
 Switch a version to use
 
-If no parameter is passed, the version to use is resolved automatically via .terraform-version files, defaulting to 'latest' if none are found.
+If no parameter is passed, the version to use is resolved automatically via [.terraform-version files](#terraform-version-file) or [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_version) (TFENV\_TERRAFORM\_VERSION takes precedence), defaulting to 'latest' if none are found.
 
 `latest` is a syntax to use the latest installed version
 
@@ -382,11 +402,13 @@ List installable versions
 
 If you put a `.terraform-version` file on your project root, or in your home directory, tfenv detects it and uses the version written in it. If the version is `latest` or `latest:<regex>`, the latest matching version currently installed will be selected.
 
+Note, that [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_version) can be used to override version, specified by `.terraform-version` file.
+
 ```console
 $ cat .terraform-version
 0.6.16
 
-$ terraform --version
+$ terraform version
 Terraform v0.6.16
 
 Your version of Terraform is out of date! The latest version
@@ -394,13 +416,16 @@ is 0.7.3. You can update by downloading from www.terraform.io
 
 $ echo 0.7.3 > .terraform-version
 
-$ terraform --version
+$ terraform version
 Terraform v0.7.3
 
 $ echo latest:^0.8 > .terraform-version
 
-$ terraform --version
+$ terraform version
 Terraform v0.8.8
+
+$ TFENV_TERRAFORM_VERSION=0.7.3 terraform --version
+Terraform v0.7.3
 ```
 
 ## Upgrading
