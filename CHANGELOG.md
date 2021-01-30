@@ -1,3 +1,24 @@
+## 2.1.0 (January 30, 2021)
+
+ * Update tfenv-min-required to search root before recursing (#203)  
+ * Terraform 0.13.0 support (#191)
+ * Add Arch Linux install instructions via Arch User Repository (AUR) (#201)
+ * min-required correctly finds tagged release versions (#206)
+ * install: make keybase a fall-through verification variant (#213)
+ * Feature/add TFENV_TERRAFORM_VERSION env var (#222)
+ * Document version-name command (#224)
+ * Fix signature verification bypass due to insufficient hashsum checking (#212)
+ * Fix keybase login exit code handling (#188)
+ * Fix bug on MacOS when using CLICOLOR=1 (#152)
+ * Improved error handling in tfenv-list-remote-curl (#186)
+ * Test in Windows (#140)
+ * force tfenv to write over existing zip if it exists (#169)
+ * Remove the versions directory when the last version is uninstalled (#128)
+ * Add support for sha256sum command (#170)
+ * Adding freebsd support (#133)
+ * Improve shell script synatx (#174)
+ * Begrudging Bash 3.x Compatability because of macOS (#181)
+
 ## 2.0.0 (April 20, 2020)
 
  * New logging and debugging library
