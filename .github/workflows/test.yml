@@ -1,43 +1,46 @@
-# This is a basic workflow to help you get started with Actions
+name: 'Test'
 
-name: 'CI'
-
-# Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches:
       - 'master'
   pull_request:
     branches:
       - 'master'
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+
+  # Only checking latest Linux/UNIX on pulls to save execution times
+  test-master-pulls:
+    if: github.event_name == 'pull_request'
     runs-on: "${{ matrix.os }}"
-    
+    strategy:
+      matrix:
+        os:
+          - 'macos-latest'
+          - 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v2'
+      - name: 'Run all tests'
+        run: './test/run.sh'
+        shell: 'bash'
+
+  # When we push to master, test everything in order to guarantee releases
+  test-master-pushes:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: "${{ matrix.os }}"
     strategy:
       matrix:
         os:
           # - 'macos-11.0' # Not yet available
           - 'macos-10.15'
           - 'ubuntu-20.04'
-          # - 'ubuntu-18.04' # Unnecessary waste of executions - should be covered by 20.04 and 16.04
+          - 'ubuntu-18.04'
           - 'ubuntu-16.04'
           - 'windows-2019'
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: 'actions/checkout@v2'
-
-      # Runs a single command using the runners shell
       - name: 'Run all tests'
         run: './test/run.sh'
         shell: 'bash'
