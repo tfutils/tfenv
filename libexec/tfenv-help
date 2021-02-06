@@ -12,6 +12,7 @@ Commands:
    list-remote   List all installable versions
    local         Set or show the local directory Terraform version
    version-name  Print current version
+   init          Update environment to use 'tfenv' correctly.
 ';
 
 exit 0;
