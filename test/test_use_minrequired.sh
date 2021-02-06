@@ -55,11 +55,15 @@ cleanup || log 'error' 'Cleanup failed?!';
 
 v='0.8.8';
 minv='0.8.0';
+minv_tag='0.13.0-rc1'
 (
   tfenv install "${v}" || true;
   tfenv use "${v}" || exit 1;
   check_active_version "${v}" || exit 1;
 ) || error_and_proceed "Installing specific version ${v}";
+
+
+log 'info' '### Install min-required normal version (#.#.#)';
 
 echo "terraform {
 
@@ -70,6 +74,20 @@ tfenv install min-required;
 tfenv use min-required;
 
 check_active_version "${minv}" || error_and_proceed 'Min required version does not match';
+
+cleanup || log 'error' 'Cleanup failed?!';
+
+log 'info' '### Install min-required tagged version (#.#.#-tag#)'
+
+echo "terraform {
+
+    required_version = \">=${minv_tag}\"
+}" >> min_required.tf;
+
+tfenv install min-required
+tfenv use min-required
+
+check_active_version "${minv_tag}" || error_and_proceed 'Min required version does not match';
 
 cleanup || log 'error' 'Cleanup failed?!';
 

@@ -159,26 +159,17 @@ download_signature() {
     || log 'error' 'SHA256SUMS signature download failed';
 };
 
+# If on MacOS with Homebrew, use GNU grep
+# This allows keybase login detection to work on Mac
+if [[ $(uname) == 'Darwin' ]] && [ $(which brew) ]; then
+  if ! [ $(which ggrep) ]; then
+    brew install grep;
+  fi
+  alias grep=ggrep;
+fi
+
 # Verify signature if verification mechanism (keybase, gpg, etc) is present
-if [[ -n "${keybase_bin}" && -x "${keybase_bin}" ]]; then
-  "${keybase_bin}" status | grep -Eq '^Logged in:[[:space:]]*yes';
-  keybase_logged_in="${?}";
-  "${keybase_bin}" list-following | grep -Fq hashicorp;
-  keybase_following_hc="${?}";
-
-  if [[ "${keybase_logged_in}" -ne 0 || "${keybase_following_hc}" -ne 0 ]]; then
-    log 'warn' 'Unable to verify OpenPGP signature unless logged into keybase and following hashicorp';
-  else
-    download_signature;
-    "${keybase_bin}" pgp verify \
-      -S hashicorp \
-      -d "${download_tmp}/${shasums_name}.sig" \
-      -i "${download_tmp}/${shasums_name}" \
-      && log 'debug' 'SHA256SUMS signature matched' \
-      || log 'error' 'SHA256SUMS signature does not match!';
-  fi;
-
-elif [[ -f "${TFENV_ROOT}/use-gnupg" ]]; then
+if [[ -f "${TFENV_ROOT}/use-gnupg" ]]; then
   # GnuPG uses the user's keyring, and any web-of-trust or local signatures or
   # anything else they have setup.  This is the crazy-powerful mode which is
   # overly confusing to newcomers.  We don't support it without the user creating
@@ -216,6 +207,23 @@ elif [[ -f "${TFENV_ROOT}/use-gpgv" ]]; then
       "${download_tmp}/${shasums_name}" \
       || log 'error' 'PGP signature rejected';
   fi;
+elif [[ -n "${keybase_bin}" && -x "${keybase_bin}" ]]; then
+  grep -Eq '^Logged in:[[:space:]]*yes' <("${keybase_bin}" status);
+  keybase_logged_in="${?}";
+  grep -Fq hashicorp <("${keybase_bin}" list-following);
+  keybase_following_hc="${?}";
+
+  if [[ "${keybase_logged_in}" -ne 0 || "${keybase_following_hc}" -ne 0 ]]; then
+    log 'warn' 'Unable to verify OpenPGP signature unless logged into keybase and following hashicorp';
+  else
+    download_signature;
+    "${keybase_bin}" pgp verify \
+      -S hashicorp \
+      -d "${download_tmp}/${shasums_name}.sig" \
+      -i "${download_tmp}/${shasums_name}" \
+      && log 'debug' 'SHA256SUMS signature matched' \
+      || log 'error' 'SHA256SUMS signature does not match!';
+  fi;
 else
   # Warning about this avoids an unwarranted sense of confidence in the SHA check
   log 'warn' 'No keybase install found, skipping OpenPGP signature verification';
@@ -227,16 +235,14 @@ if [[ -n "${shasum_bin}" && -x "${shasum_bin}" ]]; then
     "${shasum_bin}" \
       -a 256 \
       -s \
-      -c <(grep -F "${tarball_name}" "${shasums_name}") \
-      || log 'error' 'SHA256 hash does not match!';
-  );
+      -c <(grep -F "${tarball_name}" "${shasums_name}")
+  ) || log 'error' 'SHA256 hash does not match!';
 elif [[ -n "${sha256sum_bin}" && -x "${sha256sum_bin}" ]]; then
   (
     cd "${download_tmp}";
     "${sha256sum_bin}" \
-      -c <(grep -F "${tarball_name}" "${shasums_name}") \
-      || log 'error' 'SHA256 hash does not match!';
-  );
+      -c <(grep -F "${tarball_name}" "${shasums_name}")
+  ) || log 'error' 'SHA256 hash does not match!';
 else
   # Lack of shasum deserves a proper warning
   log 'warn' 'No shasum tool available. Skipping SHA256 hash validation';

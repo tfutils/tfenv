@@ -63,16 +63,27 @@ done;
 [ -d "${TFENV_ROOT}/versions" ] \
   || log 'error' 'No versions of terraform installed. Please install one with: tfenv install';
 
-declare requested="${1:-""}";
+declare requested_arg="${1:-""}";
+declare version_source_suffix="";
+declare requested="${requested_arg}";
 
-log debug "Resolving version with: tfenv-resolve-version ${requested}";
-declare resolved="$(tfenv-resolve-version ${requested})";
+if [ -z "${requested_arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+  version_source_suffix=" (set by $(tfenv-version-file))";
+  requested="$(cat "$(tfenv-version-file)" || true)";
+elif [ -z "${requested_arg}" ]; then
+  version_source_suffix=' (set by TFENV_TERRAFORM_VERSION)';
+  requested="${TFENV_TERRAFORM_VERSION}";
+fi
+
+log debug "Resolving version with: tfenv-resolve-version ${requested_arg}";
+declare resolved="$(tfenv-resolve-version ${requested_arg})";
 
 declare version="${resolved%%\:*}";
 declare regex="${resolved##*\:}";
 
 log 'debug' "Searching ${TFENV_ROOT}/versions for latest version matching ${regex}";
-declare version="$(\ls "${TFENV_ROOT}/versions" \
+declare version="$(\find "${TFENV_ROOT}/versions" -type d -exec basename {} \; \
+  | tail -n +2 \
   | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
   | grep -e "${regex}" \
   | head -n 1
@@ -80,7 +91,7 @@ declare version="$(\ls "${TFENV_ROOT}/versions" \
 
 [ -n "${version}" ] \
   && log 'debug' "Found version: ${version}" \
-  || log 'error' "No installed versions of terraform matched '${1}'";
+  || log 'error' "No installed versions of terraform matched '${requested}'${version_source_suffix}";
 
 target_path="${TFENV_ROOT}/versions/${version}";
 [ -f "${target_path}/terraform" ] \
@@ -98,6 +109,6 @@ if [ "${version_file}" != "$(tfenv-version-file)" ]; then
   log 'warn' "Default version file overridden by $(tfenv-version-file), changing the default version has no effect";
 fi;
 
-terraform --version 1>/dev/null \
-  || log 'error' "'terraform --version' failed. Something is seriously wrong";
+terraform version 1>/dev/null \
+  || log 'error' "'terraform version' failed. Something is seriously wrong";
 log 'info' "Switching completed";
