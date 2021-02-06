@@ -68,19 +68,26 @@ done;
 [[ -x "${TFENV_ROOT}/versions" && -r "${TFENV_ROOT}/versions" ]] \
   || log 'error' "tfenv versions directory is inaccessible: ${TFENV_ROOT}/versions";
 
-version_name="$(tfenv-version-name)" \
-  && log 'debug' "tfenv-version-name reported: ${version_name}" \
-  || log 'error' "tfenv-version-name failed";
+version_name="$(tfenv-version-name 2>/dev/null || true)" \
+  && log 'debug' "tfenv-version-name reported: ${version_name}";
 export version_name;
 
-version_file="$(tfenv-version-file)" \
-  && log 'debug' "tfenv-version-file reported: ${version_file}" \
-  || log 'error' "tfenv-version-file failed";
-export version_file;
+if [ -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+  version_source="$(tfenv-version-file)" \
+    && log 'debug' "tfenv-version-file reported: ${version_source}" \
+    || log 'error' "tfenv-version-file failed";
+else
+  version_source='TFENV_TERRAFORM_VERSION';
+fi
+export version_source;
+
+# Register for whether a default terraform version has yet been set
+declare -i default_set=0;
 
 print_version () {
   if [ "${1}" == "${version_name}" ]; then
-    echo "* ${1} (set by ${version_file})";
+    echo "* ${1} (set by ${version_source})";
+    default_set=1
   else
     echo "  ${1}";
   fi;
@@ -97,3 +104,7 @@ log 'debug' 'Printing versions...';
 for local_version in ${local_versions[@]}; do
   print_version "${local_version}";
 done;
+
+[ "${default_set}" -eq 0 ] && log 'info' "No default set. Set with 'tfenv use <version>'";
+
+exit 0;

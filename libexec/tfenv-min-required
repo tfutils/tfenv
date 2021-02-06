@@ -73,17 +73,18 @@ see https://www.terraform.io/docs/configuration/terraform.html for details';
 
 find_min_required() {
   local root="${1}";
+  
+  # Only grep recursively if we cannot a required version in base of directory
+  versions="$( echo $(grep -h required_version --include '*tf' "${root}"/* || grep -h -R required_version --include '*tf' "${root}"/*) | grep  -o '\([0-9]\+\.\?\)\{2,3\}\(-[a-z]\+[0-9]\+\)\?')";
 
-  versions="$(grep -h -R required_version --include '*tf' "${root}"/* | tr -c -d '0-9. ~=!<>' )";
-
-  if [[ "${versions}" =~ ([~=!<>]{0,2}[[:blank:]]*[0-9]+[0-9.]+)[^0-9]* ]]; then
-    found_min_required="${BASH_REMATCH[1]}";
+  if [[ "${versions}" =~ ([~=!<>]{0,2}[[:blank:]]*[0-9]+[0-9.]+)[^0-9]*(-[a-z]+[0-9]+)? ]]; then
+    found_min_required="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
 
     if [[ "${found_min_required}" =~ ^!=.+ ]]; then
       log 'debug' "Error: Min required version is a negation ($found_min_required) - we cannot guess the desired one.";
       bailout;
     else
-      found_min_required="$(echo "$found_min_required" | tr -c -d '0-9.')";
+      found_min_required="$(echo "$found_min_required")";
       #echo "Min required version is detected as ${found_min_required}";
       echo "${found_min_required}";
       exit 0;
