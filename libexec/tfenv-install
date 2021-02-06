@@ -159,6 +159,15 @@ download_signature() {
     || log 'error' 'SHA256SUMS signature download failed';
 };
 
+# If on MacOS with Homebrew, use GNU grep
+# This allows keybase login detection to work on Mac
+if [[ $(uname) == 'Darwin' ]] && [ $(which brew) ]; then
+  if ! [ $(which ggrep) ]; then
+    brew install grep;
+  fi
+  alias grep=ggrep;
+fi
+
 # Verify signature if verification mechanism (keybase, gpg, etc) is present
 if [[ -f "${TFENV_ROOT}/use-gnupg" ]]; then
   # GnuPG uses the user's keyring, and any web-of-trust or local signatures or
