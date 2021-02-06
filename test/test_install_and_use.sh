@@ -94,6 +94,7 @@ tests__desc=(
   '0.11.15-oci'
   'latest version matching regex'
   'specific version'
+  'specific version with v prefix'
 );
 
 tests__kv=(
@@ -105,7 +106,8 @@ tests__kv=(
   "$(tfenv list-remote | grep '^0\.11\.' | head -n 1),latest:^0.11."
   '0.11.15-oci,0.11.15-oci'
   '0.8.8,latest:^0.8'
-  "0.7.13,0.7.13"
+  '0.7.13,0.7.13'
+  '0.14.6,v0.14.6'
 );
 
 tests_count=${#tests__desc[@]};
@@ -201,7 +203,7 @@ neg_tests__desc=(
 
 neg_tests__kv=(
   '9.9.9'
-  "latest:word"
+  'latest:word'
 );
 
 neg_tests_count=${#neg_tests__desc[@]};
