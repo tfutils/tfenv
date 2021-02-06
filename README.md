@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/tfutils/tfenv.svg?branch=master)](https://travis-ci.com/tfutils/tfenv)
+![CI](https://github.com/tfutils/tfenv/workflows/CI/badge.svg)
 
 # tfenv
 
