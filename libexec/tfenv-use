@@ -69,7 +69,7 @@ declare requested="${requested_arg}";
 
 if [ -z "${requested_arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
   version_source_suffix=" (set by $(tfenv-version-file))";
-  requested="$(cat "$(tfenv-version-file)" || true)";
+  requested="$(cat "$(tfenv-version-file)" 2>/dev/null || true)";
 elif [ -z "${requested_arg}" ]; then
   version_source_suffix=' (set by TFENV_TERRAFORM_VERSION)';
   requested="${TFENV_TERRAFORM_VERSION}";
