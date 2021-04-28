@@ -49,7 +49,7 @@ fi;
 for dir in libexec bin; do
   case ":${PATH}:" in
     *:${TFENV_ROOT}/${dir}:*) log 'debug' "\$PATH already contains '${TFENV_ROOT}/${dir}', not adding it again";;
-    *) 
+    *)
       log 'debug' "\$PATH does not contain '${TFENV_ROOT}/${dir}', prepending and exporting it now";
       export PATH="${TFENV_ROOT}/${dir}:${PATH}";
       ;;
@@ -59,9 +59,6 @@ done;
 #####################
 # Begin Script Body #
 #####################
-
-[ -d "${TFENV_ROOT}/versions" ] \
-  || log 'error' 'No versions of terraform installed. Please install one with: tfenv install';
 
 if [ -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
   TFENV_VERSION_FILE="$(tfenv-version-file)" \
@@ -81,6 +78,9 @@ fi
 
 if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
   log 'debug' "TFENV_VERSION uses 'latest' keyword: ${TFENV_VERSION}";
+
+  [ -d "${TFENV_ROOT}/versions" ] \
+    || log 'error' 'No versions of terraform installed. Please install one with: tfenv install';
 
   if [[ "${TFENV_VERSION}" =~ ^latest\:.*$ ]]; then
     regex="${TFENV_VERSION##*\:}";
@@ -115,4 +115,3 @@ if [ ! -d "${TFENV_ROOT}/versions/${TFENV_VERSION}" ]; then
 fi;
 
 echo "${TFENV_VERSION}";
-
