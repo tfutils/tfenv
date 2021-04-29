@@ -1,3 +1,7 @@
+## 2.2.1 (April 29, 2021)
+
+ * hcsec-2021-12 (#257)
+
 ## 2.2.0 (February 06, 2021)
 
  * Convert GitHub CI from Travis CI to Github Actions
