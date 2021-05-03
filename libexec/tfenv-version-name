@@ -90,7 +90,7 @@ if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
     log 'debug' "'latest' keyword does not use regex";
   fi;
 
-  version="$(\find "${TFENV_ROOT}/versions" -type d -exec basename {} \; \
+  version="$(\find "${TFENV_ROOT}/versions/" -type d -exec basename {} \; \
     | tail -n +2 \
     | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
     | grep -e "${regex}" \
