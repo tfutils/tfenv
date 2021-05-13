@@ -86,7 +86,7 @@ if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
     regex="${TFENV_VERSION##*\:}";
     log 'debug' "'latest' keyword uses regex: ${regex}";
   else
-    regex='.*'; # Just saves a seperate command below without the grep
+    regex='.*'; # Just saves a separate command below without the grep
     log 'debug' "'latest' keyword does not use regex";
   fi;
 
@@ -96,13 +96,23 @@ if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
     | grep -e "${regex}" \
     | head -n 1)";
 
-  if [ -n "${version}" ]; then
-    log 'debug' "Version selected: ${version}";
-    TFENV_VERSION="${version}"
+  if [[ "${TFENV_AUTO_INSTALL:-true}" == "true" ]]; then
+    log 'debug' "Trying to find the remote version using the regex: ${regex}";
+    remote_version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)"
+    if [[ -n "${remote_version}" ]]; then
+        if [[ "${version}" != "${remote_version}" ]]; then
+          log 'debug' "The installed version '${version}' does not much the remote version '${remote_version}'";
+          TFENV_VERSION="${remote_version}"
+        else
+          TFENV_VERSION="${version}"
+        fi
+    else
+      log 'error' "No versions matching '${requested}' found in remote";
+    fi
   else
-    log 'error' "No installed versions of terraform matched '${TFENV_VERSION}'";
-  fi;
-
+    [[ -n "${version}" ]] && TFENV_VERSION="${version}" \
+      || log 'error' "No installed versions of terraform matched '${TFENV_VERSION}'";
+  fi
 else
   log 'debug' 'TFENV_VERSION does not use "latest" keyword';
 fi;
@@ -115,4 +125,3 @@ if [ ! -d "${TFENV_ROOT}/versions/${TFENV_VERSION}" ]; then
 fi;
 
 echo "${TFENV_VERSION}";
-
