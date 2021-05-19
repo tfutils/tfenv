@@ -60,10 +60,7 @@ done;
 # Begin Script Body #
 #####################
 
-[ -d "${TFENV_ROOT}/versions" ] \
-  || log 'error' 'No versions of terraform installed. Please install one with: tfenv install';
-
-if [ -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+if [[ -z "${TFENV_TERRAFORM_VERSION:-""}" ]]; then
   TFENV_VERSION_FILE="$(tfenv-version-file)" \
     && log 'debug' "TFENV_VERSION_FILE retrieved from tfenv-version-file: ${TFENV_VERSION_FILE}" \
     || log 'error' 'Failed to retrieve TFENV_VERSION_FILE from tfenv-version-file';
@@ -90,37 +87,45 @@ if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
     log 'debug' "'latest' keyword does not use regex";
   fi;
 
-  version="$(\find "${TFENV_ROOT}/versions" -type d -exec basename {} \; \
-    | tail -n +2 \
-    | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
-    | grep -e "${regex}" \
-    | head -n 1)";
+  if [[ -d "${TFENV_ROOT}/versions" ]]; then
+    local_version="$(\find "${TFENV_ROOT}/versions" -type d -exec basename {} \; \
+      | tail -n +2 \
+      | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
+      | grep -e "${regex}" \
+      | head -n 1)";
+  else
+     local_version='' # To avoid 'unbound variable' error
+  fi
 
   if [[ "${TFENV_AUTO_INSTALL:-true}" == "true" ]]; then
     log 'debug' "Trying to find the remote version using the regex: ${regex}";
     remote_version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)"
     if [[ -n "${remote_version}" ]]; then
-        if [[ "${version}" != "${remote_version}" ]]; then
-          log 'debug' "The installed version '${version}' does not much the remote version '${remote_version}'";
+        if [[ "${local_version}" != "${remote_version}" ]]; then
+          log 'debug' "The installed version '${local_version}' does not much the remote version '${remote_version}'";
           TFENV_VERSION="${remote_version}"
         else
-          TFENV_VERSION="${version}"
+          TFENV_VERSION="${local_version}"
         fi
     else
       log 'error' "No versions matching '${requested}' found in remote";
     fi
   else
-    [[ -n "${version}" ]] && TFENV_VERSION="${version}" \
-      || log 'error' "No installed versions of terraform matched '${TFENV_VERSION}'";
+    if [[ -n "${local_version}" ]]; then
+      TFENV_VERSION="${local_version}"
+    else
+      log 'error' "No installed versions of terraform matched '${TFENV_VERSION}'";
+    fi
   fi
 else
   log 'debug' 'TFENV_VERSION does not use "latest" keyword';
 fi;
 
-[ -z "${TFENV_VERSION}" ] \
-  && log 'error' "Version could not be resolved (set by ${TFENV_VERSION_SOURCE} or tfenv use <version>)";
+if [[ -z "${TFENV_VERSION}" ]]; then
+  log 'error' "Version could not be resolved (set by ${TFENV_VERSION_SOURCE} or tfenv use <version>)";
+fi
 
-if [ ! -d "${TFENV_ROOT}/versions/${TFENV_VERSION}" ]; then
+if [[ ! -d "${TFENV_ROOT}/versions/${TFENV_VERSION}" ]]; then
   log 'debug' "version '${TFENV_VERSION}' is not installed (set by ${TFENV_VERSION_SOURCE})";
 fi;
 
