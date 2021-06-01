@@ -24,7 +24,8 @@ else
 fi;
 export TFENV_ROOT;
 
-if [ "${TFENV_DEBUG:-0}" -gt 0 ]; then
+# Only reset DEBUG if TFENV_DEBUG is set, and DEBUG is unset or already a number
+if [ "${TFENV_DEBUG:-0}" -gt 0 ] && [[ "${DEBUG:-0}" =~ ^[0-9]+$ ]]; then
   [ "${DEBUG:-0}" -gt "${TFENV_DEBUG:-0}" ] || export DEBUG="${TFENV_DEBUG:-0}";
   if [[ "${TFENV_DEBUG}" -gt 2 ]]; then
     export PS4='+ [${BASH_SOURCE##*/}:${LINENO}] ';
