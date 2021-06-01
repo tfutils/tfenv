@@ -35,7 +35,7 @@ export TFENV_ROOT;
 if [ -n "${TFENV_HELPERS:-""}" ]; then
   log 'debug' 'TFENV_HELPERS is set, not sourcing helpers again';
 else
-  [ "${TFENV_DEBUG:-0}" -gt 0 ] && echo "[DEBUG] Sourcing helpers from ${TFENV_ROOT}/lib/helpers.sh";
+  [ "${TFENV_DEBUG:-0}" -gt 0 ] && >&2 echo "[DEBUG] Sourcing helpers from ${TFENV_ROOT}/lib/helpers.sh";
   if source "${TFENV_ROOT}/lib/helpers.sh"; then
     log 'debug' 'Helpers sourced successfully';
   else
