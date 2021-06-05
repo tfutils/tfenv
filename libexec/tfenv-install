@@ -119,6 +119,8 @@ else
 fi;
 
 shasums_name="terraform_${version}_SHA256SUMS";
+shasums_signing_key_postfix=".72D7468F"
+shasums_sig="${shasums_name}${shasums_signing_key_postfix}.sig";
 
 log 'info' "Installing Terraform v${version}";
 
@@ -152,11 +154,11 @@ log 'info' "Downloading SHA hash file from ${version_url}/${shasums_name}";
 curlw -s -f -o "${download_tmp}/${shasums_name}" "${version_url}/${shasums_name}" || log 'error' 'SHA256 hashes download failed';
 
 download_signature() {
-  log 'info' "Downloading SHA hash signature file from ${version_url}/${shasums_name}.sig";
+  log 'info' "Downloading SHA hash signature file from ${version_url}/${shasums_sig}";
   curlw -s -f \
-    -o "${download_tmp}/${shasums_name}.sig" \
-    "${version_url}/${shasums_name}.sig" \
-    && log 'debug' "SHA256SUMS signature file downloaded successfully to ${download_tmp}/${shasums_name}.sig" \
+    -o "${download_tmp}/${shasums_sig}" \
+    "${version_url}/${shasums_sig}" \
+    && log 'debug' "SHA256SUMS signature file downloaded successfully to ${download_tmp}/${shasums_sig}" \
     || log 'error' 'SHA256SUMS signature download failed';
 };
 
@@ -182,7 +184,7 @@ if [[ -f "${TFENV_ROOT}/use-gnupg" ]]; then
   # Deliberately unquoted command, in case caller has something fancier in "use-gnupg".
   # Also, don't use batch mode.  If someone specifies GnuPG, let them deal with any prompting.
   ${gnupg_command} \
-    --verify "${download_tmp}/${shasums_name}.sig" \
+    --verify "${download_tmp}/${shasums_sig}" \
     "${download_tmp}/${shasums_name}" \
     || log 'error' 'PGP signature rejected by GnuPG';
 
@@ -199,12 +201,12 @@ elif [[ -f "${TFENV_ROOT}/use-gpgv" ]]; then
   if [[ "${trust_tfenv}" == 'yes' ]]; then
     ${gpgv_command} \
       --keyring "${TFENV_ROOT}/share/hashicorp-keys.pgp" \
-      "${download_tmp}/${shasums_name}.sig" \
+      "${download_tmp}/${shasums_sig}" \
       "${download_tmp}/${shasums_name}" \
       || log 'error' 'PGP signature rejected';
   else
     ${gpgv_command} \
-      "${download_tmp}/${shasums_name}.sig" \
+      "${download_tmp}/${shasums_sig}" \
       "${download_tmp}/${shasums_name}" \
       || log 'error' 'PGP signature rejected';
   fi;
@@ -220,7 +222,7 @@ elif [[ -n "${keybase_bin}" && -x "${keybase_bin}" ]]; then
     download_signature;
     "${keybase_bin}" pgp verify \
       -S hashicorp \
-      -d "${download_tmp}/${shasums_name}.sig" \
+      -d "${download_tmp}/${shasums_sig}" \
       -i "${download_tmp}/${shasums_name}" \
       && log 'debug' 'SHA256SUMS signature matched' \
       || log 'error' 'SHA256SUMS signature does not match!';
