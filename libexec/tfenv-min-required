@@ -63,7 +63,7 @@ done;
 
 bailout() {
   log 'error' 'Error: Could not determine required_version based on your terraform sources.
-Make sure at least one of your *tf  of *.tf.json files includes a required version section like
+Make sure at least one of your *tf  or *.tf.json files includes a required version section like
 terraform {
   required_version = ">= 0.0.0"
 }
