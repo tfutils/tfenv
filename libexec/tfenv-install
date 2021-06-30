@@ -81,7 +81,16 @@ if [ -f "${dst_path}/terraform" ]; then
   exit 0;
 fi;
 
-TFENV_ARCH="${TFENV_ARCH:-amd64}";
+# Add support of Linux ARM64
+case "$(uname -m)" in
+  aarch64*)
+    TFENV_ARCH="${TFENV_ARCH:-arm64}";
+    ;;
+  *)
+    TFENV_ARCH="${TFENV_ARCH:-amd64}";
+    ;;
+esac;
+
 case "$(uname -s)" in
   Darwin*)
     os="darwin_${TFENV_ARCH}";
