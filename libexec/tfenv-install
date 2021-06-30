@@ -91,7 +91,6 @@ case "$(uname -m)" in
     ;;
 esac;
 
-TFENV_ARCH="${TFENV_ARCH:-amd64}";
 case "$(uname -s)" in
   Darwin*)
     os="darwin_${TFENV_ARCH}";
