@@ -81,9 +81,9 @@ if [ -f "${dst_path}/terraform" ]; then
   exit 0;
 fi;
 
-# Add support of Linux ARM64
+# Add support of ARM64 for Linux & Apple Silicon
 case "$(uname -m)" in
-  aarch64*)
+  aarch64* | arm64*)
     TFENV_ARCH="${TFENV_ARCH:-arm64}";
     ;;
   *)
