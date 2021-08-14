@@ -60,9 +60,14 @@ for v in 0.7.2 0.7.13 0.9.1 0.9.2 0.9.11; do
     || error_and_proceed "Install of version ${v} failed";
 done;
 
-tfenv use 0.9.11
+log 'info' '## Ensuring tfenv list success with no default set';
+tfenv list \
+  && log 'debug' "List succeeded with no default set" \
+  || error_and_proceed "List failed with no default set";
 
-log 'info' '## Comparing "tfenv list" to expectations';
+tfenv use 0.9.11;
+
+log 'info' '## Comparing "tfenv list" with default set';
 result="$(tfenv list)";
 expected="$(cat << EOS
 * 0.9.11 (set by $(tfenv version-file))
@@ -73,9 +78,9 @@ expected="$(cat << EOS
 EOS
 )";
 
-if [ "${expected}" != "${result}" ]; then
-  error_and_proceed "List mismatch.\nExpected:\n${expected}\nGot:\n${result}";
-fi;
+[ "${expected}" == "${result}" ] \
+  && log 'info' 'List matches expectation.' \
+  || error_and_proceed "List mismatch.\nExpected:\n${expected}\nGot:\n${result}";
 
 if [ "${#errors[@]}" -gt 0 ]; then
   log 'warn' "===== The following list tests failed =====";

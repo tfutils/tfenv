@@ -46,7 +46,7 @@ resolve_version () {
 
   declare arg="${1:-""}";
 
-  if [ -z "${arg}" ]; then
+  if [ -z "${arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
     version_file="$(tfenv-version-file)";
     log 'debug' "Version File: ${version_file}";
 
@@ -71,6 +71,9 @@ resolve_version () {
       log 'info' 'No version requested on the command line or in the version file search path. Installing "latest"';
       version_requested='latest';
     fi;
+  elif [ -n "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+    version_requested="${TFENV_TERRAFORM_VERSION}";
+    log 'debug' "TFENV_TERRAFORM_VERSION is set: ${TFENV_TERRAFORM_VERSION}";
   else
     version_requested="${arg}";
   fi;
@@ -116,14 +119,14 @@ export -f curlw;
 
 check_active_version() {
   local v="${1}";
-  [ -n "$(${TFENV_ROOT}/bin/terraform --version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
+  [ -n "$(${TFENV_ROOT}/bin/terraform version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
 }
 export -f check_active_version;
 
 check_installed_version() {
   local v="${1}";
   local bin="${TFENV_CONFIG_DIR}/versions/${v}/terraform";
-  [ -n "$(${bin} --version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
+  [ -n "$(${bin} version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
 };
 export -f check_installed_version;
 

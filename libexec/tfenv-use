@@ -63,10 +63,20 @@ done;
 [ -d "${TFENV_CONFIG_DIR}/versions" ] \
   || log 'error' 'No versions of terraform installed. Please install one with: tfenv install';
 
-declare requested="${1:-""}";
+declare requested_arg="${1:-""}";
+declare version_source_suffix="";
+declare requested="${requested_arg}";
 
-log debug "Resolving version with: tfenv-resolve-version ${requested}";
-declare resolved="$(tfenv-resolve-version ${requested})";
+if [ -z "${requested_arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+  version_source_suffix=" (set by $(tfenv-version-file))";
+  requested="$(cat "$(tfenv-version-file)" || true)";
+elif [ -z "${requested_arg}" ]; then
+  version_source_suffix=' (set by TFENV_TERRAFORM_VERSION)';
+  requested="${TFENV_TERRAFORM_VERSION}";
+fi
+
+log debug "Resolving version with: tfenv-resolve-version ${requested_arg}";
+declare resolved="$(tfenv-resolve-version ${requested_arg})";
 
 declare version="${resolved%%\:*}";
 declare regex="${resolved##*\:}";
@@ -81,7 +91,7 @@ declare version="$(\find "${TFENV_CONFIG_DIR}/versions" -type d -exec basename {
 
 [ -n "${version}" ] \
   && log 'debug' "Found version: ${version}" \
-  || log 'error' "No installed versions of terraform matched '${1}'";
+  || log 'error' "No installed versions of terraform matched '${requested}'${version_source_suffix}";
 
 target_path="${TFENV_CONFIG_DIR}/versions/${version}";
 [ -f "${target_path}/terraform" ] \
@@ -99,6 +109,6 @@ if [ "${version_file}" != "$(tfenv-version-file)" ]; then
   log 'warn' "Default version file overridden by $(tfenv-version-file), changing the default version has no effect";
 fi;
 
-terraform --version 1>/dev/null \
-  || log 'error' "'terraform --version' failed. Something is seriously wrong";
+terraform version 1>/dev/null \
+  || log 'error' "'terraform version' failed. Something is seriously wrong";
 log 'info' "Switching completed";
