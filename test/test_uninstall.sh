@@ -67,6 +67,7 @@ tests__keywords=(
   '0.11.15-oci'
   'latest'
   'latest:^0.8'
+  'v0.14.6'
 );
 
 tests__versions=(
@@ -74,6 +75,7 @@ tests__versions=(
   '0.11.15-oci'
   "$(tfenv list-remote | head -n1)"
   "$(tfenv list-remote | grep -e "^0.8" | head -n1)"
+  '0.14.6'
 );
 
 tests_count=${#tests__keywords[@]};
