@@ -32,7 +32,10 @@ fi
 export TFENV_CONFIG_DIR;
 
 if [ "${TFENV_DEBUG:-0}" -gt 0 ]; then
-  [ "${DEBUG:-0}" -gt "${TFENV_DEBUG:-0}" ] || export DEBUG="${TFENV_DEBUG:-0}";
+  # Only reset DEBUG if TFENV_DEBUG is set, and DEBUG is unset or already a number
+  if [[ "${DEBUG:-0}" =~ ^[0-9]+$ ]] && [ "${DEBUG:-0}" -gt "${TFENV_DEBUG:-0}" ]; then
+    export DEBUG="${TFENV_DEBUG:-0}";
+  fi;
   if [[ "${TFENV_DEBUG}" -gt 2 ]]; then
     export PS4='+ [${BASH_SOURCE##*/}:${LINENO}] ';
     set -x;
