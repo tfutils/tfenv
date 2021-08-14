@@ -105,6 +105,12 @@ if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
 
 else
   log 'debug' 'TFENV_VERSION does not use "latest" keyword';
+
+  # Accept a v-prefixed version, but strip the v.
+  if [[ "${TFENV_VERSION}" =~ ^v.*$ ]]; then
+    log 'debug' "Version Requested is prefixed with a v. Stripping the v."
+    TFENV_VERSION="${TFENV_VERSION#v*}";
+  fi;
 fi;
 
 [ -z "${TFENV_VERSION}" ] \

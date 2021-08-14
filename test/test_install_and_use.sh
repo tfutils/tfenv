@@ -112,12 +112,13 @@ tests__kv=(
 
 tests_count=${#tests__desc[@]};
 
-declare desc kv k v;
+declare desc kv k v test_num;
 
-for ((test_num=0; test_num<${tests_count}; ++test_num )) ; do
+for ((test_iter=0; test_iter<${tests_count}; ++test_iter )) ; do
   cleanup || log 'error' 'Cleanup failed?!';
-  desc=${tests__desc[${test_num}]};
-  kv="${tests__kv[${test_num}]}";
+  test_num=$((test_iter + 1)); 
+  desc=${tests__desc[${test_iter}]};
+  kv="${tests__kv[${test_iter}]}";
   v="${kv%,*}";
   k="${kv##*,}";
   log 'info' "## Param Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} )";
@@ -126,10 +127,11 @@ for ((test_num=0; test_num<${tests_count}; ++test_num )) ; do
     || error_and_proceed "## Param Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) failed";
 done;
 
-for ((test_num=0; test_num<${tests_count}; ++test_num )) ; do
+for ((test_iter=0; test_iter<${tests_count}; ++test_iter )) ; do
   cleanup || log 'error' 'Cleanup failed?!';
-  desc=${tests__desc[${test_num}]};
-  kv="${tests__kv[${test_num}]}";
+  test_num=$((test_iter + 1)); 
+  desc=${tests__desc[${test_iter}]};
+  kv="${tests__kv[${test_iter}]}";
   v="${kv%,*}";
   k="${kv##*,}";
   log 'info' "## ./.terraform-version Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} )";
@@ -140,10 +142,11 @@ for ((test_num=0; test_num<${tests_count}; ++test_num )) ; do
     || error_and_proceed "## ./.terraform-version Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) failed";
 done;
 
-for ((test_num=0; test_num<${tests_count}; ++test_num )) ; do
+for ((test_iter=0; test_iter<${tests_count}; ++test_iter )) ; do
   cleanup || log 'error' 'Cleanup failed?!';
-  desc=${tests__desc[${test_num}]};
-  kv="${tests__kv[${test_num}]}";
+  test_num=$((test_iter + 1)); 
+  desc=${tests__desc[${test_iter}]};
+  kv="${tests__kv[${test_iter}]}";
   v="${kv%,*}";
   k="${kv##*,}";
   log 'info' "## TFENV_TERRAFORM_VERSION Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} )";
@@ -208,10 +211,11 @@ neg_tests__kv=(
 
 neg_tests_count=${#neg_tests__desc[@]};
 
-for ((test_num=0; test_num<${neg_tests_count}; ++test_num )) ; do
+for ((test_iter=0; test_iter<${neg_tests_count}; ++test_iter )) ; do
   cleanup || log 'error' 'Cleanup failed?!';
-  desc=${neg_tests__desc[${test_num}]}
-  k="${neg_tests__kv[${test_num}]}";
+  test_num=$((test_iter + 1));
+  desc=${neg_tests__desc[${test_iter}]}
+  k="${neg_tests__kv[${test_iter}]}";
   expected_error_message="No versions matching '${k}' found in remote";
   log 'info' "##  Invalid Version Test ${test_num}/${neg_tests_count}: ${desc} ( ${k} )";
   [ -z "$(tfenv install "${k}" 2>&1 | grep "${expected_error_message}")" ] \
