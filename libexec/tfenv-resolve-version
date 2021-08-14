@@ -99,6 +99,12 @@ fi;
 
 log 'debug' "Version Requested: ${version_requested}";
 
+# Accept a v-prefixed version, but strip the v.
+if [[ "${version_requested}" =~ ^v.*$ ]]; then
+  log 'debug' "Version Requested is prefixed with a v. Stripping the v."
+  version_requested="${version_requested#v*}";
+fi;
+
 if [[ "${version_requested}" =~ ^min-required$ ]]; then
   log 'info' 'Detecting minimum required version...';
   min_required="$(tfenv-min-required)" \

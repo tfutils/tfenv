@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# Usage: tfenv min-required
-# Summary: Detect the minimal required version from *tf files
 
 set -uo pipefail;
 
@@ -50,7 +48,7 @@ fi;
 for dir in libexec bin; do
   case ":${PATH}:" in
     *:${TFENV_ROOT}/${dir}:*) log 'debug' "\$PATH already contains '${TFENV_ROOT}/${dir}', not adding it again";;
-    *)
+    *) 
       log 'debug' "\$PATH does not contain '${TFENV_ROOT}/${dir}', prepending and exporting it now";
       export PATH="${TFENV_ROOT}/${dir}:${PATH}";
       ;;
@@ -61,44 +59,19 @@ done;
 # Begin Script Body #
 #####################
 
-bailout() {
-  log 'error' 'Error: Could not determine required_version based on your terraform sources.
-Make sure at least one of your *tf  or *.tf.json files includes a required version section like
-terraform {
-  required_version = ">= 0.0.0"
-}
+[ "${#}" -ne 0 ] \
+  && log 'error' "usage: tfenv pin"
 
-see https://www.terraform.io/docs/configuration/terraform.html for details';
-};
+[ -d "${TFENV_ROOT}/versions/" ] \
+  || log 'error' 'No versions available. Please install one with: tfenv install'
 
-find_min_required() {
-  local root="${1}";
+[[ -x "${TFENV_ROOT}/versions" && -r "${TFENV_ROOT}/versions" ]] \
+  || log 'error' "tfenv versions directory is inaccessible: ${TFENV_ROOT}/versions";
 
-  versions="$( echo $(grep -h required_version "${root}"/{*.tf,*.tf.json} 2>/dev/null ) | grep  -o '\([0-9]\+\.\?\)\{2,3\}\(-[a-z]\+[0-9]\+\)\?')";
+version_name="$(tfenv-version-name 2>/dev/null || true)" \
+  && log 'debug' "tfenv-version-name reported: ${version_name}";
 
-  if [[ "${versions}" =~ ([~=!<>]{0,2}[[:blank:]]*[0-9]+[0-9.]+)[^0-9]*(-[a-z]+[0-9]+)? ]]; then
-    found_min_required="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
+echo "${version_name}" > .terraform-version;
+log 'info' "Pinned version by writing \"${version_name}\" to $(pwd)/.terraform-version";
 
-    if [[ "${found_min_required}" =~ ^!=.+ ]]; then
-      log 'debug' "Error: Min required version is a negation ($found_min_required) - we cannot guess the desired one.";
-      bailout;
-    else
-      found_min_required="$(echo "$found_min_required")";
-      #echo "Min required version is detected as ${found_min_required}";
-
-      # Probably not an advisable way to choose a terraform version,
-      # but this is the way this functionality works in terraform:
-      # add .0 to versions without a minor and/or patch version (e.g. 12.0)
-      while ! [[ "${found_min_required}" =~ [0-9]+\.[0-9]+\.[0-9]+ ]]; do
-        found_min_required="${found_min_required}.0";
-      done;
-
-      echo "${found_min_required}";
-      exit 0;
-    fi;
-  fi;
-
-  bailout;
-};
-
-find_min_required "${TFENV_DIR:-$(pwd)}";
+exit 0;

@@ -47,7 +47,7 @@ fi;
 for dir in libexec bin; do
   case ":${PATH}:" in
     *:${TFENV_ROOT}/${dir}:*) log 'debug' "\$PATH already contains '${TFENV_ROOT}/${dir}', not adding it again";;
-    *) 
+    *)
       log 'debug' "\$PATH does not contain '${TFENV_ROOT}/${dir}', prepending and exporting it now";
       export PATH="${TFENV_ROOT}/${dir}:${PATH}";
       ;;
@@ -63,7 +63,8 @@ done;
 declare requested="${1:-""}";
 
 log debug "Resolving version with: tfenv-resolve-version ${requested}";
-declare resolved="$(tfenv-resolve-version ${requested})";
+declare resolved;
+resolved="$(tfenv-resolve-version ${requested})" || log 'error' "Failed to resolve ${requested} version";
 
 declare version="${resolved%%\:*}";
 declare regex="${resolved##*\:}";
@@ -133,7 +134,12 @@ shasums_sig="${shasums_name}${shasums_signing_key_postfix}.sig";
 log 'info' "Installing Terraform v${version}";
 
 # Create a local temporary directory for downloads
-download_tmp="$(mktemp -d tfenv_download.XXXXXX)" || log 'error' "Unable to create temporary download directory in $(pwd)";
+tmpdir_arg="--tmpdir"
+if [[ $(uname) == 'Darwin' ]]; then
+  # MacOS uses an old version of `mktemp` which only supports the deprecated `-t` option
+  tmpdir_arg="-t"
+fi
+download_tmp="$(mktemp -d ${tmpdir_arg} tfenv_download.XXXXXX)" || log 'error' "Unable to create temporary download directory in $(pwd)";
 # Clean it up in case of error
 trap "rm -rf ${download_tmp}" EXIT;
 
