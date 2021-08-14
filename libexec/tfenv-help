@@ -12,6 +12,7 @@ Commands:
    list-remote   List all installable versions
    version-name  Print current version
    init          Update environment to use 'tfenv' correctly.
+   pin           Write the current active version to ./.terraform-version
 ';
 
 exit 0;
