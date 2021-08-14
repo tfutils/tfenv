@@ -91,7 +91,7 @@ if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
   fi;
 
   declare local_version='';
-  if [[ -d "${TFENV_ROOT}/versions" ]]; then
+  if [[ -d "${TFENV_CONFIG_DIR}/versions" ]]; then
     local_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
       | tail -n +2 \
       | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
