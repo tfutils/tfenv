@@ -50,58 +50,56 @@ fi;
 
 declare -a errors=();
 
-log 'info' '### Install not min-required version';
 cleanup || log 'error' 'Cleanup failed?!';
 
-v='0.8.8';
+
+log 'info' '### Install min-required normal version (#.#.#)';
+
 minv='0.8.0';
-(
-  tfenv install "${v}" || true;
-  tfenv use "${v}" || exit 1;
-  check_active_version "${v}" || exit 1;
-) || error_and_proceed "Installing specific version ${v}";
 
 echo "terraform {
-
   required_version = \">=${minv}\"
-}" >> min_required.tf;
+}" > min_required.tf;
 
-tfenv install min-required;
-tfenv use min-required;
-
-check_active_version "${minv}" || error_and_proceed 'Min required version does not match';
+(
+  tfenv install min-required;
+  tfenv use min-required;
+  check_active_version "${minv}";
+) || error_and_proceed 'Min required version does not match';
 
 cleanup || log 'error' 'Cleanup failed?!';
 
-############################
-# Test Incomplete Versions #
-############################
+
+log 'info' '### Install min-required tagged version (#.#.#-tag#)'
+
+minv='0.13.0-rc1'
+
+echo "terraform {
+    required_version = \">=${minv}\"
+}" > min_required.tf;
+
+(
+  tfenv install min-required;
+  tfenv use min-required;
+  check_active_version "${minv}";
+) || error_and_proceed 'Min required tagged-version does not match';
+
+cleanup || log 'error' 'Cleanup failed?!';
+
+
+log 'info' '### Install min-required incomplete version (#.#.<missing>)'
 
 minv='0.12';
 
 echo "terraform {
-
   required_version = \">=${minv}\"
 }" >> min_required.tf;
 
-tfenv install min-required;
-tfenv use min-required;
-
-check_active_version "${minv}.0" || error_and_proceed "Min required version does not match for incomplete version ${minv}";
-
-cleanup || log 'error' 'Cleanup failed?!';
-
-minv='0.13';
-
-echo "terraform {
-
-  required_version = \">=${minv}\"
-}" >> min_required.tf;
-
-tfenv install min-required;
-tfenv use min-required;
-
-check_active_version "${minv}.0" || error_and_proceed "Min required version does not match for incomplete version ${minv}";
+(
+  tfenv install min-required;
+  tfenv use min-required;
+  check_active_version "${minv}.0";
+) || error_and_proceed 'Min required incomplete-version does not match';
 
 cleanup || log 'error' 'Cleanup failed?!';
 
