@@ -79,7 +79,7 @@ fi
 if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
   log 'debug' "TFENV_VERSION uses 'latest' keyword: ${TFENV_VERSION}";
 
-  [ -d "${TFENV_ROOT}/versions" ] \
+  [ -d "${TFENV_CONFIG_DIR}/versions" ] \
     || log 'error' 'No versions of terraform installed. Please install one with: tfenv install';
 
   if [[ "${TFENV_VERSION}" =~ ^latest\:.*$ ]]; then
