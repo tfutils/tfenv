@@ -85,6 +85,14 @@ find_min_required() {
     else
       found_min_required="$(echo "$found_min_required")";
       #echo "Min required version is detected as ${found_min_required}";
+
+      # Probably not an advisable way to choose a terraform version,
+      # but this is the way this functionality works in terraform:
+      # add .0 to versions without a minor and/or patch version (e.g. 12.0)
+      while ! [[ "${found_min_required}" =~ [0-9]+\.[0-9]+\.[0-9]+ ]]; do
+        found_min_required="${found_min_required}.0";
+      done;
+
       echo "${found_min_required}";
       exit 0;
     fi;
