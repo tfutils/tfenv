@@ -81,8 +81,8 @@ declare resolved="$(tfenv-resolve-version ${requested_arg})";
 declare version="${resolved%%\:*}";
 declare regex="${resolved##*\:}";
 
-log 'debug' "Searching ${TFENV_CONFIG_DIR}/versions for latest version matching ${regex}";
-declare version="$(\find "${TFENV_CONFIG_DIR}/versions" -type d -exec basename {} \; \
+log 'debug' "Searching ${TFENV_CONFIG_DIR}/versions/ for latest version matching ${regex}";
+declare version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
   | tail -n +2 \
   | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
   | grep -e "${regex}" \

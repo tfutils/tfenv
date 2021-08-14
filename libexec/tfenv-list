@@ -94,7 +94,7 @@ print_version () {
 };
 
 log 'debug' 'Listing versions...';
-local_versions=($(\find "${TFENV_CONFIG_DIR}/versions" -type d -exec basename {} \; \
+local_versions=($(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
   | tail -n +2 \
   | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3));
 
