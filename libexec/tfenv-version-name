@@ -90,7 +90,7 @@ if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
     log 'debug' "'latest' keyword does not use regex";
   fi;
 
-  declare local_version = '';
+  declare local_version='';
   if [[ -d "${TFENV_ROOT}/versions" ]]; then
     local_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
       | tail -n +2 \
