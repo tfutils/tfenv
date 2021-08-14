@@ -90,14 +90,13 @@ if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
     log 'debug' "'latest' keyword does not use regex";
   fi;
 
+  declare local_version = '';
   if [[ -d "${TFENV_ROOT}/versions" ]]; then
     local_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
       | tail -n +2 \
       | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
       | grep -e "${regex}" \
       | head -n 1)";
-  else
-     local_version=''; # To avoid 'unbound variable' error
   fi;
 
   if [[ "${TFENV_AUTO_INSTALL:-true}" == "true" ]]; then
