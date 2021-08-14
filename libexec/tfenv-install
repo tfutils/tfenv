@@ -63,7 +63,8 @@ done;
 declare requested="${1:-""}";
 
 log debug "Resolving version with: tfenv-resolve-version ${requested}";
-declare resolved="$(tfenv-resolve-version ${requested})";
+declare resolved;
+resolved="$(tfenv-resolve-version ${requested})" || log 'error' "Failed to resolve ${requested} version";
 
 declare version="${resolved%%\:*}";
 declare regex="${resolved##*\:}";
