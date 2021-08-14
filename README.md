@@ -147,7 +147,7 @@ $ tfenv install 0.7.9
 
 ##### `TFENV_AUTO_INSTALL`
 
-Boolean (Default: true)
+String (Default: true)
 
 Should tfenv automatically install terraform if the version specified by defaults or a .terraform-version file is not currently installed.
 
