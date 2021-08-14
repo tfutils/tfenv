@@ -75,7 +75,7 @@ log 'debug' "Processing install for version ${version}, using regex ${regex}";
 version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
 [ -n "${version}" ] || log 'error' "No versions matching '${requested}' found in remote";
 
-dst_path="${TFENV_ROOT}/versions/${version}";
+dst_path="${TFENV_CONFIG_DIR}/versions/${version}";
 if [ -f "${dst_path}/terraform" ]; then
   echo "Terraform v${version} is already installed";
   exit 0;
@@ -171,12 +171,12 @@ if [[ $(uname) == 'Darwin' ]] && [ $(which brew) ]; then
 fi
 
 # Verify signature if verification mechanism (keybase, gpg, etc) is present
-if [[ -f "${TFENV_ROOT}/use-gnupg" ]]; then
+if [[ -f "${TFENV_CONFIG_DIR}/use-gnupg" ]]; then
   # GnuPG uses the user's keyring, and any web-of-trust or local signatures or
   # anything else they have setup.  This is the crazy-powerful mode which is
   # overly confusing to newcomers.  We don't support it without the user creating
   # the file use-gnupg, optionally with directives in it.
-  gnupg_command="$(sed -E -n -e 's/^binary: *//p' <"${TFENV_ROOT}/use-gnupg")";
+  gnupg_command="$(sed -E -n -e 's/^binary: *//p' <"${TFENV_CONFIG_DIR}/use-gnupg")";
   [[ -n "${gnupg_command}" ]] || gnupg_command=gpg;
 
   download_signature;
@@ -187,13 +187,13 @@ if [[ -f "${TFENV_ROOT}/use-gnupg" ]]; then
     "${download_tmp}/${shasums_name}" \
     || log 'error' 'PGP signature rejected by GnuPG';
 
-elif [[ -f "${TFENV_ROOT}/use-gpgv" ]]; then
+elif [[ -f "${TFENV_CONFIG_DIR}/use-gpgv" ]]; then
   # gpgv is a much simpler interface to verification, but does require that the
   # key have been downloaded and marked trusted.
   # We don't force the caller to trust the tfenv repo's copy of their key, they
   # have to choose to make that trust decision.
-  gpgv_command="$(sed -E -n -e 's/^binary: *//p' <"${TFENV_ROOT}/use-gpgv")";
-  trust_tfenv="$(sed -E -n -e 's/^trust.?tfenv: *//p' <"${TFENV_ROOT}/use-gpgv")";
+  gpgv_command="$(sed -E -n -e 's/^binary: *//p' <"${TFENV_CONFIG_DIR}/use-gpgv")";
+  trust_tfenv="$(sed -E -n -e 's/^trust.?tfenv: *//p' <"${TFENV_CONFIG_DIR}/use-gpgv")";
   [[ -n "${gpgv_command}" ]] || gpgv_command=gpgv;
 
   download_signature;
