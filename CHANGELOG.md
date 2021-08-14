@@ -1,3 +1,42 @@
+## 2.2.2 (May 6, 2021)
+
+ * remove trust from revoked signing key as of hcsec-2021-12
+ * fix installation of versions signed by revoked key by forcing to use the new key
+
+## 2.2.1 (April 29, 2021)
+
+ * hcsec-2021-12 (#257)
+
+## 2.2.0 (February 06, 2021)
+
+ * Convert GitHub CI from Travis CI to Github Actions
+ * Fix min-required after it was broken by 2.1.0 (#235)
+ * Min-required recursive lookup was dangerously broken. Removed the recursion that should never have been (#237)
+ * Fix the failure of tfenv list when no default was set (#236)
+ * Add init command (#240)
+ * Use ggrep on Mac with Homebrew (#218)
+
+## 2.1.0 (January 30, 2021)
+
+ * Update tfenv-min-required to search root before recursing (#203)  
+ * Terraform 0.13.0 support (#191)
+ * Add Arch Linux install instructions via Arch User Repository (AUR) (#201)
+ * min-required correctly finds tagged release versions (#206)
+ * install: make keybase a fall-through verification variant (#213)
+ * Feature/add TFENV_TERRAFORM_VERSION env var (#222)
+ * Document version-name command (#224)
+ * Fix signature verification bypass due to insufficient hashsum checking (#212)
+ * Fix keybase login exit code handling (#188)
+ * Fix bug on MacOS when using CLICOLOR=1 (#152)
+ * Improved error handling in tfenv-list-remote-curl (#186)
+ * Test in Windows (#140)
+ * force tfenv to write over existing zip if it exists (#169)
+ * Remove the versions directory when the last version is uninstalled (#128)
+ * Add support for sha256sum command (#170)
+ * Adding freebsd support (#133)
+ * Improve shell script synatx (#174)
+ * Begrudging Bash 3.x Compatability because of macOS (#181)
+
 ## 2.0.0 (April 20, 2020)
 
  * New logging and debugging library

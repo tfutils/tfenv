@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/tfutils/tfenv.svg?branch=master)](https://travis-ci.com/tfutils/tfenv)
+![CI](https://github.com/tfutils/tfenv/workflows/CI/badge.svg)
 
 # tfenv
 
@@ -20,9 +20,15 @@ Currently tfenv supports the following OSes
 
 Install via Homebrew
 
-  ```console
-  $ brew install tfenv
-  ```
+```console
+$ brew install tfenv
+```
+
+Install via Arch User Repository (AUR)
+   
+```console
+$ yay --sync tfenv
+```
 
 Install via puppet
 
@@ -36,31 +42,31 @@ include ::tfenv
 
 1. Check out tfenv into any path (here is `${HOME}/.tfenv`)
 
-  ```console
-  $ git clone https://github.com/tfutils/tfenv.git ~/.tfenv
-  ```
+```console
+$ git clone https://github.com/tfutils/tfenv.git ~/.tfenv
+```
 
 2. Add `~/.tfenv/bin` to your `$PATH` any way you like
 
-  ```console
-  $ echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bash_profile
-  ```
+```console
+$ echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bash_profile
+```
 
   OR you can make symlinks for `tfenv/bin/*` scripts into a path that is already added to your `$PATH` (e.g. `/usr/local/bin`) `OSX/Linux Only!`
 
-  ```console
-  $ ln -s ~/.tfenv/bin/* /usr/local/bin
-  ```
+```console
+$ ln -s ~/.tfenv/bin/* /usr/local/bin
+```
 
   On Ubuntu/Debian touching `/usr/local/bin` might require sudo access, but you can create `${HOME}/bin` or `${HOME}/.local/bin` and on next login it will get added to the session `$PATH`
   or by running `. ${HOME}/.profile` it will get added to the current shell session's `$PATH`.
 
-  ```console
-  $ mkdir -p ~/.local/bin/
-  $ . ~/.profile
-  $ ln -s ~/.tfenv/bin/* ~/.local/bin
-  $ which tfenv
-  ```
+```console
+$ mkdir -p ~/.local/bin/
+$ . ~/.profile
+$ ln -s ~/.tfenv/bin/* ~/.local/bin
+$ which tfenv
+```
 
 ## Usage
 
@@ -68,11 +74,11 @@ include ::tfenv
 
 Install a specific version of Terraform.
 
-If no parameter is passed, the version to use is resolved automatically via .terraform-version files, defaulting to 'latest' if none are found.
+If no parameter is passed, the version to use is resolved automatically via [.terraform-version files](#terraform-version-file) or [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_version) (TFENV\_TERRAFORM\_VERSION takes precedence), defaulting to 'latest' if none are found.
 
 If a parameter is passed, available options:
 
-- `i.j.k` exact version to install
+- `x.y.z` [Semver 2.0.0](https://semver.org/) string specifying the exact version to install
 - `latest` is a syntax to install latest version
 - `latest:<regex>` is a syntax to install latest version matching regex (used by grep -e)
 - `min-required` is a syntax to recursively scan your Terraform files to detect which version is minimally required. See [required_version](https://www.terraform.io/docs/configuration/terraform.html) docs. Also [see min-required](#min-required) section below.
@@ -104,7 +110,7 @@ validation failure.
 
 #### .terraform-version
 
-If you use a [.terraform-version file](#terraform-version-file), `tfenv install` (no argument) will install the version written in it.
+If you use a [.terraform-version](#terraform-version-file) file, `tfenv install` (no argument) will install the version written in it.
 
 #### min-required
 
@@ -135,7 +141,7 @@ String (Default: amd64)
 Specify architecture. Architecture other than the default amd64 can be specified with the `TFENV_ARCH` environment variable
 
 ```console
-TFENV_ARCH=arm tfenv install 0.7.9
+$ TFENV_ARCH=arm tfenv install 0.7.9
 ```
 
 ##### `TFENV_AUTO_INSTALL`
@@ -145,7 +151,7 @@ String (Default: true)
 Should tfenv automatically install terraform if the version specified by defaults or a .terraform-version file is not currently installed.
 
 ```console
-TFENV_AUTO_INSTALL=false terraform plan
+$ TFENV_AUTO_INSTALL=false terraform plan
 ```
 
 ##### `TFENV_CURL_OUTPUT`
@@ -176,7 +182,31 @@ String (Default: https://releases.hashicorp.com)
 To install from a remote other than the default
 
 ```console
-TFENV_REMOTE=https://example.jfrog.io/artifactory/hashicorp
+$ TFENV_REMOTE=https://example.jfrog.io/artifactory/hashicorp
+```
+
+##### `TFENV_CONFIG_DIR`
+
+Path (Default: `$TFENV_ROOT`)
+
+The path to a directory where the local terraform versions and configuration files exist.
+
+```console
+TFENV_CONFIG_DIR="$XDG_CONFIG_HOME/tfenv"
+```
+
+##### `TFENV_TERRAFORM_VERSION`
+
+String (Default: "")
+
+If not empty string, this variable overrides Terraform version, specified in [.terraform-version files](#terraform-version-file).
+`latest` and `latest:<regex>` syntax are also supported.
+[`tfenv install`](#tfenv-install-version) and [`tfenv use`](#tfenv-use-version) command also respects this variable.
+
+e.g.
+
+```console
+$ TFENV_TERRAFORM_VERSION=latest:^0.11. terraform --version
 ```
 
 #### Bashlog Logging Library
@@ -217,7 +247,7 @@ Each executable logs to its own file.
 e.g.
 
 ```console
-BASHLOG_FILE=1 tfenv use latest
+$ BASHLOG_FILE=1 tfenv use latest
 ```
 
 will log to `/tmp/tfenv-use.log`
@@ -239,7 +269,7 @@ This variable allows you to pass a string containing a command that will be exec
 e.g.
 
 ```console
-BASHLOG_I_PROMISE_TO_BE_CAREFUL_CUSTOM_EVAL_PREFIX='echo "${$$} "'
+$ BASHLOG_I_PROMISE_TO_BE_CAREFUL_CUSTOM_EVAL_PREFIX='echo "${$$} "'
 ```
 will prefix every log line with the calling process' PID.
 
@@ -255,7 +285,7 @@ Each executable logs to its own file.
 e.g.
 
 ```console
-BASHLOG_JSON=1 tfenv use latest
+$ BASHLOG_JSON=1 tfenv use latest
 ```
 
 will log in JSON format to `/tmp/tfenv-use.log.json`
@@ -279,11 +309,10 @@ To log to syslog using the `logger` binary, set this to 1.
 The basic functionality is thus:
 
 ```console
-local tag="${BASHLOG_SYSLOG_TAG:-$(basename "${0}")}";
-local facility="${BASHLOG_SYSLOG_FACILITY:-local0}";
-local pid="${$}";
-
-logger --id="${pid}" -t "${tag}" -p "${facility}.${severity}" "${syslog_line}"
+$ local tag="${BASHLOG_SYSLOG_TAG:-$(basename "${0}")}";
+$ local facility="${BASHLOG_SYSLOG_FACILITY:-local0}";
+$ local pid="${$}";
+$ logger --id="${pid}" -t "${tag}" -p "${facility}.${severity}" "${syslog_line}"
 ```
 
 ##### `BASHLOG_SYSLOG_FACILITY`
@@ -306,7 +335,7 @@ Defaults to the PID of the calling process.
 
 Switch a version to use
 
-If no parameter is passed, the version to use is resolved automatically via .terraform-version files, defaulting to 'latest' if none are found.
+If no parameter is passed, the version to use is resolved automatically via [.terraform-version files](#terraform-version-file) or [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_version) (TFENV\_TERRAFORM\_VERSION takes precedence), defaulting to 'latest' if none are found.
 
 `latest` is a syntax to use the latest installed version
 
@@ -339,7 +368,7 @@ $ tfenv uninstall latest:^0.8
 List installed versions
 
 ```console
-% tfenv list
+$ tfenv list
 * 0.10.7 (set by /opt/tfenv/version)
   0.9.0-beta2
   0.8.8
@@ -356,7 +385,7 @@ List installed versions
 List installable versions
 
 ```console
-% tfenv list-remote
+$ tfenv list-remote
 0.9.0-beta2
 0.9.0-beta1
 0.8.8
@@ -382,11 +411,13 @@ List installable versions
 
 If you put a `.terraform-version` file on your project root, or in your home directory, tfenv detects it and uses the version written in it. If the version is `latest` or `latest:<regex>`, the latest matching version currently installed will be selected.
 
+Note, that [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_version) can be used to override version, specified by `.terraform-version` file.
+
 ```console
 $ cat .terraform-version
 0.6.16
 
-$ terraform --version
+$ terraform version
 Terraform v0.6.16
 
 Your version of Terraform is out of date! The latest version
@@ -394,13 +425,16 @@ is 0.7.3. You can update by downloading from www.terraform.io
 
 $ echo 0.7.3 > .terraform-version
 
-$ terraform --version
+$ terraform version
 Terraform v0.7.3
 
 $ echo latest:^0.8 > .terraform-version
 
-$ terraform --version
+$ terraform version
 Terraform v0.8.8
+
+$ TFENV_TERRAFORM_VERSION=0.7.3 terraform --version
+Terraform v0.7.3
 ```
 
 ## Upgrading

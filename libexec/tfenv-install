@@ -63,7 +63,8 @@ done;
 declare requested="${1:-""}";
 
 log debug "Resolving version with: tfenv-resolve-version ${requested}";
-declare resolved="$(tfenv-resolve-version ${requested})";
+declare resolved;
+resolved="$(tfenv-resolve-version ${requested})" || log 'error' "Failed to resolve ${requested} version";
 
 declare version="${resolved%%\:*}";
 declare regex="${resolved##*\:}";
@@ -75,13 +76,22 @@ log 'debug' "Processing install for version ${version}, using regex ${regex}";
 version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
 [ -n "${version}" ] || log 'error' "No versions matching '${requested}' found in remote";
 
-dst_path="${TFENV_ROOT}/versions/${version}";
+dst_path="${TFENV_CONFIG_DIR}/versions/${version}";
 if [ -f "${dst_path}/terraform" ]; then
   echo "Terraform v${version} is already installed";
   exit 0;
 fi;
 
-TFENV_ARCH="${TFENV_ARCH:-amd64}";
+# Add support of ARM64 for Linux & Apple Silicon
+case "$(uname -m)" in
+  aarch64* | arm64*)
+    TFENV_ARCH="${TFENV_ARCH:-arm64}";
+    ;;
+  *)
+    TFENV_ARCH="${TFENV_ARCH:-amd64}";
+    ;;
+esac;
+
 case "$(uname -s)" in
   Darwin*)
     os="darwin_${TFENV_ARCH}";
@@ -118,6 +128,8 @@ else
 fi;
 
 shasums_name="terraform_${version}_SHA256SUMS";
+shasums_signing_key_postfix=".72D7468F"
+shasums_sig="${shasums_name}${shasums_signing_key_postfix}.sig";
 
 log 'info' "Installing Terraform v${version}";
 
@@ -151,16 +163,63 @@ log 'info' "Downloading SHA hash file from ${version_url}/${shasums_name}";
 curlw -s -f -o "${download_tmp}/${shasums_name}" "${version_url}/${shasums_name}" || log 'error' 'SHA256 hashes download failed';
 
 download_signature() {
-  log 'info' "Downloading SHA hash signature file from ${version_url}/${shasums_name}.sig";
+  log 'info' "Downloading SHA hash signature file from ${version_url}/${shasums_sig}";
   curlw -s -f \
-    -o "${download_tmp}/${shasums_name}.sig" \
-    "${version_url}/${shasums_name}.sig" \
-    && log 'debug' "SHA256SUMS signature file downloaded successfully to ${download_tmp}/${shasums_name}.sig" \
+    -o "${download_tmp}/${shasums_sig}" \
+    "${version_url}/${shasums_sig}" \
+    && log 'debug' "SHA256SUMS signature file downloaded successfully to ${download_tmp}/${shasums_sig}" \
     || log 'error' 'SHA256SUMS signature download failed';
 };
 
+# If on MacOS with Homebrew, use GNU grep
+# This allows keybase login detection to work on Mac
+if [[ $(uname) == 'Darwin' ]] && [ $(which brew) ]; then
+  if ! [ $(which ggrep) ]; then
+    brew install grep;
+  fi
+  alias grep=ggrep;
+fi
+
 # Verify signature if verification mechanism (keybase, gpg, etc) is present
-if [[ -n "${keybase_bin}" && -x "${keybase_bin}" ]]; then
+if [[ -f "${TFENV_CONFIG_DIR}/use-gnupg" ]]; then
+  # GnuPG uses the user's keyring, and any web-of-trust or local signatures or
+  # anything else they have setup.  This is the crazy-powerful mode which is
+  # overly confusing to newcomers.  We don't support it without the user creating
+  # the file use-gnupg, optionally with directives in it.
+  gnupg_command="$(sed -E -n -e 's/^binary: *//p' <"${TFENV_CONFIG_DIR}/use-gnupg")";
+  [[ -n "${gnupg_command}" ]] || gnupg_command=gpg;
+
+  download_signature;
+  # Deliberately unquoted command, in case caller has something fancier in "use-gnupg".
+  # Also, don't use batch mode.  If someone specifies GnuPG, let them deal with any prompting.
+  ${gnupg_command} \
+    --verify "${download_tmp}/${shasums_sig}" \
+    "${download_tmp}/${shasums_name}" \
+    || log 'error' 'PGP signature rejected by GnuPG';
+
+elif [[ -f "${TFENV_CONFIG_DIR}/use-gpgv" ]]; then
+  # gpgv is a much simpler interface to verification, but does require that the
+  # key have been downloaded and marked trusted.
+  # We don't force the caller to trust the tfenv repo's copy of their key, they
+  # have to choose to make that trust decision.
+  gpgv_command="$(sed -E -n -e 's/^binary: *//p' <"${TFENV_CONFIG_DIR}/use-gpgv")";
+  trust_tfenv="$(sed -E -n -e 's/^trust.?tfenv: *//p' <"${TFENV_CONFIG_DIR}/use-gpgv")";
+  [[ -n "${gpgv_command}" ]] || gpgv_command=gpgv;
+
+  download_signature;
+  if [[ "${trust_tfenv}" == 'yes' ]]; then
+    ${gpgv_command} \
+      --keyring "${TFENV_ROOT}/share/hashicorp-keys.pgp" \
+      "${download_tmp}/${shasums_sig}" \
+      "${download_tmp}/${shasums_name}" \
+      || log 'error' 'PGP signature rejected';
+  else
+    ${gpgv_command} \
+      "${download_tmp}/${shasums_sig}" \
+      "${download_tmp}/${shasums_name}" \
+      || log 'error' 'PGP signature rejected';
+  fi;
+elif [[ -n "${keybase_bin}" && -x "${keybase_bin}" ]]; then
   grep -Eq '^Logged in:[[:space:]]*yes' <("${keybase_bin}" status);
   keybase_logged_in="${?}";
   grep -Fq hashicorp <("${keybase_bin}" list-following);
@@ -172,49 +231,10 @@ if [[ -n "${keybase_bin}" && -x "${keybase_bin}" ]]; then
     download_signature;
     "${keybase_bin}" pgp verify \
       -S hashicorp \
-      -d "${download_tmp}/${shasums_name}.sig" \
+      -d "${download_tmp}/${shasums_sig}" \
       -i "${download_tmp}/${shasums_name}" \
       && log 'debug' 'SHA256SUMS signature matched' \
       || log 'error' 'SHA256SUMS signature does not match!';
-  fi;
-
-elif [[ -f "${TFENV_ROOT}/use-gnupg" ]]; then
-  # GnuPG uses the user's keyring, and any web-of-trust or local signatures or
-  # anything else they have setup.  This is the crazy-powerful mode which is
-  # overly confusing to newcomers.  We don't support it without the user creating
-  # the file use-gnupg, optionally with directives in it.
-  gnupg_command="$(sed -E -n -e 's/^binary: *//p' <"${TFENV_ROOT}/use-gnupg")";
-  [[ -n "${gnupg_command}" ]] || gnupg_command=gpg;
-
-  download_signature;
-  # Deliberately unquoted command, in case caller has something fancier in "use-gnupg".
-  # Also, don't use batch mode.  If someone specifies GnuPG, let them deal with any prompting.
-  ${gnupg_command} \
-    --verify "${download_tmp}/${shasums_name}.sig" \
-    "${download_tmp}/${shasums_name}" \
-    || log 'error' 'PGP signature rejected by GnuPG';
-
-elif [[ -f "${TFENV_ROOT}/use-gpgv" ]]; then
-  # gpgv is a much simpler interface to verification, but does require that the
-  # key have been downloaded and marked trusted.
-  # We don't force the caller to trust the tfenv repo's copy of their key, they
-  # have to choose to make that trust decision.
-  gpgv_command="$(sed -E -n -e 's/^binary: *//p' <"${TFENV_ROOT}/use-gpgv")";
-  trust_tfenv="$(sed -E -n -e 's/^trust.?tfenv: *//p' <"${TFENV_ROOT}/use-gpgv")";
-  [[ -n "${gpgv_command}" ]] || gpgv_command=gpgv;
-
-  download_signature;
-  if [[ "${trust_tfenv}" == 'yes' ]]; then
-    ${gpgv_command} \
-      --keyring "${TFENV_ROOT}/share/hashicorp-keys.pgp" \
-      "${download_tmp}/${shasums_name}.sig" \
-      "${download_tmp}/${shasums_name}" \
-      || log 'error' 'PGP signature rejected';
-  else
-    ${gpgv_command} \
-      "${download_tmp}/${shasums_name}.sig" \
-      "${download_tmp}/${shasums_name}" \
-      || log 'error' 'PGP signature rejected';
   fi;
 else
   # Warning about this avoids an unwarranted sense of confidence in the SHA check
@@ -227,16 +247,14 @@ if [[ -n "${shasum_bin}" && -x "${shasum_bin}" ]]; then
     "${shasum_bin}" \
       -a 256 \
       -s \
-      -c <(grep -F "${tarball_name}" "${shasums_name}") \
-      || log 'error' 'SHA256 hash does not match!';
-  );
+      -c <(grep -F "${tarball_name}" "${shasums_name}")
+  ) || log 'error' 'SHA256 hash does not match!';
 elif [[ -n "${sha256sum_bin}" && -x "${sha256sum_bin}" ]]; then
   (
     cd "${download_tmp}";
     "${sha256sum_bin}" \
-      -c <(grep -F "${tarball_name}" "${shasums_name}") \
-      || log 'error' 'SHA256 hash does not match!';
-  );
+      -c <(grep -F "${tarball_name}" "${shasums_name}")
+  ) || log 'error' 'SHA256 hash does not match!';
 else
   # Lack of shasum deserves a proper warning
   log 'warn' 'No shasum tool available. Skipping SHA256 hash validation';

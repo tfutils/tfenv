@@ -24,8 +24,18 @@ else
 fi;
 export TFENV_ROOT;
 
+if [ -z "${TFENV_CONFIG_DIR:-""}" ]; then
+  TFENV_CONFIG_DIR="$TFENV_ROOT";
+else
+  TFENV_CONFIG_DIR="${TFENV_CONFIG_DIR%/}";
+fi
+export TFENV_CONFIG_DIR;
+
 if [ "${TFENV_DEBUG:-0}" -gt 0 ]; then
-  [ "${DEBUG:-0}" -gt "${TFENV_DEBUG:-0}" ] || export DEBUG="${TFENV_DEBUG:-0}";
+  # Only reset DEBUG if TFENV_DEBUG is set, and DEBUG is unset or already a number
+  if [[ "${DEBUG:-0}" =~ ^[0-9]+$ ]] && [ "${DEBUG:-0}" -gt "${TFENV_DEBUG:-0}" ]; then
+    export DEBUG="${TFENV_DEBUG:-0}";
+  fi;
   if [[ "${TFENV_DEBUG}" -gt 2 ]]; then
     export PS4='+ [${BASH_SOURCE##*/}:${LINENO}] ';
     set -x;
@@ -39,17 +49,17 @@ resolve_version () {
 
   declare arg="${1:-""}";
 
-  if [ -z "${arg}" ]; then
+  if [ -z "${arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
     version_file="$(tfenv-version-file)";
     log 'debug' "Version File: ${version_file}";
 
-    if [ "${version_file}" != "${TFENV_ROOT}/version" ]; then
-      log 'debug' "Version File (${version_file}) is not the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version)";
+    if [ "${version_file}" != "${TFENV_CONFIG_DIR}/version" ]; then
+      log 'debug' "Version File (${version_file}) is not the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version)";
       version_requested="$(cat "${version_file}")" \
         || log 'error' "Failed to open ${version_file}";
 
     elif [ -f "${version_file}" ]; then
-      log 'debug' "Version File is the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version)";
+      log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version)";
       version_requested="$(cat "${version_file}")" \
         || log 'error' "Failed to open ${version_file}";
 
@@ -60,10 +70,13 @@ resolve_version () {
       fi;
 
     else
-      log 'debug' "Version File is the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version) but it doesn't exist";
+      log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version) but it doesn't exist";
       log 'info' 'No version requested on the command line or in the version file search path. Installing "latest"';
       version_requested='latest';
     fi;
+  elif [ -n "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+    version_requested="${TFENV_TERRAFORM_VERSION}";
+    log 'debug' "TFENV_TERRAFORM_VERSION is set: ${TFENV_TERRAFORM_VERSION}";
   else
     version_requested="${arg}";
   fi;
@@ -109,20 +122,20 @@ export -f curlw;
 
 check_active_version() {
   local v="${1}";
-  [ -n "$(${TFENV_ROOT}/bin/terraform --version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
+  [ -n "$(${TFENV_ROOT}/bin/terraform version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
 }
 export -f check_active_version;
 
 check_installed_version() {
   local v="${1}";
-  local bin="${TFENV_ROOT}/versions/${v}/terraform";
-  [ -n "$(${bin} --version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
+  local bin="${TFENV_CONFIG_DIR}/versions/${v}/terraform";
+  [ -n "$(${bin} version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
 };
 export -f check_installed_version;
 
 check_default_version() {
   local v="${1}";
-  local def="$(cat "${TFENV_ROOT}/version")";
+  local def="$(cat "${TFENV_CONFIG_DIR}/version")";
   [ "${def}" == "${v}" ];
 };
 export -f check_default_version;

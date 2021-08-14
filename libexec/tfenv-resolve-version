@@ -65,17 +65,17 @@ declare version_requested version regex min_required version_file;
 
 declare arg="${1:-""}";
 
-if [ -z "${arg}" ]; then
+if [ -z "${arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
   version_file="$(tfenv-version-file)";
   log 'debug' "Version File: ${version_file}";
 
-  if [ "${version_file}" != "${TFENV_ROOT}/version" ]; then
-    log 'debug' "Version File (${version_file}) is not the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version)";
+  if [ "${version_file}" != "${TFENV_CONFIG_DIR}/version" ]; then
+    log 'debug' "Version File (${version_file}) is not the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version)";
     version_requested="$(cat "${version_file}")" \
       || log 'error' "Failed to open ${version_file}";
 
   elif [ -f "${version_file}" ]; then
-    log 'debug' "Version File is the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version)";
+    log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version)";
     version_requested="$(cat "${version_file}")" \
       || log 'error' "Failed to open ${version_file}";
 
@@ -86,10 +86,13 @@ if [ -z "${arg}" ]; then
     fi;
 
   else
-    log 'debug' "Version File is the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version) but it doesn't exist";
+    log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version) but it doesn't exist";
     log 'info' 'No version requested on the command line or in the version file search path. Installing "latest"';
     version_requested='latest';
   fi;
+elif [ -n "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+  version_requested="${TFENV_TERRAFORM_VERSION}";
+  log 'debug' "TFENV_TERRAFORM_VERSION is set: ${TFENV_TERRAFORM_VERSION}";
 else
   version_requested="${arg}";
 fi;

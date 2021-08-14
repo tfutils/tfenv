@@ -62,32 +62,39 @@ done;
 [ "${#}" -ne 0 ] \
   && log 'error' "usage: tfenv list"
 
-[ -d "${TFENV_ROOT}/versions" ] \
+[ -d "${TFENV_CONFIG_DIR}/versions" ] \
   || log 'error' 'No versions available. Please install one with: tfenv install'
 
-[[ -x "${TFENV_ROOT}/versions" && -r "${TFENV_ROOT}/versions" ]] \
-  || log 'error' "tfenv versions directory is inaccessible: ${TFENV_ROOT}/versions";
+[[ -x "${TFENV_CONFIG_DIR}/versions" && -r "${TFENV_CONFIG_DIR}/versions" ]] \
+  || log 'error' "tfenv versions directory is inaccessible: ${TFENV_CONFIG_DIR}/versions";
 
-version_name="$(tfenv-version-name)" \
-  && log 'debug' "tfenv-version-name reported: ${version_name}" \
-  || log 'error' "tfenv-version-name failed";
+version_name="$(tfenv-version-name 2>/dev/null || true)" \
+  && log 'debug' "tfenv-version-name reported: ${version_name}";
 export version_name;
 
-version_file="$(tfenv-version-file)" \
-  && log 'debug' "tfenv-version-file reported: ${version_file}" \
-  || log 'error' "tfenv-version-file failed";
-export version_file;
+if [ -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+  version_source="$(tfenv-version-file)" \
+    && log 'debug' "tfenv-version-file reported: ${version_source}" \
+    || log 'error' "tfenv-version-file failed";
+else
+  version_source='TFENV_TERRAFORM_VERSION';
+fi
+export version_source;
+
+# Register for whether a default terraform version has yet been set
+declare -i default_set=0;
 
 print_version () {
   if [ "${1}" == "${version_name}" ]; then
-    echo "* ${1} (set by ${version_file})";
+    echo "* ${1} (set by ${version_source})";
+    default_set=1
   else
     echo "  ${1}";
   fi;
 };
 
 log 'debug' 'Listing versions...';
-local_versions=($(\find "${TFENV_ROOT}/versions" -type d -exec basename {} \; \
+local_versions=($(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
   | tail -n +2 \
   | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3));
 
@@ -97,3 +104,7 @@ log 'debug' 'Printing versions...';
 for local_version in ${local_versions[@]}; do
   print_version "${local_version}";
 done;
+
+[ "${default_set}" -eq 0 ] && log 'info' "No default set. Set with 'tfenv use <version>'";
+
+exit 0;

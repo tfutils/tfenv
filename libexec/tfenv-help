@@ -10,6 +10,8 @@ Commands:
    uninstall     Uninstall a specific version of Terraform
    list          List all installed versions
    list-remote   List all installable versions
+   version-name  Print current version
+   init          Update environment to use 'tfenv' correctly.
 ';
 
 exit 0;
