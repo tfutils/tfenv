@@ -62,7 +62,7 @@ done;
 [ "${#}" -ne 0 ] \
   && log 'error' "usage: tfenv pin"
 
-[ -d "${TFENV_ROOT}/versions" ] \
+[ -d "${TFENV_ROOT}/versions/" ] \
   || log 'error' 'No versions available. Please install one with: tfenv install'
 
 [[ -x "${TFENV_ROOT}/versions" && -r "${TFENV_ROOT}/versions" ]] \
@@ -71,7 +71,7 @@ done;
 version_name="$(tfenv-version-name 2>/dev/null || true)" \
   && log 'debug' "tfenv-version-name reported: ${version_name}";
 
-echo $version_name >> .terraform-version;
-echo "Pinned $version_name in current directory"
+echo "${version_name}" > .terraform-version;
+log 'info' "Pinned version by writing \"${version_name}\" to $(pwd)/.terraform-version";
 
 exit 0;
