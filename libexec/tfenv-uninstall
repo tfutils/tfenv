@@ -67,16 +67,16 @@ declare arg="${1:-""}";
 if [ -z "${arg:-""}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
   version_file="$(tfenv-version-file)";
   log 'debug' "Version File: ${version_file}";
-  if [ "${version_file}" != "${TFENV_ROOT}/version" ]; then
-    log 'debug' "Version File (${version_file}) is not the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version)";
+  if [ "${version_file}" != "${TFENV_CONFIG_DIR}/version" ]; then
+    log 'debug' "Version File (${version_file}) is not the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version)";
     version_requested="$(cat "${version_file}")" \
       || log 'error' "Failed to open ${version_file}";
   elif [ -f "${version_file}" ]; then
-    log 'debug' "Version File is the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version)";
+    log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version)";
     version_requested="$(cat "${version_file}")" \
       || log 'error' "Failed to open ${version_file}";
   else
-    log 'debug' "Version File is the default \${TFENV_ROOT}/version (${TFENV_ROOT}/version) but it doesn't exist";
+    log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version) but it doesn't exist";
     log 'info' 'No version requested on the command line or in the version file search path. Installing "latest"';
     version_requested='latest';
   fi;
@@ -111,13 +111,13 @@ log 'debug' "Processing uninstall for version ${version}, using regex ${regex}";
 version="$(tfenv-list | sed -E 's/^(\*| )? //g; s/ \(set by .+\)$//' | grep -e "${regex}" | head -n 1)";
 [ -n "${version}" ] || log 'error' "No versions matching '${regex}' found in local";
 
-dst_path="${TFENV_ROOT}/versions/${version}";
+dst_path="${TFENV_CONFIG_DIR}/versions/${version}";
 if [ -f "${dst_path}/terraform" ]; then 
   log 'info' "Uninstall Terraform v${version}";
   rm -r "${dst_path}";
   
   # If no versions remain, remove the versions directory
-  rmdir "${TFENV_ROOT}/versions" 2>/dev/null;
+  rmdir "${TFENV_CONFIG_DIR}/versions" 2>/dev/null;
   
   log 'info' "Terraform v${version} is successfully uninstalled";
 fi;
