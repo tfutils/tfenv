@@ -14,7 +14,7 @@ jobs:
 
   # Only checking latest Linux/UNIX on pulls to save execution times
   test-master-pulls:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/sort-remote-list'
     runs-on: "${{ matrix.os }}"
     strategy:
       matrix:
