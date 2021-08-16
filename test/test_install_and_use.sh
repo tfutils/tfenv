@@ -161,8 +161,8 @@ cleanup || log 'error' 'Cleanup failed?!';
 log 'info' '## ${HOME}/.terraform-version Test Preparation';
 
 # 0.12.22 reports itself as 0.12.21 and breaks testing
-declare v1="$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | grep -v '0.12.22' | head -n 2 | tail -n 1)";
-declare v2="$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | grep -v '0.12.22' | head -n 1)";
+declare v1="$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | grep -v '0.12.22' | tail -n 2 | head -n 1)";
+declare v2="$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | grep -v '0.12.22' | tail -n 1)";
 
 if [ -f "${HOME}/.terraform-version" ]; then
   log 'info' "Backing up ${HOME}/.terraform-version to ${HOME}/.terraform-version.bup";
