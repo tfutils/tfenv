@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'master'
+      - 'sort-remote-list'
   pull_request:
     branches:
       - 'master'
