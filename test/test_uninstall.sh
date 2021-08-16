@@ -73,8 +73,8 @@ tests__keywords=(
 tests__versions=(
   '0.9.1'
   '0.11.15-oci'
-  "$(tfenv list-remote | head -n1)"
-  "$(tfenv list-remote | grep -e "^0.8" | head -n1)"
+  "$(tfenv list-remote | tail -n1)"
+  "$(tfenv list-remote | grep -e "^0.8" | tail -n1)"
   '0.14.6'
 );
 

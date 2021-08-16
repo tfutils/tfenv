@@ -73,7 +73,7 @@ declare regex="${resolved##*\:}";
 
 log 'debug' "Processing install for version ${version}, using regex ${regex}";
 
-version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
+version="$(tfenv-list-remote | grep -e "${regex}" | tail -n 1)";
 [ -n "${version}" ] || log 'error' "No versions matching '${requested}' found in remote";
 
 dst_path="${TFENV_CONFIG_DIR}/versions/${version}";
