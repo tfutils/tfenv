@@ -100,8 +100,8 @@ local_versions=($(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {
 
 log 'debug' "Local versions: ${local_versions[@]}";
 
-log 'debug' 'Printing versions...';
-for local_version in ${local_versions[@]}; do
+log 'debug' 'Printing versions...';${local_versions[@]}
+for local_version in "${local_versions[@]}"; do
   print_version "${local_version}";
 done;
 
