@@ -134,10 +134,9 @@ shasums_sig="${shasums_name}${shasums_signing_key_postfix}.sig";
 log 'info' "Installing Terraform v${version}";
 
 # Create a local temporary directory for downloads
-tmpdir_arg="--tmpdir"
-if [[ $(uname) == 'Darwin' ]]; then
-  # MacOS uses an old version of `mktemp` which only supports the deprecated `-t` option
-  tmpdir_arg="-t"
+tmpdir_arg="-t"
+if mktemp --help 2>&1 | grep -- '--tmpdir' >/dev/null; then
+  tmpdir_arg="--tmpdir"
 fi
 download_tmp="$(mktemp -d ${tmpdir_arg} tfenv_download.XXXXXX)" || log 'error' "Unable to create temporary download directory in $(pwd)";
 # Clean it up in case of error
