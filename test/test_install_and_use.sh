@@ -98,12 +98,12 @@ tests__desc=(
 );
 
 tests__kv=(
-  "$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | head -n 1),latest"
-  "$(tfenv list-remote | head -n 1),latest:"
-  "$(tfenv list-remote | grep 'alpha' | head -n 1),latest:alpha"
-  "$(tfenv list-remote | grep 'beta' | head -n 1),latest:beta"
-  "$(tfenv list-remote | grep 'rc' | head -n 1),latest:rc"
-  "$(tfenv list-remote | grep '^0\.11\.' | head -n 1),latest:^0.11."
+  "$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | tail -n 1),latest"
+  "$(tfenv list-remote | tail -n 1),latest:"
+  "$(tfenv list-remote | grep 'alpha' | tail -n 1),latest:alpha"
+  "$(tfenv list-remote | grep 'beta' | tail -n 1),latest:beta"
+  "$(tfenv list-remote | grep 'rc' | tail -n 1),latest:rc"
+  "$(tfenv list-remote | grep '^0\.11\.' | tail -n 1),latest:^0.11."
   '0.11.15-oci,0.11.15-oci'
   '0.8.8,latest:^0.8'
   '0.7.13,0.7.13'
