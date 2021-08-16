@@ -93,15 +93,15 @@ if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
   declare local_version='';
   if [[ -d "${TFENV_CONFIG_DIR}/versions" ]]; then
     local_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
-      | tail -n +2 \
+      | head -n +2 \
       | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
       | grep -e "${regex}" \
-      | head -n 1)";
+      | tail -n 1)";
   fi;
 
   if [[ "${TFENV_AUTO_INSTALL:-true}" == "true" ]]; then
     log 'debug' "Trying to find the remote version using the regex: ${regex}";
-    remote_version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
+    remote_version="$(tfenv-list-remote | grep -e "${regex}" | tail -n 1)";
     if [[ -n "${remote_version}" ]]; then
         if [[ "${local_version}" != "${remote_version}" ]]; then
           log 'debug' "The installed version '${local_version}' does not much the remote version '${remote_version}'";
