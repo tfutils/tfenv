@@ -8,7 +8,9 @@
 
 Currently tfenv supports the following OSes
 
-- Mac OS X (64bit)
+- macOS
+  - 64bit
+  - Arm (Apple Silicon)
 - Linux
   - 64bit
   - Arm
