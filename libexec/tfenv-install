@@ -162,13 +162,13 @@ case "${TFENV_CURL_OUTPUT:-2}" in
 esac;
 
 log 'info' "Downloading release tarball from ${version_url}/${tarball_name}";
-curlw ${curl_progress} -f -o "${download_tmp}/${tarball_name}" "${version_url}/${tarball_name}" || log 'error' 'Tarball download failed';
+curlw ${curl_progress} -f -L -o "${download_tmp}/${tarball_name}" "${version_url}/${tarball_name}" || log 'error' 'Tarball download failed';
 log 'info' "Downloading SHA hash file from ${version_url}/${shasums_name}";
-curlw -s -f -o "${download_tmp}/${shasums_name}" "${version_url}/${shasums_name}" || log 'error' 'SHA256 hashes download failed';
+curlw -s -f -L -o "${download_tmp}/${shasums_name}" "${version_url}/${shasums_name}" || log 'error' 'SHA256 hashes download failed';
 
 download_signature() {
   log 'info' "Downloading SHA hash signature file from ${version_url}/${shasums_sig}";
-  curlw -s -f \
+  curlw -s -f -L \
     -o "${download_tmp}/${shasums_sig}" \
     "${version_url}/${shasums_sig}" \
     && log 'debug' "SHA256SUMS signature file downloaded successfully to ${download_tmp}/${shasums_sig}" \
