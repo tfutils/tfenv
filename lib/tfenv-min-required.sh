@@ -3,7 +3,7 @@
 set -uo pipefail;
 
 function tfenv-min-required() {
-  local path="${1:-.}";
+  local path="${1:-${TFENV_DIR:-.}}";
 
   local versions="$( echo $(cat ${path}/{*.tf,*.tf.json} 2>/dev/null | grep -Eh '^\s*[^#]*\s*required_version') | grep -o '[~=!<>]\{0,2\}\s*\([0-9]\+\.\?\)\{2,3\}\(-[a-z]\+[0-9]\+\)\?')";
 
