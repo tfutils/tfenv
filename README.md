@@ -200,7 +200,7 @@ TFENV_CONFIG_DIR="$XDG_CONFIG_HOME/tfenv"
 String (Default: "")
 
 If not empty string, this variable overrides Terraform version, specified in [.terraform-version files](#terraform-version-file).
-`latest` and `latest:<regex>` syntax are also supported.
+`min-required`, `latest` and `latest:<regex>` syntax are also supported.
 [`tfenv install`](#tfenv-install-version) and [`tfenv use`](#tfenv-use-version) command also respects this variable.
 
 e.g.

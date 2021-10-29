@@ -72,15 +72,23 @@ done;
 # Begin Script Body #
 #####################
 
-log 'debug' 'Getting version from tfenv-version-name';
-TFENV_VERSION="$(tfenv-version-name)" \
-  && log 'debug' "TFENV_VERSION is ${TFENV_VERSION}" \
-  || {
-    # Errors will be logged from tfenv-version name,
-    # we don't need to trouble STDERR with repeat information here
-    log 'debug' 'Failed to get version from tfenv-version-name';
-    exit 1;
-  };
+if [[ "${TFENV_TERRAFORM_VERSION}" =~ ^min-required$ ]]; then
+  log 'info' 'TFENV_TERRAFORM_VERSION set to "min-required". Detecting minimum required version...';
+  min_required="$(tfenv-min-required)" || log 'error' 'tfenv-min-required failed';
+  log 'info' "Minimum required version detected: ${min_required}";
+  TFENV_VERSION=${min_required}
+else
+  log 'debug' 'Getting version from tfenv-version-name';
+  TFENV_VERSION="$(tfenv-version-name)" \
+    && log 'debug' "TFENV_VERSION is ${TFENV_VERSION}" \
+    || {
+      # Errors will be logged from tfenv-version name,
+      # we don't need to trouble STDERR with repeat information here
+      log 'debug' 'Failed to get version from tfenv-version-name';
+      exit 1;
+    };
+fi;
+
 export TFENV_VERSION;
 
 if [ ! -d "${TFENV_CONFIG_DIR}/versions/${TFENV_VERSION}" ]; then
