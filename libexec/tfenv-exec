@@ -72,7 +72,7 @@ done;
 # Begin Script Body #
 #####################
 
-if [[ "${TFENV_TERRAFORM_VERSION}" =~ ^min-required$ ]]; then
+if [[ ! -z ${TFENV_TERRAFORM_VERSION+x} ]] && [[ "${TFENV_TERRAFORM_VERSION}" =~ ^min-required$ ]]; then
   log 'info' 'TFENV_TERRAFORM_VERSION set to "min-required". Detecting minimum required version...';
   min_required="$(tfenv-min-required)" || log 'error' 'tfenv-min-required failed';
   log 'info' "Minimum required version detected: ${min_required}";
