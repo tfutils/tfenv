@@ -42,7 +42,30 @@ if [ "${TFENV_DEBUG:-0}" -gt 0 ]; then
   fi;
 fi;
 
-source "${TFENV_ROOT}/lib/bashlog.sh";
+if [ "${TFENV_DEBUG:-0}" -eq 0 ]; then
+  function log() {
+    level="$1"
+    info="\033[32m"
+    error="\033[31m"
+    warn="\033[33m"
+    reset="\033[0m"
+    case "$level" in
+      'debug')
+        return
+        ;;
+      'error')
+        echo -e "${!level}[${level^^}] ${*:2}${reset}" >&2
+        exit 1
+        ;;
+      *)
+        echo -e "${!level}[${level^^}] ${*:2}${reset}" >&2
+        ;;
+    esac
+  }
+  export -f log;
+else
+  source "${TFENV_ROOT}/lib/bashlog.sh";
+fi
 
 resolve_version () {
   declare version_requested version regex min_required version_file;
