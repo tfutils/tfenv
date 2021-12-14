@@ -14,26 +14,27 @@ function _log_exception() {
 export -f _log_exception;
 
 function log() {
-  local date_format="${BASHLOG_DATE_FORMAT:-+%F %T}";
-  local date="$(date "${date_format}")";
-  local date_s="$(date "+%s")";
-
-  local file="${BASHLOG_FILE:-0}";
-  local file_path="${BASHLOG_FILE_PATH:-/tmp/$(basename "${0}").log}";
-
-  local json="${BASHLOG_JSON:-0}";
-  local json_path="${BASHLOG_JSON_PATH:-/tmp/$(basename "${0}").log.json}";
-
   local syslog="${BASHLOG_SYSLOG:-0}";
-  local tag="${BASHLOG_SYSLOG_TAG:-$(basename "${0}")}";
+  local file="${BASHLOG_FILE:-0}";
+  local json="${BASHLOG_JSON:-0}";
+  local stdout_extra="${BASHLOG_EXTRA:-0}";
+
+  if [ "${file}" -eq 1 ] || [ "${json}" -eq 1 ] || [ "${stdout_extra}" -eq 1 ]; then
+    local date_format="${BASHLOG_DATE_FORMAT:-+%F %T}";
+    local date="$(date "${date_format}")";
+    local date_s="$(date "+%s")";
+  fi
+  local file_path="${BASHLOG_FILE_PATH:-/tmp/${0##*/}.log}";
+  local json_path="${BASHLOG_JSON_PATH:-/tmp/${0##*/}.log.json}";
+
+  local tag="${BASHLOG_SYSLOG_TAG:-${0##*/})}";
   local facility="${BASHLOG_SYSLOG_FACILITY:-local0}";
   local pid="${$}";
 
   local level="${1}";
-  local upper="$(echo "${level}" | awk '{print toupper($0)}')";
+  local upper="${level^^}";
   local debug_level="${TFENV_DEBUG:-0}";
   local stdout_colours="${BASHLOG_COLOURS:-1}";
-  local stdout_extra="${BASHLOG_EXTRA:-0}";
 
   local custom_eval_prefix="${BASHLOG_I_PROMISE_TO_BE_CAREFUL_CUSTOM_EVAL_PREFIX:-""}";
 
