@@ -141,7 +141,7 @@ String (Default: amd64)
 Specify architecture. Architecture other than the default amd64 can be specified with the `TFENV_ARCH` environment variable
 
 ```console
-$ TFENV_ARCH=arm tfenv install 0.7.9
+$ TFENV_ARCH=arm64 tfenv install 0.7.9
 ```
 
 ##### `TFENV_AUTO_INSTALL`
