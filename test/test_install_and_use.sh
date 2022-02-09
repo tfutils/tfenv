@@ -114,18 +114,18 @@ tests_count=${#tests__desc[@]};
 
 declare desc kv k v test_num;
 
-for ((test_iter=0; test_iter<${tests_count}; ++test_iter )) ; do
-  cleanup || log 'error' 'Cleanup failed?!';
-  test_num=$((test_iter + 1)); 
-  desc=${tests__desc[${test_iter}]};
-  kv="${tests__kv[${test_iter}]}";
-  v="${kv%,*}";
-  k="${kv##*,}";
-  log 'info' "## Param Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} )";
-  test_install_and_use "${v}" "${k}" \
-    && log info "## Param Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) succeeded" \
-    || error_and_proceed "## Param Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) failed";
-done;
+#for ((test_iter=0; test_iter<${tests_count}; ++test_iter )) ; do
+#  cleanup || log 'error' 'Cleanup failed?!';
+#  test_num=$((test_iter + 1)); 
+#  desc=${tests__desc[${test_iter}]};
+#  kv="${tests__kv[${test_iter}]}";
+#  v="${kv%,*}";
+#  k="${kv##*,}";
+#  log 'info' "## Param Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} )";
+#  test_install_and_use "${v}" "${k}" \
+#    && log info "## Param Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) succeeded" \
+#    || error_and_proceed "## Param Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) failed";
+#done;
 
 for ((test_iter=0; test_iter<${tests_count}; ++test_iter )) ; do
   cleanup || log 'error' 'Cleanup failed?!';

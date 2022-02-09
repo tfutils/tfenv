@@ -86,8 +86,8 @@ if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
     regex="${TFENV_VERSION##*\:}";
     log 'debug' "'latest' keyword uses regex: ${regex}";
   else
-    regex='.*'; # Just saves a seperate command below without the grep
-    log 'debug' "'latest' keyword does not use regex";
+    regex="^[0-9]\+\.[0-9]\+\.[0-9]\+$";
+    log 'debug' "Version uses latest keyword alone. Forcing regex to match stable versions only: ${regex}";
   fi;
 
   version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
