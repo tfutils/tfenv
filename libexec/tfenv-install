@@ -107,12 +107,12 @@ esac;
 case "$(uname -s)" in
   Darwin*)
     # ARM for darwin only is available for versions >= 1.0.2
-    if [[ "${version}" =~ 1\.0\.(([2-9]|1[0-1]]))$ || 
-	  ! "${version}" =~ 0\.\d*.\d*
+    if [[ "${version}" =~ 1\.0\.[0-1]$ || 
+	  "${version}" =~ 0\.\d*.\d*
     ]]; then
-      os="darwin_${TFENV_ARCH}";
-    else
       os="darwin_amd64";
+    else
+      os="darwin_${TFENV_ARCH}";
     fi;
     ;;
   MINGW64*)
