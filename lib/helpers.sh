@@ -42,7 +42,24 @@ if [ "${TFENV_DEBUG:-0}" -gt 0 ]; then
   fi;
 fi;
 
-source "${TFENV_ROOT}/lib/bashlog.sh";
+function load_bashlog () {
+  source "${TFENV_ROOT}/lib/bashlog.sh";
+}
+if [ "${TFENV_DEBUG:-0}" -gt 0 ] ; then
+  # our shim below cannot be used when debugging is enabled
+  load_bashlog
+else
+  # Shim that understands to no-op for debug messages, and defers to
+  # full bashlog for everything else.
+  function log () {
+    if [ "$1" != 'debug' ] ; then
+      # Loading full bashlog will overwrite the `log` function
+      load_bashlog
+      log "$@"
+    fi
+  }
+  export -f log;
+fi
 
 resolve_version () {
   declare version_requested version regex min_required version_file;

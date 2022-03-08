@@ -163,7 +163,7 @@ export -f log;
 
 declare prev_cmd="null";
 declare this_cmd="null";
-trap 'prev_cmd=$this_cmd; this_cmd=$BASH_COMMAND' DEBUG \
+trap 'prev_cmd=${this_cmd:-null}; this_cmd=$BASH_COMMAND' DEBUG \
   && log debug 'DEBUG trap set' \
   || log 'error' 'DEBUG trap failed to set';
 
