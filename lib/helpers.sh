@@ -158,4 +158,8 @@ function error_and_proceed() {
 };
 export -f error_and_proceed;
 
+source "$TFENV_ROOT/lib/tfenv-exec.sh";
+source "$TFENV_ROOT/lib/tfenv-version-file.sh";
+source "$TFENV_ROOT/lib/tfenv-version-name.sh";
+
 export TFENV_HELPERS=1;
