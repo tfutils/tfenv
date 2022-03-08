@@ -78,3 +78,4 @@ function tfenv-version-name() {
 
   echo "${TFENV_VERSION}";
 }
+export -f tfenv-version-name;

@@ -34,3 +34,4 @@ function tfenv-exec() {
 
   return 0;
 }
+export -f tfenv-exec;

@@ -45,6 +45,7 @@ fi;
 function load_bashlog () {
   source "${TFENV_ROOT}/lib/bashlog.sh";
 }
+export -f load_bashlog;
 if [ "${TFENV_DEBUG:-0}" -gt 0 ] ; then
   # our shim below cannot be used when debugging is enabled
   load_bashlog

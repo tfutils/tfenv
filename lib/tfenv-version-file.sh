@@ -15,6 +15,7 @@ find_local_version_file() {
   log 'debug' "No version file found in ${1}";
   return 1;
 }
+export -f find_local_version_file;
 
 function tfenv-version-file() {
   if ! find_local_version_file "${TFENV_DIR:-${PWD}}"; then
@@ -24,3 +25,4 @@ function tfenv-version-file() {
     fi;
   fi;
 }
+export -f tfenv-version-file;
