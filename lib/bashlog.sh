@@ -32,7 +32,7 @@ function log() {
   local pid="${$}";
 
   local level="${1}";
-  local upper="${level^^}";
+  local upper="$(tr '[:lower:]' '[:upper:]')";
   local debug_level="${TFENV_DEBUG:-0}";
   local stdout_colours="${BASHLOG_COLOURS:-1}";
 
