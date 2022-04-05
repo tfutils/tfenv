@@ -73,4 +73,4 @@ remote_versions="$(curlw -sSf "${TFENV_REMOTE}/terraform/")" \
 
 #log 'debug' "Remote versions available: ${remote_versions}"; # Even in debug mode this is too verbose
 
-grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)[0-9]*)?" <<<"${remote_versions}" | uniq;
+grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)-?[0-9]*)?" <<<"${remote_versions}" | uniq;
