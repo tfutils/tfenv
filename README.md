@@ -74,7 +74,7 @@ $ which tfenv
 
 Install a specific version of Terraform.
 
-If no parameter is passed, the version to use is resolved automatically via [.terraform-version files](#terraform-version-file) or [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_version) (TFENV\_TERRAFORM\_VERSION takes precedence), defaulting to 'latest' if none are found.
+If no parameter is passed, the version to use is resolved automatically via [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_version), [.terraform-version files](#terraform-version-file), or [required_version in "terraform" section of any .tf or .tf.json file](#min-required), in that order of precedence, i.e. TFENV\_TERRAFORM\_VERSION, then .terraform-version, and then required_version in .tf. The default is 'latest' if none are found.
 
 If a parameter is passed, available options:
 

@@ -57,19 +57,41 @@ resolve_version () {
       log 'debug' "Version File (${version_file}) is not the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version)";
       version_requested="$(cat "${version_file}")" \
         || log 'error' "Failed to open ${version_file}";
+    fi
 
-    elif [ -f "${version_file}" ]; then
+    if [ -z "${version_requested:-""}" ]; then
+      log 'debug' 'Tryng to set version from "required_version" under "terraform" section'
+      versions="$( echo $(cat {*.tf,*.tf.json} 2>/dev/null | grep -h required_version) | grep  -o '\([0-9]\+\.\?\)\{2,3\}\(-[a-z]\+[0-9]\+\)\?')";
+      if [[ "${versions}" =~ ([~=!<>]{0,2}[[:blank:]]*[0-9]+[0-9.]+)[^0-9]*(-[a-z]+[0-9]+)? ]]; then
+        found_min_required="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
+        if [[ "${found_min_required}" =~ ^!=.+ ]]; then
+          log 'debug' "required_version is a negation - we cannot guess the desired one, skipping.";
+        else
+          found_min_required="$(echo "$found_min_required")";
+
+          # Probably not an advisable way to choose a terraform version,
+          # but this is the way this functionality works in terraform:
+          # add .0 to versions without a minor and/or patch version (e.g. 12.0)
+          while ! [[ "${found_min_required}" =~ [0-9]+\.[0-9]+\.[0-9]+ ]]; do
+            found_min_required="${found_min_required}.0";
+          done;
+          version_requested="${found_min_required}";
+        fi;
+      fi;
+    fi;
+
+    if [ -z "${version_requested}" -a -f "${version_file}" ]; then
       log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version)";
       version_requested="$(cat "${version_file}")" \
         || log 'error' "Failed to open ${version_file}";
 
-      # Absolute fallback
       if [ -z "${version_requested}" ]; then
         log 'debug' 'Version file had no content. Falling back to "latest"';
         version_requested='latest';
       fi;
 
-    else
+    # Absolute fallback
+    elif [ -z "${version_requested}" ]; then
       log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version) but it doesn't exist";
       log 'info' 'No version requested on the command line or in the version file search path. Installing "latest"';
       version_requested='latest';
@@ -149,6 +171,8 @@ cleanup() {
   rm -rf ./.terraform-version;
   log 'debug' "Deleting ${pwd}/min_required.tf";
   rm -rf ./min_required.tf;
+  log 'debug' "Deleting ${pwd}/required_version.tf";
+  rm -rf ./required_version.tf;
 };
 export -f cleanup;
 

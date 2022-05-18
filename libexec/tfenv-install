@@ -73,8 +73,8 @@ declare regex="${resolved##*\:}";
 
 log 'debug' "Processing install for version ${version}, using regex ${regex}";
 
-version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
-[ -n "${version}" ] || log 'error' "No versions matching '${requested}' found in remote";
+remote_version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
+[ -n "${remote_version}" ] && version="${remote_version}" || log 'error' "No versions matching '${requested:-$version}' found in remote";
 
 dst_path="${TFENV_CONFIG_DIR}/versions/${version}";
 if [ -f "${dst_path}/terraform" ]; then
@@ -176,11 +176,14 @@ download_signature() {
 };
 
 # If on MacOS with Homebrew, use GNU grep
-# This allows keybase login detection to work on Mac
+# This allows keybase login detection to work on Mac,
+# and is required to be able to detect terraform version
+# from "required_version" setting in "*.tf" files
 if [[ $(uname) == 'Darwin' ]] && [ $(which brew) ]; then
   if ! [ $(which ggrep) ]; then
     brew install grep;
   fi
+  shopt -s expand_aliases
   alias grep=ggrep;
 fi
 
