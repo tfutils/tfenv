@@ -116,7 +116,13 @@ function curlw () {
     TLS_OPT="";
   fi;
 
-  curl ${TLS_OPT} "$@";
+  if [[ ! -z "${TFENV_NETRC_PATH:-""}" ]]; then
+    NETRC_OPT="--netrc-file ${TFENV_NETRC_PATH}";
+  else
+    NETRC_OPT="";
+  fi;
+
+  curl ${TLS_OPT} ${NETRC_OPT} "$@";
 }
 export -f curlw;
 
