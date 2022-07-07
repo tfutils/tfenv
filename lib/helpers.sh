@@ -9,16 +9,16 @@ if [ -z "${TFENV_ROOT:-""}" ]; then
     local file_name;
 
     while [ "${target_file}" != "" ]; do
-      cd "$(dirname ${target_file})" || early_death "Failed to 'cd \$(dirname ${target_file})' while trying to determine TFENV_ROOT";
-      file_name="$(basename "${target_file}")" || early_death "Failed to 'basename \"${target_file}\"' while trying to determine TFENV_ROOT";
+      cd "${target_file%/*}" || early_death "Failed to 'cd \$(${target_file%/*})' while trying to determine TFENV_ROOT";
+      file_name="${target_file##*/}" || early_death "Failed to '\"${target_file##*/}\"' while trying to determine TFENV_ROOT";
       target_file="$(readlink "${file_name}")";
     done;
 
     echo "$(pwd -P)/${file_name}";
   };
-
-  TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)";
-  [ -n ${TFENV_ROOT} ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TFENV_ROOT";
+  TFENV_SHIM=$(readlink_f "${0}")
+  TFENV_ROOT="${TFENV_SHIM%/*/*}";
+  [ -n "${TFENV_ROOT}" ] || early_death "Failed to determine TFENV_ROOT"
 else
   TFENV_ROOT="${TFENV_ROOT%/}";
 fi;
@@ -42,7 +42,25 @@ if [ "${TFENV_DEBUG:-0}" -gt 0 ]; then
   fi;
 fi;
 
-source "${TFENV_ROOT}/lib/bashlog.sh";
+function load_bashlog () {
+  source "${TFENV_ROOT}/lib/bashlog.sh";
+}
+export -f load_bashlog;
+if [ "${TFENV_DEBUG:-0}" -gt 0 ] ; then
+  # our shim below cannot be used when debugging is enabled
+  load_bashlog
+else
+  # Shim that understands to no-op for debug messages, and defers to
+  # full bashlog for everything else.
+  function log () {
+    if [ "$1" != 'debug' ] ; then
+      # Loading full bashlog will overwrite the `log` function
+      load_bashlog
+      log "$@"
+    fi
+  }
+  export -f log;
+fi
 
 resolve_version () {
   declare version_requested version regex min_required version_file;
@@ -157,5 +175,9 @@ function error_and_proceed() {
   log 'warn' "Test Failed: ${1}";
 };
 export -f error_and_proceed;
+
+source "$TFENV_ROOT/lib/tfenv-exec.sh";
+source "$TFENV_ROOT/lib/tfenv-version-file.sh";
+source "$TFENV_ROOT/lib/tfenv-version-name.sh";
 
 export TFENV_HELPERS=1;
