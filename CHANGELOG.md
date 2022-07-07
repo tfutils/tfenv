@@ -1,3 +1,12 @@
+## 2.2.3 (Feb 9, 2022)
+
+ * Fix: mktemp not working correctly on Alpine Linux (#285)
+ * Add support of ARM64 (#280)
+ * Add support for tf.json files on min-required (#277)
+ * Fix issue #210 - allow non-numeric values for DEBUG (#274)
+ * Download latest version if user uses regex and TFENV_AUTO_INSTALL is true (#272)
+ * Add tfenv pin command (#270)
+
 ## 2.2.2 (May 6, 2021)
 
  * remove trust from revoked signing key as of hcsec-2021-12
