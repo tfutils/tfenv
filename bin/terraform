@@ -26,7 +26,7 @@ if [ -z "${TFENV_ROOT:-""}" ]; then
   };
   TFENV_SHIM=$(readlink_f "${0}")
   TFENV_ROOT="${TFENV_SHIM%/*/*}";
-  [ -n "${TFENV_ROOT}" ] || early_death "Failed to determine TFENV_ROOT"
+  [ -n "${TFENV_ROOT}" ] || early_death "Failed to determine TFENV_ROOT";
 else
   TFENV_ROOT="${TFENV_ROOT%/}";
 fi;
@@ -47,7 +47,7 @@ fi;
 for dir in libexec bin; do
   case ":${PATH}:" in
     *:${TFENV_ROOT}/${dir}:*) log 'debug' "\$PATH already contains '${TFENV_ROOT}/${dir}', not adding it again";;
-    *) 
+    *)
       log 'debug' "\$PATH does not contain '${TFENV_ROOT}/${dir}', prepending and exporting it now";
       export PATH="${TFENV_ROOT}/${dir}:${PATH}";
       ;;
@@ -62,4 +62,4 @@ log 'debug' "program=\"${0##*/}\"";
 
 declare tfenv_path="${TFENV_ROOT}/bin/tfenv";
 
-tfenv-exec "$@"
+tfenv-exec "$@";

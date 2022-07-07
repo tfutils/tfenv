@@ -18,7 +18,7 @@ if [ -z "${TFENV_ROOT:-""}" ]; then
   };
   TFENV_SHIM=$(readlink_f "${0}")
   TFENV_ROOT="${TFENV_SHIM%/*/*}";
-  [ -n "${TFENV_ROOT}" ] || early_death "Failed to determine TFENV_ROOT"
+  [ -n "${TFENV_ROOT}" ] || early_death "Failed to determine TFENV_ROOT";
 else
   TFENV_ROOT="${TFENV_ROOT%/}";
 fi;
@@ -44,23 +44,24 @@ fi;
 
 function load_bashlog () {
   source "${TFENV_ROOT}/lib/bashlog.sh";
-}
+};
 export -f load_bashlog;
+
 if [ "${TFENV_DEBUG:-0}" -gt 0 ] ; then
   # our shim below cannot be used when debugging is enabled
-  load_bashlog
+  load_bashlog;
 else
   # Shim that understands to no-op for debug messages, and defers to
   # full bashlog for everything else.
   function log () {
     if [ "$1" != 'debug' ] ; then
       # Loading full bashlog will overwrite the `log` function
-      load_bashlog
-      log "$@"
-    fi
-  }
+      load_bashlog;
+      log "$@";
+    fi;
+  };
   export -f log;
-fi
+fi;
 
 resolve_version () {
   declare version_requested version regex min_required version_file;
@@ -78,10 +79,10 @@ resolve_version () {
     fi
 
     if [ -z "${version_requested:-""}" ]; then
-      log 'debug' 'Tryng to set version from "required_version" under "terraform" section'
+      log 'debug' 'Trying to set version from "required_version" under "terraform" section';
       versions="$( echo $(cat {*.tf,*.tf.json} 2>/dev/null | grep -h required_version) | grep  -o '\([0-9]\+\.\?\)\{2,3\}\(-[a-z]\+[0-9]\+\)\?')";
       if [[ "${versions}" =~ ([~=!<>]{0,2}[[:blank:]]*[0-9]+[0-9.]+)[^0-9]*(-[a-z]+[0-9]+)? ]]; then
-        found_min_required="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
+        found_min_required="${BASH_REMATCH[1]}${BASH_REMATCH[2]}";
         if [[ "${found_min_required}" =~ ^!=.+ ]]; then
           log 'debug' "required_version is a negation - we cannot guess the desired one, skipping.";
         else
@@ -145,7 +146,7 @@ resolve_version () {
     regex="^${version_requested}$";
     log 'debug' "Version is explicit: ${version}. Regex enforces the version: ${regex}";
   fi;
-}
+};
 
 # Curl wrapper to switch TLS option for each OS
 function curlw () {
@@ -163,13 +164,13 @@ function curlw () {
   fi;
 
   curl ${TLS_OPT} ${NETRC_OPT} "$@";
-}
+};
 export -f curlw;
 
 check_active_version() {
   local v="${1}";
   [ -n "$(${TFENV_ROOT}/bin/terraform version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
-}
+};
 export -f check_active_version;
 
 check_installed_version() {

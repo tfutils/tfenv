@@ -33,5 +33,5 @@ function tfenv-exec() {
   || log 'error' "Failed to execute: ${TF_BIN_PATH} $*";
 
   return 0;
-}
+};
 export -f tfenv-exec;

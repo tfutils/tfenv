@@ -65,8 +65,8 @@ function log() {
   local severities_ALERT=1;  # Unused
   local severities_EMERG=0;  # Unused
 
-  local severity_var="severities_${upper}"
-  local severity="${!severity_var:-3}"
+  local severity_var="severities_${upper}";
+  local severity="${!severity_var:-3}";
 
   if [ "${debug_level}" -gt 0 ] || [ "${severity}" -lt 7 ]; then
 
@@ -111,7 +111,7 @@ function log() {
   local colours_DEFAULT='\033[0m' # Default
 
   local norm="${colours_DEFAULT}";
-  local colour_var="colours_${upper}"
+  local colour_var="colours_${upper}";
   local colour="${!colour_var:-\033[31m}";
 
   local std_line;

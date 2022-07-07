@@ -58,8 +58,23 @@ log 'info' '### Install required_version normal version (#.#.#)';
 reqv='0.14.11';
 
 echo "terraform {
-  required_version = \">=${reqv}\"
+  required_version = \">= ${reqv}\"
 }" > required_version.tf;
+
+(
+  tfenv install;
+  tfenv use;
+  check_active_version "${reqv}";
+) || error_and_proceed 'required_version does not match';
+
+cleanup || log 'error' 'Cleanup failed?!';
+
+
+log 'info' '### Install required_version normal version with arbitrary whitespace (#.#.#)';
+
+reqv='0.14.11';
+
+echo "terraform    {    required_version     =       \"   >=    ${reqv}  \"    }" > required_version.tf;
 
 (
   tfenv install;

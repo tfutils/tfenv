@@ -63,13 +63,14 @@ done;
 if [[ $(uname) == 'Darwin' ]] && [ $(which brew) ]; then
   if ! [ $(which ggrep) ]; then
     brew install grep;
-  fi
-  shopt -s expand_aliases
+  fi;
+
+  shopt -s expand_aliases;
   alias grep=ggrep;
-fi
+fi;
 
 #####################
 # Begin Script Body #
 #####################
 
-tfenv-version-name "$@"
+tfenv-version-name "$@";
