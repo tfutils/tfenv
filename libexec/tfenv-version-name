@@ -56,6 +56,18 @@ for dir in libexec bin; do
   esac;
 done;
 
+# If on MacOS with Homebrew, use GNU grep
+# This allows keybase login detection to work on Mac,
+# and is required to be able to detect terraform version
+# from "required_version" setting in "*.tf" files
+if [[ $(uname) == 'Darwin' ]] && [ $(which brew) ]; then
+  if ! [ $(which ggrep) ]; then
+    brew install grep;
+  fi
+  shopt -s expand_aliases
+  alias grep=ggrep;
+fi
+
 #####################
 # Begin Script Body #
 #####################

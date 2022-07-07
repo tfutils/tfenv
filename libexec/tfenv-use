@@ -79,6 +79,7 @@ log debug "Resolving version with: tfenv-resolve-version ${requested_arg}";
 declare resolved="$(tfenv-resolve-version ${requested_arg})";
 log debug "Resolved to: ${resolved}";
 
+declare requested_version="${resolved%%\:*}";
 declare version="${resolved%%\:*}";
 declare regex="${resolved##*\:}";
 
@@ -92,7 +93,7 @@ declare version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename 
 
 [ -n "${version}" ] \
   && log 'debug' "Found version: ${version}" \
-  || log 'error' "No installed versions of terraform matched '${requested}'${version_source_suffix}";
+  || log 'error' "No installed versions of terraform matched '${requested_version}'${version_source_suffix}";
 
 target_path="${TFENV_CONFIG_DIR}/versions/${version}";
 [ -f "${target_path}/terraform" ] \
