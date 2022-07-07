@@ -14,7 +14,7 @@ find_local_version_file() {
   done;
   log 'debug' "No version file found in ${1}";
   return 1;
-}
+};
 export -f find_local_version_file;
 
 function tfenv-version-file() {
@@ -24,5 +24,5 @@ function tfenv-version-file() {
       echo "${TFENV_CONFIG_DIR}/version";
     fi;
   fi;
-}
+};
 export -f tfenv-version-file;

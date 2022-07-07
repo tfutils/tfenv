@@ -73,8 +73,8 @@ declare regex="${resolved##*\:}";
 
 log 'debug' "Processing install for version ${version}, using regex ${regex}";
 
-version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
-[ -n "${version}" ] || log 'error' "No versions matching '${requested}' found in remote";
+remote_version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
+[ -n "${remote_version}" ] && version="${remote_version}" || log 'error' "No versions matching '${requested:-$version}' found in remote";
 
 dst_path="${TFENV_CONFIG_DIR}/versions/${version}";
 if [ -f "${dst_path}/terraform" ]; then
@@ -118,7 +118,7 @@ case "$(uname -s)" in
     os="windows_${TFENV_ARCH}";
     ;;
   FreeBSD*)
-    os="freebsd_${TFENV_ARCH}"
+    os="freebsd_${TFENV_ARCH}";
     ;;
   *)
     os="linux_${TFENV_ARCH}";
@@ -140,17 +140,20 @@ else
 fi;
 
 shasums_name="terraform_${version}_SHA256SUMS";
-shasums_signing_key_postfix=".72D7468F"
+shasums_signing_key_postfix=".72D7468F";
 shasums_sig="${shasums_name}${shasums_signing_key_postfix}.sig";
 
 log 'info' "Installing Terraform v${version}";
 
 # Create a local temporary directory for downloads
-tmpdir_arg="-t"
+tmpdir_arg="-t";
+
 if mktemp --help 2>&1 | grep -- '--tmpdir' >/dev/null; then
-  tmpdir_arg="--tmpdir"
-fi
+  tmpdir_arg="--tmpdir";
+fi;
+
 download_tmp="$(mktemp -d ${tmpdir_arg} tfenv_download.XXXXXX)" || log 'error' "Unable to create temporary download directory in $(pwd)";
+
 # Clean it up in case of error
 trap "rm -rf ${download_tmp}" EXIT;
 
@@ -188,13 +191,10 @@ download_signature() {
 };
 
 # If on MacOS with Homebrew, use GNU grep
-# This allows keybase login detection to work on Mac
-if [[ $(uname) == 'Darwin' ]] && [ $(which brew) ]; then
-  if ! [ $(which ggrep) ]; then
-    brew install grep;
-  fi
-  alias grep=ggrep;
-fi
+# This allows keybase login detection to work on Mac,
+# and is required to be able to detect terraform version
+# from "required_version" setting in "*.tf" files
+check_dependencies;
 
 # Verify signature if verification mechanism (keybase, gpg, etc) is present
 if [[ -f "${TFENV_CONFIG_DIR}/use-gnupg" ]]; then

@@ -47,7 +47,7 @@ fi;
 for dir in libexec bin; do
   case ":${PATH}:" in
     *:${TFENV_ROOT}/${dir}:*) log 'debug' "\$PATH already contains '${TFENV_ROOT}/${dir}', not adding it again";;
-    *) 
+    *)
       log 'debug' "\$PATH does not contain '${TFENV_ROOT}/${dir}', prepending and exporting it now";
       export PATH="${TFENV_ROOT}/${dir}:${PATH}";
       ;;
@@ -73,12 +73,13 @@ if [ -z "${requested_arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
 elif [ -z "${requested_arg}" ]; then
   version_source_suffix=' (set by TFENV_TERRAFORM_VERSION)';
   requested="${TFENV_TERRAFORM_VERSION}";
-fi
+fi;
 
 log debug "Resolving version with: tfenv-resolve-version ${requested_arg}";
 declare resolved="$(tfenv-resolve-version ${requested_arg})";
 log debug "Resolved to: ${resolved}";
 
+declare requested_version="${resolved%%\:*}";
 declare version="${resolved%%\:*}";
 declare regex="${resolved##*\:}";
 
@@ -92,7 +93,7 @@ declare version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename 
 
 [ -n "${version}" ] \
   && log 'debug' "Found version: ${version}" \
-  || log 'error' "No installed versions of terraform matched '${requested}'${version_source_suffix}";
+  || log 'error' "No installed versions of terraform matched '${requested_version}'${version_source_suffix}";
 
 target_path="${TFENV_CONFIG_DIR}/versions/${version}";
 [ -f "${target_path}/terraform" ] \

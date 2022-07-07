@@ -18,11 +18,14 @@ jobs:
     strategy:
       matrix:
         os:
-          - 'macos-11'
           - 'macos-latest'
           - 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v2'
+        with:
+          fetch-depth: 1
+      - name: 'Install Dependencies'
+        run: './test/install_deps.sh'
       - name: 'Run all tests'
         run: './test/run.sh'
         shell: 'bash'
@@ -41,6 +44,10 @@ jobs:
           - 'windows-2019'
     steps:
       - uses: 'actions/checkout@v2'
+        with:
+          fetch-depth: 1
+      - name: 'Install Dependencies'
+        run: './test/install_deps.sh'
       - name: 'Run all tests'
         run: './test/run.sh'
         shell: 'bash'
