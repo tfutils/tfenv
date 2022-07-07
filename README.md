@@ -54,6 +54,11 @@ $ git clone https://github.com/tfutils/tfenv.git ~/.tfenv
 $ echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bash_profile
 ```
 
+  For WSL users
+```bash
+$ echo 'export PATH=$PATH:$HOME/.tfenv/bin' >> ~/.bashrc
+```
+
   OR you can make symlinks for `tfenv/bin/*` scripts into a path that is already added to your `$PATH` (e.g. `/usr/local/bin`) `OSX/Linux Only!`
 
 ```console
