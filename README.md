@@ -8,7 +8,9 @@
 
 Currently tfenv supports the following OSes
 
-- Mac OS X (64bit)
+- macOS
+  - 64bit
+  - Arm (Apple Silicon)
 - Linux
   - 64bit
   - Arm
@@ -43,13 +45,18 @@ include ::tfenv
 1. Check out tfenv into any path (here is `${HOME}/.tfenv`)
 
 ```console
-$ git clone https://github.com/tfutils/tfenv.git ~/.tfenv
+$ git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv
 ```
 
 2. Add `~/.tfenv/bin` to your `$PATH` any way you like
 
 ```console
 $ echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bash_profile
+```
+
+  For WSL users
+```bash
+$ echo 'export PATH=$PATH:$HOME/.tfenv/bin' >> ~/.bashrc
 ```
 
   OR you can make symlinks for `tfenv/bin/*` scripts into a path that is already added to your `$PATH` (e.g. `/usr/local/bin`) `OSX/Linux Only!`
@@ -141,7 +148,7 @@ String (Default: amd64)
 Specify architecture. Architecture other than the default amd64 can be specified with the `TFENV_ARCH` environment variable
 
 ```console
-$ TFENV_ARCH=arm tfenv install 0.7.9
+$ TFENV_ARCH=arm64 tfenv install 0.7.9
 ```
 
 ##### `TFENV_AUTO_INSTALL`
