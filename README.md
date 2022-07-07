@@ -216,6 +216,18 @@ e.g.
 $ TFENV_TERRAFORM_VERSION=latest:^0.11. terraform --version
 ```
 
+##### `TFENV_NETRC_PATH`
+
+String (Default: "")
+
+If not empty string, this variable specifies the credentials file used to access the remote location (useful if used in conjunction with TFENV_REMOTE).
+
+e.g.
+
+```console
+$ TFENV_NETRC_PATH="$PWD/.netrc.tfenv"
+```
+
 #### Bashlog Logging Library
 
 ##### `BASHLOG_COLOURS`
