@@ -62,11 +62,11 @@ done;
 [ "${#}" -ne 0 ] \
   && log 'error' "usage: tfenv pin"
 
-[ -d "${TFENV_ROOT}/versions/" ] \
+[ -d "${TFENV_CONFIG_DIR}/versions/" ] \
   || log 'error' 'No versions available. Please install one with: tfenv install'
 
-[[ -x "${TFENV_ROOT}/versions" && -r "${TFENV_ROOT}/versions" ]] \
-  || log 'error' "tfenv versions directory is inaccessible: ${TFENV_ROOT}/versions";
+[[ -x "${TFENV_CONFIG_DIR}/versions" && -r "${TFENV_CONFIG_DIR}/versions" ]] \
+  || log 'error' "tfenv versions directory is inaccessible: ${TFENV_CONFIG_DIR}/versions";
 
 version_name="$(tfenv-version-name 2>/dev/null || true)" \
   && log 'debug' "tfenv-version-name reported: ${version_name}";
