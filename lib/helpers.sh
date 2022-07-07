@@ -207,6 +207,18 @@ function error_and_proceed() {
 };
 export -f error_and_proceed;
 
+function check_dependencies() {
+  if [[ $(uname) == 'Darwin' ]] && [ $(which brew) ]; then
+    if ! [ $(which ggrep) ]; then
+      log 'error' 'A metaphysical dichotomy has caused this unit to overload and shut down. GNU Grep is a requirement and your Mac does not have it. Consider "brew install grep"';
+    fi;
+
+    shopt -s expand_aliases;
+    alias grep=ggrep;
+  fi;
+};
+export -f check_dependencies;
+
 source "$TFENV_ROOT/lib/tfenv-exec.sh";
 source "$TFENV_ROOT/lib/tfenv-version-file.sh";
 source "$TFENV_ROOT/lib/tfenv-version-name.sh";

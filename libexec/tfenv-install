@@ -194,14 +194,7 @@ download_signature() {
 # This allows keybase login detection to work on Mac,
 # and is required to be able to detect terraform version
 # from "required_version" setting in "*.tf" files
-if [[ $(uname) == 'Darwin' ]] && [ $(which brew) ]; then
-  if ! [ $(which ggrep) ]; then
-    brew install grep;
-  fi;
-
-  shopt -s expand_aliases;
-  alias grep=ggrep;
-fi;
+check_dependencies;
 
 # Verify signature if verification mechanism (keybase, gpg, etc) is present
 if [[ -f "${TFENV_CONFIG_DIR}/use-gnupg" ]]; then
