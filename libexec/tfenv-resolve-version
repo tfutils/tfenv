@@ -103,7 +103,9 @@ else
   version_requested="${arg}";
 fi;
 
-log 'debug' "Version Requested: ${version_requested}";
+[[ -n "${version_requested:-""}" ]] \
+  && log 'debug' "Version Requested: ${version_requested}" \
+  || log 'error' 'Version could not be resolved!';
 
 # Accept a v-prefixed version, but strip the v.
 if [[ "${version_requested}" =~ ^v.*$ ]]; then
