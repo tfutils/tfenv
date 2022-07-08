@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+
+set -uo pipefail;
+
 function tfenv-exec() {
   log 'debug' 'Getting version from tfenv-version-name';
   TFENV_VERSION="$(tfenv-version-name)" \
