@@ -47,6 +47,13 @@ fi;
 # Begin Script Body #
 #####################
 
+test_install_no_version() {
+  # Takes no version
+  tfenv install || return 1;
+  tfenv use || return 1;
+  return 0;
+}
+
 test_install_and_use() {
   # Takes a static version and the optional keyword to install it with
   local k="${2-""}";
@@ -113,6 +120,9 @@ tests__kv=(
 tests_count=${#tests__desc[@]};
 
 declare desc kv k v test_num;
+
+log 'info' 'Testing use with no version';
+test_install_no_version;
 
 for ((test_iter=0; test_iter<${tests_count}; ++test_iter )) ; do
   cleanup || log 'error' 'Cleanup failed?!';

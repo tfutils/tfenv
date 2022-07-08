@@ -102,7 +102,7 @@ if [ -z "${arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
     fi;
   fi;
 
-  if [ -z "${version_requested}" -a -f "${version_file}" ]; then
+  if [ -z "${version_requested:-""}" -a -f "${version_file:-""}" ]; then
     log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version)";
     version_requested="$(cat "${version_file}")" \
       || log 'error' "Failed to open ${version_file}";
@@ -113,7 +113,7 @@ if [ -z "${arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
     fi;
 
   # Absolute fallback
-  elif [ -z "${version_requested}" ]; then
+  elif [ -z "${version_requested:-""}" ]; then
     log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version) but it doesn't exist";
     log 'info' 'No version requested on the command line or in the version file search path. Installing "latest"';
     version_requested='latest';
