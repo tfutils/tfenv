@@ -1,7 +1,14 @@
-find_local_version_file() {
+#!/usr/bin/env bash
+
+set -uo pipefail;
+
+function find_local_version_file() {
   log 'debug' "Looking for a version file in ${1}";
+
   local root="${1}";
+
   while ! [[ "${root}" =~ ^//[^/]*$ ]]; do
+
     if [ -e "${root}/.terraform-version" ]; then
       log 'debug' "Found at ${root}/.terraform-version";
       echo "${root}/.terraform-version";
@@ -9,9 +16,12 @@ find_local_version_file() {
     else
       log 'debug' "Not found at ${root}/.terraform-version";
     fi;
+
     [ -n "${root}" ] || break;
     root="${root%/*}";
+
   done;
+
   log 'debug' "No version file found in ${1}";
   return 1;
 };
