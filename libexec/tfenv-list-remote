@@ -18,7 +18,7 @@ if [ -z "${TFENV_ROOT:-""}" ]; then
     local file_name;
 
     while [ "${target_file}" != "" ]; do
-      cd "$(dirname ${target_file})" || early_death "Failed to 'cd \$(dirname ${target_file})' while trying to determine TFENV_ROOT";
+      cd "$(dirname "${target_file}")" || early_death "Failed to 'cd \$(dirname ${target_file})' while trying to determine TFENV_ROOT";
       file_name="$(basename "${target_file}")" || early_death "Failed to 'basename \"${target_file}\"' while trying to determine TFENV_ROOT";
       target_file="$(readlink "${file_name}")";
     done;
@@ -73,4 +73,8 @@ remote_versions="$(curlw -sSf "${TFENV_REMOTE}/terraform/")" \
 
 #log 'debug' "Remote versions available: ${remote_versions}"; # Even in debug mode this is too verbose
 
-grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)-?[0-9]*)?" <<<"${remote_versions}" | uniq;
+if [[ "${TFENV_REVERSE_REMOTE:-0}" -eq 1 ]]; then
+  grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)-?[0-9]*)?" <<<"${remote_versions}" | uniq | awk '{a[i++]=$0} END {for (j=i-1; j>=0;) print a[j--] }';
+else
+  grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)-?[0-9]*)?" <<<"${remote_versions}" | uniq;
+fi;
