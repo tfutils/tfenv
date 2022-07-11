@@ -192,6 +192,21 @@ To install from a remote other than the default
 $ TFENV_REMOTE=https://example.jfrog.io/artifactory/hashicorp
 ```
 
+##### `TFENV_REVERSE_REMOTE`
+
+Integer (Default: 0)
+
+When using a custom remote, such as Artifactory, instead of the Hashicorp servers,
+the list of terraform versions returned by the curl of the remote directory may be inverted.
+In this case the `latest` functionality will not work as expected because it expects the
+versions to be listed in order of release date from newest to oldest. If your remote
+is instead providing a list that is oldes-first, set `TFENV_REVERSE_REMOTE=1` and
+functionality will be restored.
+
+```console
+$ TFENV_REVERSE_REMOTE=1 tfenv list-remote
+```
+
 ##### `TFENV_CONFIG_DIR`
 
 Path (Default: `$TFENV_ROOT`)
