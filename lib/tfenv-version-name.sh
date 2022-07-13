@@ -95,6 +95,10 @@ function tfenv-version-name() {
     log 'error' "Version could not be resolved (set by ${TFENV_VERSION_SOURCE} or tfenv use <version>)";
   fi;
 
+  if [[ "${TFENV_VERSION}" == min-required ]]; then
+    TFENV_VERSION="$(tfenv-min-required)";
+  fi;
+
   if [[ ! -d "${TFENV_CONFIG_DIR}/versions/${TFENV_VERSION}" ]]; then
     log 'debug' "version '${TFENV_VERSION}' is not installed (set by ${TFENV_VERSION_SOURCE})";
   fi;
