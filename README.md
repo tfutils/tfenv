@@ -163,6 +163,10 @@ Should tfenv automatically install terraform if the version specified by default
 $ TFENV_AUTO_INSTALL=false terraform plan
 ```
 
+```console
+$ terraform use <version that is not yet installed>
+```
+
 ##### `TFENV_CURL_OUTPUT`
 
 Integer (Default: 2)
@@ -386,6 +390,8 @@ $ tfenv use 0.7.0
 $ tfenv use latest
 $ tfenv use latest:^0.8
 ```
+
+Note: `tfenv use latest` or `tfenv use latest:<regex>` will find the latest matching version that is already installed. If no matching versions are installed, and TFENV_AUTO_INSTALL is set to `true` (which is the default) the the latest matching version in the remote repository will be installed and used.
 
 ### tfenv uninstall &lt;version>
 
