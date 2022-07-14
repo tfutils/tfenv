@@ -196,6 +196,15 @@ if [ -f "${HOME}/.terraform-version.bup" ]; then
   mv "${HOME}/.terraform-version.bup" "${HOME}/.terraform-version";
 fi;
 
+log 'info' 'Use with no input and TFENV_AUTO_INSTALL:';
+cleanup || log 'error' 'Cleanup failed?!';
+
+(
+  tfenv use || exit 1;
+  check_default_version "$(tfenv list-remote | grep -e "^[0-9]\+\.[0-9]\+\.[0-9]\+$" | head -n 1)" || exit 1;
+) && log info '## Use (No Input) Test 1/1: succeeded' \
+  || error_and_proceed '## Use (No Input) Test 1/1: failed';
+
 log 'info' 'Install invalid specific version';
 cleanup || log 'error' 'Cleanup failed?!';
 

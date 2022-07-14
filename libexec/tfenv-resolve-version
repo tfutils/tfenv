@@ -93,7 +93,7 @@ if [ -z "${arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
 
   else 
     log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version) but it doesn't exist";
-    log 'info' 'No version requested on the command line or in the version file search path. Installing "latest"';
+    log 'debug' 'No version requested on the command line or in the version file search path. Installing "latest"';
     version_requested='latest';
   fi;
 elif [ -n "${TFENV_TERRAFORM_VERSION:-""}" ]; then
@@ -114,11 +114,11 @@ if [[ "${version_requested}" =~ ^v.*$ ]]; then
 fi;
 
 if [[ "${version_requested}" =~ ^min-required$ ]]; then
-  log 'info' 'Detecting minimum required version...';
+  log 'debug' 'Detecting minimum required version...';
   min_required="$(tfenv-min-required)" \
     || log 'error' 'tfenv-min-required failed';
 
-  log 'info' "Minimum required version detected: ${min_required}";
+  log 'debug' "Minimum required version detected: ${min_required}";
   version_requested="${min_required}";
 fi;
 

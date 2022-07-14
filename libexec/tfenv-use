@@ -60,8 +60,12 @@ done;
 
 [ "${#}" -gt 1 ] && log 'error' 'usage: tfenv use [<version>]';
 
-[ -d "${TFENV_CONFIG_DIR}/versions" ] \
-  || log 'error' 'No versions of terraform installed. Please install one with: tfenv install';
+declare auto_install="${TFENV_AUTO_INSTALL:-true}";
+
+if [ "${auto_install}" != 'true' ]; then
+  [ -d "${TFENV_CONFIG_DIR}/versions" ] \
+    || log 'error' 'No versions of terraform installed. Please install one with: tfenv install';
+fi;
 
 declare requested_arg="${1:-""}";
 declare version_source_suffix="";
@@ -89,30 +93,53 @@ log debug "Resolved to: ${resolved}";
 
 declare version="${resolved%%\:*}";
 declare regex="${resolved##*\:}";
+declare installed_version='';
 
 log 'debug' "Searching ${TFENV_CONFIG_DIR}/versions/ for latest version matching ${regex}";
-declare version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
-  | tail -n +2 \
-  | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
-  | grep -e "${regex}" \
-  | head -n 1
-)";
 
-[ -n "${version}" ] \
-  && log 'debug' "Found version: ${version}" \
-  || log 'error' "No installed versions of terraform matched '${requested}'${version_source_suffix}";
+if [ -d "${TFENV_CONFIG_DIR}/versions" ]; then
+  installed_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
+    | tail -n +2 \
+    | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
+    | grep -e "${regex}" \
+    | head -n 1
+  )";
+fi;
 
-target_path="${TFENV_CONFIG_DIR}/versions/${version}";
+if [ -n "${installed_version}" ]; then
+  log 'debug' "Found version: ${installed_version}";
+else
+  if [ "${auto_install}" == 'true' ]; then
+    log 'info' "No installed versions of terraform matched '${resolved}'. Trying to install a matching version since TFENV_AUTO_INSTALL=true";
+    tfenv-install "${resolved}" || log 'error' 'Installing a matching version failed';
+
+    installed_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
+      | tail -n +2 \
+      | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
+      | grep -e "${regex}" \
+      | head -n 1
+    )";
+
+    [ -n "${installed_version}" ] \
+      || log 'error' "Despite successfully installing a version matching '${resolved}', a matching version could not be found in '${TFENV_CONFIG_DIR}/versions/' - This should be pretty much impossible";
+  fi;
+fi;
+
+target_path="${TFENV_CONFIG_DIR}/versions/${installed_version}";
+log 'debug' "target_path is ${TFENV_CONFIG_DIR}/versions/${installed_version}";
+
+[ -d "${target_path}" ] \
+  || log 'error' "Version directory for ${installed_version} (${target_path}) is not present! Manual intervention required.";
 [ -f "${target_path}/terraform" ] \
-  || log 'error' "Version directory for ${version} is present, but the terraform binary is not! Manual intervention required.";
+  || log 'error' "Version directory for ${installed_version} is present, but the terraform binary is not! Manual intervention required.";
 [ -x "${target_path}/terraform" ] \
-  || log 'error' "Version directory for ${version} is present, but the terraform binary is not executable! Manual intervention required.";
+  || log 'error' "Version directory for ${installed_version} is present, but the terraform binary is not executable! Manual intervention required.";
 
-log 'info' "Switching default version to v${version}";
+log 'info' "Switching default version to v${installed_version}";
 version_file="${TFENV_CONFIG_DIR}/version";
-log 'debug' "Writing \"${version}\" to \"${version_file}\"";
-echo "${version}" > "${version_file}" \
-  || log 'error' "Switch to v${version} failed";
+log 'debug' "Writing \"${installed_version}\" to \"${version_file}\"";
+echo "${installed_version}" > "${version_file}" \
+  || log 'error' "Switch to v${installed_version} failed";
 
 if [ "${version_file}" != "${loaded_version_file}" ]; then
   log 'warn' "Default version file overridden by ${loaded_version_file}, changing the default version has no effect";

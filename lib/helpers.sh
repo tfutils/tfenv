@@ -105,6 +105,8 @@ export -f check_default_version;
 function cleanup() {
   log 'info' 'Performing cleanup';
   local pwd="$(pwd)";
+  log 'debug' "Deleting ${pwd}/version";
+  rm -rf ./version;
   log 'debug' "Deleting ${pwd}/versions";
   rm -rf ./versions;
   log 'debug' "Deleting ${pwd}/.terraform-version";
