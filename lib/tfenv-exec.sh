@@ -4,25 +4,25 @@ set -uo pipefail;
 
 function tfenv-exec() {
   for _arg in ${@:1}; do
-    if [[ "$_arg" == -chdir=* ]]; then
-      log 'debug' "Found -chdir arg: ${_arg#-chdir=}"
+    if [[ "${_arg}" == -chdir=* ]]; then
+      log 'debug' "Found -chdir arg: ${_arg#-chdir=}";
       export TFENV_DIR="${PWD}/${_arg#-chdir=}";
       break;
     else
       export TFENV_DIR="${PWD}";
     fi;
-    log 'info' "Set TFENV_DIR to $TFENV_DIR"
+    log 'info' "Set TFENV_DIR to ${TFENV_DIR}";
   done;
 
   log 'debug' 'Getting version from tfenv-version-name';
   TFENV_VERSION="$(tfenv-version-name)" \
-  && log 'debug' "TFENV_VERSION is ${TFENV_VERSION}" \
-  || {
-    # Errors will be logged from tfenv-version name,
-    # we don't need to trouble STDERR with repeat information here
-    log 'debug' 'Failed to get version from tfenv-version-name';
-    return 1;
-  };
+    && log 'debug' "TFENV_VERSION is ${TFENV_VERSION}" \
+    || {
+      # Errors will be logged from tfenv-version name,
+      # we don't need to trouble STDERR with repeat information here
+      log 'debug' 'Failed to get version from tfenv-version-name';
+      return 1;
+    };
   export TFENV_VERSION;
 
   if [ ! -d "${TFENV_CONFIG_DIR}/versions/${TFENV_VERSION}" ]; then
@@ -31,7 +31,7 @@ function tfenv-exec() {
       TFENV_VERSION_SOURCE="$(tfenv-version-file)";
     else
       TFENV_VERSION_SOURCE='TFENV_TERRAFORM_VERSION';
-    fi
+    fi;
       log 'info' "version '${TFENV_VERSION}' is not installed (set by ${TFENV_VERSION_SOURCE}). Installing now as TFENV_AUTO_INSTALL==true";
       tfenv-install;
     else
