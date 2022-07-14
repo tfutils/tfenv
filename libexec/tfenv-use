@@ -89,6 +89,8 @@ fi;
 
 log debug "Resolving version with: tfenv-resolve-version ${requested_arg}";
 declare resolved="$(tfenv-resolve-version ${requested_arg})";
+[ -z "${resolved}" ] && log 'error' "Failure to resolve version from ${requested_arg}";
+
 log debug "Resolved to: ${resolved}";
 
 declare version="${resolved%%\:*}";
@@ -111,7 +113,11 @@ if [ -n "${installed_version}" ]; then
 else
   if [ "${auto_install}" == 'true' ]; then
     log 'info' "No installed versions of terraform matched '${resolved}'. Trying to install a matching version since TFENV_AUTO_INSTALL=true";
-    tfenv-install "${resolved}" || log 'error' 'Installing a matching version failed';
+
+    declare install_version='';
+    [ "${version}" == 'latest' ] && install_version="${version}:${regex}" || install_version="${version}";
+
+    tfenv-install "${install_version}" || log 'error' 'Installing a matching version failed';
 
     installed_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
       | tail -n +2 \
