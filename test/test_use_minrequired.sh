@@ -120,6 +120,24 @@ echo 'min-required' > .terraform-version;
 
 cleanup || log 'error' 'Cleanup failed?!';
 
+
+log 'info' '### Install min-required with TFENV_AUTO_INSTALL & -chdir';
+
+minv='1.1.0';
+
+mkdir -p chdir-dir
+echo "terraform {
+  required_version = \">=${minv}\"
+}" >> chdir-dir/min_required.tf;
+echo 'min-required' > chdir-dir/.terraform-version
+
+(
+  TFENV_AUTO_INSTALL=true terraform -chdir=chdir-dir version;
+  check_active_version "${minv}" chdir-dir;
+) || error_and_proceed 'Min required version from -chdir does not match';
+
+cleanup || log 'error' 'Cleanup failed?!';
+
 if [ "${#errors[@]}" -gt 0 ]; then
   log 'warn' '===== The following use_minrequired tests failed =====';
   for error in "${errors[@]}"; do

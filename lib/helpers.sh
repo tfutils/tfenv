@@ -84,7 +84,20 @@ export -f curlw;
 
 function check_active_version() {
   local v="${1}";
-  [ -n "$(${TFENV_ROOT}/bin/terraform version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
+  local maybe_chdir=;
+  if [ -n "${2:-}" ]; then
+      maybe_chdir="-chdir=${2}";
+  fi;
+
+  local active_version="$(${TFENV_ROOT}/bin/terraform ${maybe_chdir} version | grep '^Terraform')";
+
+  if ! grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?\$" <(echo "${active_version}"); then
+    log 'debug' "Expected version ${v} but found ${active_version}";
+    return 1;
+  fi;
+
+  log 'debug' "Active version ${v} as expected";
+  return 0;
 };
 export -f check_active_version;
 
@@ -113,6 +126,8 @@ function cleanup() {
   rm -rf ./.terraform-version;
   log 'debug' "Deleting ${pwd}/min_required.tf";
   rm -rf ./min_required.tf;
+  log 'debug' "Deleting ${pwd}/chdir-dir";
+  rm -rf ./chdir-dir;
 };
 export -f cleanup;
 
