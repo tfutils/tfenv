@@ -254,7 +254,7 @@ elif [[ -n "${keybase_bin}" && -x "${keybase_bin}" ]]; then
   fi;
 else
   # Warning about this avoids an unwarranted sense of confidence in the SHA check
-  log 'warn' 'No keybase install found, skipping OpenPGP signature verification';
+  log 'warn' "Not instructed to use Local PGP (${TFENV_CONFIG_DIR}/use-{gpgv,gnupg}) & No keybase install found, skipping OpenPGP signature verification";
 fi;
 
 if [[ -n "${shasum_bin}" && -x "${shasum_bin}" ]]; then
