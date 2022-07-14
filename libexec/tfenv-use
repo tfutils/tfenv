@@ -66,10 +66,18 @@ done;
 declare requested_arg="${1:-""}";
 declare version_source_suffix="";
 declare requested="${requested_arg}";
+declare loaded_version_file="$(tfenv-version-file)";
 
 if [ -z "${requested_arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
-  version_source_suffix=" (set by $(tfenv-version-file))";
-  requested="$(cat "$(tfenv-version-file)" || true)";
+  version_source_suffix=" (set by ${loaded_version_file})";
+
+  if [ -f "${loaded_version_file}" ]; then
+    requested="$(cat "${loaded_version_file}" || true)";
+  else
+    # No-one asked for anything, no default version is set either
+    requested='latest';
+  fi;
+
 elif [ -z "${requested_arg}" ]; then
   version_source_suffix=' (set by TFENV_TERRAFORM_VERSION)';
   requested="${TFENV_TERRAFORM_VERSION}";
@@ -106,8 +114,8 @@ log 'debug' "Writing \"${version}\" to \"${version_file}\"";
 echo "${version}" > "${version_file}" \
   || log 'error' "Switch to v${version} failed";
 
-if [ "${version_file}" != "$(tfenv-version-file)" ]; then
-  log 'warn' "Default version file overridden by $(tfenv-version-file), changing the default version has no effect";
+if [ "${version_file}" != "${loaded_version_file}" ]; then
+  log 'warn' "Default version file overridden by ${loaded_version_file}, changing the default version has no effect";
 fi;
 
 terraform version 1>/dev/null \
