@@ -100,8 +100,8 @@ log 'debug' "Searching ${TFENV_CONFIG_DIR}/versions/ for latest version matching
 if [ -d "${TFENV_CONFIG_DIR}/versions" ]; then
   installed_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
     | tail -n +2 \
-    | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
     | grep -e "${regex}" \
+    | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3r,3 \
     | head -n 1
   )";
 fi;
@@ -145,6 +145,4 @@ if [ "${version_file}" != "${loaded_version_file}" ]; then
   log 'warn' "Default version file overridden by ${loaded_version_file}, changing the default version has no effect";
 fi;
 
-terraform version 1>/dev/null \
-  || log 'error' "'terraform version' failed. Something is seriously wrong";
-log 'info' "Switching completed";
+log 'info' "Default version (when not overridden by .terraform-version or TFENV_TERRAFORM_VERSION) is now: ${installed_version}";

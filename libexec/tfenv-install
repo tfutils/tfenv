@@ -152,7 +152,7 @@ if mktemp --help 2>&1 | grep -- '--tmpdir' >/dev/null; then
   tmpdir_arg="--tmpdir";
 fi;
 
-download_tmp="$(mktemp -d ${tmpdir_arg} tfenv_download.XXXXXX)" || log 'error' "Unable to create temporary download directory in $(pwd)";
+download_tmp="$(mktemp -d ${tmpdir_arg} tfenv_download.XXXXXX)" || log 'error' "Unable to create temporary download directory (mktemp -d ${tmpdir_arg} tfenv_download.XXXXXX). Working Directory is: $(pwd)";
 
 # Clean it up in case of error
 trap "rm -rf ${download_tmp}" EXIT;
