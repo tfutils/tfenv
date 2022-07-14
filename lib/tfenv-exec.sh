@@ -11,7 +11,7 @@ function tfenv-exec() {
     else
       export TFENV_DIR="${PWD}";
     fi;
-    log 'info' "Set TFENV_DIR to ${TFENV_DIR}";
+    log 'debug' "Set TFENV_DIR to ${TFENV_DIR}";
   done;
 
   log 'debug' 'Getting version from tfenv-version-name';
