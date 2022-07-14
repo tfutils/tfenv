@@ -103,15 +103,17 @@ If [keybase](https://keybase.io/) is available in the path it will also verify t
 
 You can opt-in to using GnuPG tools for PGP signature verification if keybase is not available:
 
+Where `TFENV_INSTALL_DIR` is for example, `~/.tfenv` or `/usr/local/Cellar/tfenv/<version>`
+
 ```console
-$ echo 'trust-tfenv: yes' > ~/.tfenv/use-gpgv
+$ echo 'trust-tfenv: yes' > ${TFENV_INSTALL_DIR}/use-gpgv
 $ tfenv install
 ```
 
 The `trust-tfenv` directive means that verification uses a copy of the
 Hashicorp OpenPGP key found in the tfenv repository.  Skipping that directive
 means that the Hashicorp key must be in the existing default trusted keys.
-Use the file `~/.tfenv/use-gnupg` to instead invoke the full `gpg` tool and
+Use the file `${TFENV_INSTALL_DIR}/use-gnupg` to instead invoke the full `gpg` tool and
 see web-of-trust status; beware that a lack of trust path will not cause a
 validation failure.
 
