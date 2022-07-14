@@ -118,6 +118,11 @@ if [[ "${version_requested}" =~ ^min-required$ ]]; then
   min_required="$(tfenv-min-required)" \
     || log 'error' 'tfenv-min-required failed';
 
+  if [ -z "${min_required}" ]; then
+    log 'debug' 'It was not possible to detect a minimum-required version. Do you have a required_version line present?';
+    exit;
+  fi;
+
   log 'debug' "Minimum required version detected: ${min_required}";
   version_requested="${min_required}";
 fi;
