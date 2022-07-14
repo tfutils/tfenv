@@ -5,13 +5,9 @@ set -uo pipefail;
 function tfenv-exec() {
   for _arg in ${@:1}; do
     if [[ "${_arg}" == -chdir=* ]]; then
-      log 'debug' "Found -chdir arg: ${_arg#-chdir=}";
+      log 'debug' "Found -chdir arg. Setting TFENV_DIR to: ${_arg#-chdir=}";
       export TFENV_DIR="${PWD}/${_arg#-chdir=}";
-      break;
-    else
-      export TFENV_DIR="${PWD}";
     fi;
-    log 'info' "Set TFENV_DIR to ${TFENV_DIR}";
   done;
 
   log 'debug' 'Getting version from tfenv-version-name';
