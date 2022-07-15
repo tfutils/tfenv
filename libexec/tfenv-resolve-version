@@ -129,24 +129,24 @@ fi;
 
 if [[ "${version_requested}" =~ ^latest-allowed$ ]]; then
   log 'info' 'Detecting latest allowable version...';
-  version_spec="$(grep -h required_version "${TFENV_DIR:-$(pwd)}"/{*.tf,*.tf.json} 2>/dev/null | rev | cut -d'"' -f2 | rev | cut -d, -f1)"
-  version_num="$(echo "$version_spec" | sed -E 's/[^0-9.]+//')"
+  version_spec="$(grep -h required_version "${TFENV_DIR:-$(pwd)}"/{*.tf,*.tf.json} 2>/dev/null | rev | cut -d'"' -f2 | rev | cut -d, -f1)";
+  version_num="$(echo "${version_spec}" | sed -E 's/[^0-9.]+//')";
 
-  case "$version_spec" in
+  case "${version_spec}" in
     '>'*)
-      version_requested=latest
+      version_requested=latest;
       ;;
     '<='*)
-      version_requested="$version_num"
+      version_requested="${version_num}";
       ;;
     '~>'*)
-      version_without_rightmost="$(echo "$version_num" | rev | cut -d. -f2- | rev)"
-      version_requested="latest:^${version_without_rightmost}"
+      version_without_rightmost="$(echo "${version_num}" | rev | cut -d. -f2- | rev)";
+      version_requested="latest:^${version_without_rightmost}";
       ;;
     *)
-      log 'error' "Unsupported version spec: '${version_spec}', only >, >=, <=, and ~> are supported."
+      log 'error' "Unsupported version spec: '${version_spec}', only >, >=, <=, and ~> are supported.";
       ;;
-  esac
+  esac;
 fi;
 
 if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
