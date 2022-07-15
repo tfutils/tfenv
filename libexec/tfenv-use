@@ -76,7 +76,7 @@ if [ -z "${requested_arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
   version_source_suffix=" (set by ${loaded_version_file})";
 
   if [ -f "${loaded_version_file}" ]; then
-    requested="$(cat "${loaded_version_file}" || true)";
+    requested="$(grep --invert-match '^#' "${loaded_version_file}" || true)";
   else
     # No-one asked for anything, no default version is set either
     requested='latest';
