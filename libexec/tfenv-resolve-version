@@ -128,9 +128,10 @@ if [[ "${version_requested}" =~ ^min-required$ ]]; then
 fi;
 
 if [[ "${version_requested}" =~ ^latest-allowed$ ]]; then
-  log 'info' 'Detecting latest allowable version...';
+  log 'debug' 'Detecting latest allowable version...';
   version_spec="$(grep -h required_version "${TFENV_DIR:-$(pwd)}"/{*.tf,*.tf.json} 2>/dev/null | rev | cut -d'"' -f2 | rev | cut -d, -f1)";
   version_num="$(echo "${version_spec}" | sed -E 's/[^0-9.]+//')";
+  log 'debug' "Using ${version_num} from version spec: ${version_spec}";
 
   case "${version_spec}" in
     '>'*)
@@ -147,6 +148,7 @@ if [[ "${version_requested}" =~ ^latest-allowed$ ]]; then
       log 'error' "Unsupported version spec: '${version_spec}', only >, >=, <=, and ~> are supported.";
       ;;
   esac;
+  log 'debug' "Determined the requested version to be: ${version_requested}";
 fi;
 
 if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
