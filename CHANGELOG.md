@@ -1,4 +1,4 @@
-## 3.0.0 (July 14, 2022)
+## 3.0.0 (July 15, 2022)
 
  * BREAKING CHANGE: Don't install ggrep on macs automatically; it's just not good practice. ggrep now a pre-requisite for Mac.
  * BREAKING CHANGE: When TFENV_AUTO_INSTALL=true, tfenv use will now attempt to install a matching version when no matching version is installed already, including defaulting to latest if no version is specified at the command line or in overrides (Mike Peachey <mike.peachey@bjss.com>)
