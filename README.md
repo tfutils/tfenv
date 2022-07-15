@@ -88,8 +88,8 @@ If a parameter is passed, available options:
 - `x.y.z` [Semver 2.0.0](https://semver.org/) string specifying the exact version to install
 - `latest` is a syntax to install latest version
 - `latest:<regex>` is a syntax to install latest version matching regex (used by grep -e)
-- `latest-allowed` is a syntax to recursively scan your Terraform files to detect which version is maximally allowed.
-- `min-required` is a syntax to recursively scan your Terraform files to detect which version is minimally required.
+- `latest-allowed` is a syntax to scan your Terraform files to detect which version is maximally allowed.
+- `min-required` is a syntax to scan your Terraform files to detect which version is minimally required.
 
 See [required_version](https://www.terraform.io/docs/configuration/terraform.html) docs. Also [see min-required & latest-allowed](#min-required) section below.
 
