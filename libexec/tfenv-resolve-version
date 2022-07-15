@@ -141,7 +141,7 @@ if [[ "${version_requested}" =~ ^latest-allowed$ ]]; then
       version_requested="${version_num}";
       ;;
     '~>'*)
-      version_without_rightmost="$(echo "${version_num}" | sed 's/\./\n./g' | head -n -1 | xargs -I@ echo -n @)";
+      version_without_rightmost="$(echo "${version_num}" | rev | cut -d. -f2- | rev)";
       version_requested="latest:^${version_without_rightmost}";
       ;;
     *)
