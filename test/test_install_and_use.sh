@@ -110,6 +110,14 @@ tests__kv=(
   '0.14.6,v0.14.6'
 );
 
+tests_file_only__desc=(
+  'version with comment'
+);
+
+tests_file_only__kv=(
+  '1.2.3,# this is a comment\n1.2.3'
+);
+
 tests_count=${#tests__desc[@]};
 
 declare desc kv k v test_num;
@@ -127,19 +135,23 @@ for ((test_iter=0; test_iter<${tests_count}; ++test_iter )) ; do
     || error_and_proceed "## Param Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) failed";
 done;
 
-for ((test_iter=0; test_iter<${tests_count}; ++test_iter )) ; do
+tests_file__desc=("${tests__desc[@]}" "${tests_file_only__desc[@]}");
+tests_file__kv=("${tests__kv[@]}" "${tests_file_only__kv[@]}");
+tests_file_count=${#tests_file__desc[@]};
+
+for ((test_iter=0; test_iter<${tests_file_count}; ++test_iter )) ; do
   cleanup || log 'error' 'Cleanup failed?!';
-  test_num=$((test_iter + 1)); 
-  desc=${tests__desc[${test_iter}]};
-  kv="${tests__kv[${test_iter}]}";
+  test_num=$((test_iter + 1));
+  desc="${tests_file__desc[${test_iter}]}";
+  kv="${tests_file__kv[${test_iter}]}";
   v="${kv%,*}";
   k="${kv##*,}";
-  log 'info' "## ./.terraform-version Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} )";
+  log 'info' "## ./.terraform-version Test ${test_num}/${tests_file_count}: ${desc} ( ${k} / ${v} )";
   log 'info' "Writing ${k} to ./.terraform-version";
-  echo "${k}" > ./.terraform-version;
+  echo -e "${k}" > ./.terraform-version;
   test_install_and_use "${v}" \
-    && log info "## ./.terraform-version Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) succeeded" \
-    || error_and_proceed "## ./.terraform-version Test ${test_num}/${tests_count}: ${desc} ( ${k} / ${v} ) failed";
+    && log info "## ./.terraform-version Test ${test_num}/${tests_file_count}: ${desc} ( ${k} / ${v} ) succeeded" \
+    || error_and_proceed "## ./.terraform-version Test ${test_num}/${tests_file_count}: ${desc} ( ${k} / ${v} ) failed";
 done;
 
 for ((test_iter=0; test_iter<${tests_count}; ++test_iter )) ; do
