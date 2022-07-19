@@ -123,7 +123,7 @@ case "$(uname -m)" in
         fi;
       ;;
       "darwin")
-        # No M1 builds before 1.0.2
+        # No Apple Silicon builds before 1.0.2
         if [[ "${version}" =~ 0\..+$ || "${version}" =~ 1\.0\.0|1$
         ]]; then
           TFENV_ARCH="${TFENV_ARCH:-amd64}";
