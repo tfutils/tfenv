@@ -122,6 +122,15 @@ case "$(uname -m)" in
           TFENV_ARCH="${TFENV_ARCH:-arm64}";
         fi;
       ;;
+      "darwin")
+        # No M1 builds before 1.0.2
+        if [[ "${version}" =~ 0\..+$ || "${version}" =~ 1\.0\.0|1$
+        ]]; then
+          TFENV_ARCH="${TFENV_ARCH:-amd64}";
+        else
+          TFENV_ARCH="${TFENV_ARCH:-arm64}";
+        fi;
+      ;;
     esac;
     ;;
   *)
