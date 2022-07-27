@@ -5,8 +5,10 @@ set -uo pipefail;
 function tfenv-exec() {
   for _arg in ${@:1}; do
     if [[ "${_arg}" == -chdir=* ]]; then
-      log 'debug' "Found -chdir arg. Setting TFENV_DIR to: ${_arg#-chdir=}";
-      export TFENV_DIR="${PWD}/${_arg#-chdir=}";
+      chdir="${_arg#-chdir=}";
+      log 'debug' "Found -chdir arg: ${chdir}";
+      export TFENV_DIR="${PWD}/$(realpath --relative-to="${PWD}" "$chdir")";
+      log 'debug' "Setting TFENV_DIR to: ${TFENV_DIR}";
     fi;
   done;
 
