@@ -85,14 +85,11 @@ fi;
 # Add support of ARM64 for Linux & Apple Silicon
 case "$(uname -m)" in
   aarch64* | arm64*)
-    # There is no arm64 support for versions:
-    # < 0.11.15
-    # >= 0.12.0, < 0.12.30
-    # >= 0.13.0, < 0.13.5
-    if [[ "${version}" =~ 0\.(([0-9]|10))\.\d* ||
-          "${version}" =~ 0\.11\.(([0-9]|1[0-4]))$ ||
-          "${version}" =~ 0\.12\.(([0-9]|[1-2][0-9]))$ ||
-          "${version}" =~ 0\.13\.[0-4]$
+    # There is no arm64 support for all versions below v1.0.2:
+    # https://github.com/hashicorp/terraform/issues/27257#issuecomment-875834420
+    if [[
+      "${version}" =~ 0\.(([0-9]|1[0-5]))\.\d* ||
+      "${version}" == 1\.0\.[0-1]$
     ]]; then
       TFENV_ARCH="${TFENV_ARCH:-amd64}";
     else
