@@ -45,7 +45,7 @@ include ::tfenv
 1. Check out tfenv into any path (here is `${HOME}/.tfenv`)
 
 ```console
-$ git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv
+$ git clone --depth=1 https://github.com/ssc-spc-cloud-nuage/tfenv.git ~/.tfenv
 ```
 
 2. Add `~/.tfenv/bin` to your `$PATH` any way you like
