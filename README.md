@@ -145,9 +145,11 @@ terraform {
 
 ##### `TFENV_ARCH`
 
-String (Default: amd64)
+String (Default: `amd64`)
 
 Specify architecture. Architecture other than the default amd64 can be specified with the `TFENV_ARCH` environment variable
+
+Note: Default changes to `arm64` for versions that have arm64 builds available when `$(uname -m)` matches `aarch64* | arm64*`
 
 ```console
 $ TFENV_ARCH=arm64 tfenv install 0.7.9
