@@ -40,6 +40,11 @@ function tfenv-version-name() {
   if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
     log 'debug' "TFENV_VERSION uses 'latest' keyword: ${TFENV_VERSION}";
 
+    if [[ "${TFENV_VERSION}" == latest-allowed ]]; then
+        TFENV_VERSION="$(tfenv-resolve-version)";
+        log 'debug' "Resolved latest-allowed to: ${TFENV_VERSION}";
+    fi;
+
     if [[ "${TFENV_VERSION}" =~ ^latest\:.*$ ]]; then
       regex="${TFENV_VERSION##*\:}";
       log 'debug' "'latest' keyword uses regex: ${regex}";

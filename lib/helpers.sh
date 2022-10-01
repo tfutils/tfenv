@@ -91,7 +91,7 @@ function check_active_version() {
 
   local active_version="$(${TFENV_ROOT}/bin/terraform ${maybe_chdir} version | grep '^Terraform')";
 
-  if ! grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?\$" <(echo "${active_version}"); then
+  if ! grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?( is already installed)?\$" <(echo "${active_version}"); then
     log 'debug' "Expected version ${v} but found ${active_version}";
     return 1;
   fi;
@@ -124,6 +124,8 @@ function cleanup() {
   rm -rf ./versions;
   log 'debug' "Deleting ${pwd}/.terraform-version";
   rm -rf ./.terraform-version;
+  log 'debug' "Deleting ${pwd}/latest_allowed.tf";
+  rm -rf ./latest_allowed.tf;
   log 'debug' "Deleting ${pwd}/min_required.tf";
   rm -rf ./min_required.tf;
   log 'debug' "Deleting ${pwd}/chdir-dir";

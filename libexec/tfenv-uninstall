@@ -93,6 +93,10 @@ if [[ "${version_requested}" =~ ^min-required$ ]]; then
   log 'error' 'min-required is an unsupported option for uninstall';
 fi;
 
+if [[ "${version_requested}" == latest-allowed ]]; then
+  log 'error' 'latest-allowed is an unsupported option for uninstall';
+fi;
+
 if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
   version="${version_requested%%\:*}";
   regex="${version_requested##*\:}";
