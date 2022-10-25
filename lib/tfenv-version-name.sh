@@ -33,7 +33,9 @@ function tfenv-version-name() {
       TFENV_VERSION="${potential_min_required}" \
       TFENV_VERSION_SOURCE='terraform{required_version}';
     else
-      log 'error' 'Specifically asked for min-required via terraform{required_version}, but none found';
+      log 'debug' 'Specifically asked for min-required via terraform{required_version}, but none found, falling back to normal detection';
+      TFENV_TERRAFORM_VERSION="";
+      echo $(tfenv-version-name);
     fi;
   fi;
 
