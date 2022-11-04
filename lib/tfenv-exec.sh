@@ -5,21 +5,6 @@ set -uo pipefail;
 function realpath-relative-to() {
   # A basic implementation of GNU `realpath --relative-to=$1 $2`
   # that can also be used on macOS.
-
-  # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
-  readlink_f() {
-    local target_file="${1}";
-    local file_name;
-
-    while [ "${target_file}" != "" ]; do
-      cd "$(dirname "$target_file")" || early_death "Failed to 'cd \$(${target_file%/*})'";
-      file_name="${target_file##*/}" || early_death "Failed to '\"${target_file##*/}\"'";
-      target_file="$(readlink "${file_name}")";
-    done;
-
-    echo "$(pwd -P)/${file_name}";
-  };
-
   local relative_to="$(readlink_f "${1}")";
   local path="$(readlink_f "${2}")";
 
