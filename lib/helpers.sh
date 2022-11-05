@@ -8,7 +8,7 @@ readlink_f() {
   local file_name;
 
   while [ "${target_file}" != "" ]; do
-    cd "${target_file%/*}" || early_death "Failed to 'cd \$(${target_file%/*})'";
+    cd "$(dirname "${target_file}")" || early_death "Failed to 'cd \$(${target_file%/*})'";
     file_name="${target_file##*/}" || early_death "Failed to '\"${target_file##*/}\"'";
     target_file="$(readlink "${file_name}")";
   done;
