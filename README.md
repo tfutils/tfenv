@@ -1,4 +1,4 @@
-![CI](https://github.com/tfutils/tfenv/workflows/CI/badge.svg)
+[![CI Test](https://github.com/tfutils/tfenv/actions/workflows/test.yml/badge.svg)](https://github.com/tfutils/tfenv/actions/workflows/test.yml)
 
 # tfenv
 
