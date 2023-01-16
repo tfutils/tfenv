@@ -171,7 +171,7 @@ $ TFENV_AUTO_INSTALL=false terraform plan
 ```
 
 ```console
-$ terraform use <version that is not yet installed>
+$ tfenv use <version that is not yet installed>
 ```
 
 ##### `TFENV_CURL_OUTPUT`
