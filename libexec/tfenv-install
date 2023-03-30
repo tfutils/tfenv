@@ -124,8 +124,7 @@ case "$(uname -m)" in
       ;;
       "darwin")
         # No Apple Silicon builds before 1.0.2
-        if [[ "${version}" =~ 0\..+$ || "${version}" =~ 1\.0\.0|1$
-        ]]; then
+        if [[ "${version}" =~ ^0\. || "${version}" =~ ^1\.0\.[01]$ ]]; then
           TFENV_ARCH="${TFENV_ARCH:-amd64}";
         else
           TFENV_ARCH="${TFENV_ARCH:-arm64}";
