@@ -27,7 +27,7 @@ $ brew install tfenv
 ```
 
 Install via Arch User Repository (AUR)
-   
+
 ```console
 $ yay --sync tfenv
 ```
@@ -218,6 +218,54 @@ functionality will be restored.
 
 ```console
 $ TFENV_REVERSE_REMOTE=1 tfenv list-remote
+```
+
+##### `TFENV_SORT_VERSIONS_REMOTE`
+
+Integer (Default: 0)
+
+When using a custom remote, such as Artifactory, instead of the Hashicorp servers,
+the list of terraform versions returned by the curl of the remote directory may be inverted
+and sorted alphabetically, and not in a version-aware sort.
+
+For example, you will have something like this:
+
+```
+1.0.0
+1.0.10
+1.0.11
+1.0.1
+1.0.2
+1.0.3
+1.0.4
+1.0.5
+1.0.6
+1.0.7
+1.0.8
+1.0.9
+```
+
+instead of:
+
+```
+1.0.0
+1.0.1
+1.0.2
+1.0.3
+1.0.4
+1.0.5
+1.0.6
+1.0.7
+1.0.8
+1.0.9
+1.0.10
+1.0.11
+```
+
+To use `sort --version-sort` over all the list of versions, set this environment variable:
+
+```console
+$ TFENV_SORT_VERSIONS_REMOTE=1 tfenv list-remote
 ```
 
 ##### `TFENV_CONFIG_DIR`
