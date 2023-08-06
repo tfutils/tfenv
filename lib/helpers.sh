@@ -153,6 +153,7 @@ export -f check_dependencies;
 
 source "$TFENV_ROOT/lib/tfenv-exec.sh";
 source "$TFENV_ROOT/lib/tfenv-min-required.sh";
+source "$TFENV_ROOT/lib/tfenv-parse-version-file.sh";
 source "$TFENV_ROOT/lib/tfenv-version-file.sh";
 source "$TFENV_ROOT/lib/tfenv-version-name.sh";
 
