@@ -64,7 +64,11 @@ done;
 declare version_requested version regex;
 declare arg="${1:-""}";
 
-if [ -z "${arg:-""}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+TFENV_ENGINE="$(tfenv-resolve-engine)"
+
+export TFENV_ENGINE
+
+if [ -z "${arg}" ] && [ -z "${TFENV_TERRAFORM_VERSION:-""}" ] && [ -z "${TFENV_TOFU_VERSION:-""}" ]; then
   version_file="$(tfenv-version-file)";
   log 'debug' "Version File: ${version_file}";
   if [ "${version_file}" != "${TFENV_CONFIG_DIR}/version" ]; then
@@ -80,9 +84,12 @@ if [ -z "${arg:-""}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
     log 'info' 'No version requested on the command line or in the version file search path. Installing "latest"';
     version_requested='latest';
   fi;
-elif [ -n "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+elif [ "${TFENV_ENGINE}" = "terraform" ] && [ -n "${TFENV_TERRAFORM_VERSION:-""}" ]; then
   version_requested="${TFENV_TERRAFORM_VERSION}";
   log 'debug' "TFENV_TERRAFORM_VERSION is set: ${TFENV_TERRAFORM_VERSION}";
+elif [ "${TFENV_ENGINE}" = "tofu" ] && [ -n "${TFENV_TOFU_VERSION:-""}" ]; then
+  version_requested="${TFENV_TOFU_VERSION}";
+  log 'debug' "TFENV_TERRAFORM_VERSION is set: ${TFENV_TOFU_VERSION}";
 else
   version_requested="${arg}";
 fi;
@@ -115,13 +122,13 @@ log 'debug' "Processing uninstall for version ${version}, using regex ${regex}";
 version="$(tfenv-list | sed -E 's/^(\*| )? //g; s/ \(set by .+\)$//' | grep -e "${regex}" | head -n 1)";
 [ -n "${version}" ] || log 'error' "No versions matching '${regex}' found in local";
 
-dst_path="${TFENV_CONFIG_DIR}/versions/${version}";
-if [ -f "${dst_path}/terraform" ]; then
-  log 'info' "Uninstall Terraform v${version}";
+dst_path="${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions/${version}";
+if [ -f "${dst_path}/${TFENV_ENGINE}" ]; then
+  log 'info' "Uninstall ${TFENV_ENGINE} v${version}";
   rm -r "${dst_path}";
 
   # If no versions remain, remove the versions directory
-  rmdir "${TFENV_CONFIG_DIR}/versions" 2>/dev/null;
+  rmdir "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions" 2>/dev/null;
 
-  log 'info' "Terraform v${version} is successfully uninstalled";
+  log 'info' "${TFENV_ENGINE} v${version} is successfully uninstalled";
 fi;

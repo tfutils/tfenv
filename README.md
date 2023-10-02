@@ -2,7 +2,7 @@
 
 # tfenv
 
-[Terraform](https://www.terraform.io/) version manager inspired by [rbenv](https://github.com/rbenv/rbenv)
+[Terraform](https://www.terraform.io/) and [OpenTofu](https://opentofu.org/) version manager inspired by [rbenv](https://github.com/rbenv/rbenv)
 
 ## Support
 
@@ -79,9 +79,11 @@ $ which tfenv
 
 ### tfenv install [version]
 
-Install a specific version of Terraform.
+Install a specific version of Terraform or OpenTofu.
 
-If no parameter is passed, the version to use is resolved automatically via [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_version) or [.terraform-version files](#terraform-version-file), in that order of precedence, i.e. TFENV\_TERRAFORM\_VERSION, then .terraform-version. The default is 'latest' if none are found.
+If no parameter is passed, the version to use is resolved automatically via [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_version) or [.terraform-version files](#terraform-version-file) for Terraform and [TFENV\_TOFU\_VERSION environment variable](#tfenv_tofu_version) or [.tofu-version files](#tofu-version-file) for OpenTofu, in that order of precedence, i.e. TFENV\_TERRAFORM\_VERSION, then .terraform-version. The default is 'latest' if none are found.
+
+Which tool to use (Terraform or OpenTofu) is determined automatically based on the environment variables and version files.  tfenv defaults to Terraform if no environment variables or version files are found.  Terraform or OpenTofu can be explicitly specified with the [TFENV\_ENGINE environment variable](#tfenv_engine), setting it to `terraform` or `tofu`.
 
 If a parameter is passed, available options:
 
@@ -124,6 +126,10 @@ validation failure.
 #### .terraform-version
 
 If you use a [.terraform-version](#terraform-version-file) file, `tfenv install` (no argument) will install the version written in it.
+
+#### .tofu-version
+
+If you use a [.tofu-version](#tofu-version-file) file, `tfenv install` (no argument) will install the version written in it.
 
 <a name="min-required"></a>
 #### min-required & latest-allowed
@@ -195,6 +201,12 @@ Set the debug level for TFENV.
 * 2: Extended debug output, with source file names and interactive debug shells on error
 * 3: Debug level 2 + Bash execution tracing
 
+##### `TFENV_ENGINE`
+
+String (Default: Determined based on other environment variable and files)
+
+Specifies which underlying tool to use.  Possible values `terraform` and `tofu`.
+
 ##### `TFENV_REMOTE`
 
 String (Default: https://releases.hashicorp.com)
@@ -242,6 +254,20 @@ e.g.
 
 ```console
 $ TFENV_TERRAFORM_VERSION=latest:^0.11. terraform --version
+```
+
+##### `TFENV_TOFU_VERSION`
+
+String (Default: "")
+
+If not empty string, this variable overrides Terraform version, specified in [.tofu-version files](#tofu-version-file).
+`latest` and `latest:<regex>` syntax are also supported.
+[`tfenv install`](#tfenv-install-version) and [`tfenv use`](#tfenv-use-version) command also respects this variable.
+
+e.g.
+
+```console
+$ TFENV_TOFU_VERSION=latest:^1.6.0. tofu --version
 ```
 
 ##### `TFENV_NETRC_PATH`
@@ -382,7 +408,7 @@ Defaults to the PID of the calling process.
 
 Switch a version to use
 
-If no parameter is passed, the version to use is resolved automatically via [.terraform-version files](#terraform-version-file) or [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_version) (TFENV\_TERRAFORM\_VERSION takes precedence), defaulting to 'latest' if none are found.
+If no parameter is passed, the version to use is resolved automatically via [.terraform-version files](#terraform-version-file) or [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_version) (TFENV\_TERRAFORM\_VERSION takes precedence) for Terraform or [.tofu-version files](#tofu-version-file) or [TFENV\_TOFU\_VERSION environment variable](#tfenv_tofu_version) (TFENV\_TOFU\_VERSION takes precedence) if using OpenTofu, defaulting to 'latest' if none are found.
 
 `latest` is a syntax to use the latest installed version
 
@@ -460,7 +486,7 @@ $ tfenv list-remote
 
 If you put a `.terraform-version` file on your project root, or in your home directory, tfenv detects it and uses the version written in it. If the version is `latest` or `latest:<regex>`, the latest matching version currently installed will be selected.
 
-Note, that [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_version) can be used to override version, specified by `.terraform-version` file.
+Note, that [TFENV\_TERRAFORM\_VERSION environment variable](#tfenv_terraform_version) can be used to override version, specified by `.terraform-version` file for Terraform and [TFENV\_TOFU\_VERSION environment variable](#tfenv_tofu_version) can be used to override version, specified by `.tofu-version` file for OpenTofu.
 
 ```console
 $ cat .terraform-version

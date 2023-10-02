@@ -3,23 +3,47 @@
 set -uo pipefail;
 
 function tfenv-version-name() {
-  if [[ -z "${TFENV_TERRAFORM_VERSION:-""}" ]]; then
-    log 'debug' 'We are not hardcoded by a TFENV_TERRAFORM_VERSION environment variable';
+  TFENV_ENGINE="$(tfenv-resolve-engine)";
+  export TFENV_ENGINE;
 
-    TFENV_VERSION_FILE="$(tfenv-version-file)" \
-      && log 'debug' "TFENV_VERSION_FILE retrieved from tfenv-version-file: ${TFENV_VERSION_FILE}" \
-      || log 'error' 'Failed to retrieve TFENV_VERSION_FILE from tfenv-version-file';
+  if [[ "${TFENV_ENGINE}" = "terraform" ]]; then
+    if [[ -z "${TFENV_TERRAFORM_VERSION:-""}" ]]; then
+      log 'debug' 'We are not hardcoded by a TFENV_TERRAFORM_VERSION environment variables';
 
-    TFENV_VERSION="$(cat "${TFENV_VERSION_FILE}" || true)" \
-      && log 'debug' "TFENV_VERSION specified in TFENV_VERSION_FILE: ${TFENV_VERSION}";
+      TFENV_VERSION_FILE="$(tfenv-version-file)" \
+        && log 'debug' "TFENV_VERSION_FILE retrieved from tfenv-version-file: ${TFENV_VERSION_FILE}" \
+          || log 'error' 'Failed to retrieve TFENV_VERSION_FILE from tfenv-version-file';
 
-    TFENV_VERSION_SOURCE="${TFENV_VERSION_FILE}";
+      TFENV_VERSION="$(cat "${TFENV_VERSION_FILE}" || true)" \
+        && log 'debug' "TFENV_VERSION specified in TFENV_VERSION_FILE: ${TFENV_VERSION}";
 
+      TFENV_VERSION_SOURCE="${TFENV_VERSION_FILE}";
+    else
+      TFENV_VERSION="${TFENV_TERRAFORM_VERSION}" \
+        && log 'debug' "TFENV_VERSION specified in TFENV_TERRAFORM_VERSION environment variable: ${TFENV_VERSION}";
+
+      TFENV_VERSION_SOURCE='TFENV_TERRAFORM_VERSION';
+    fi
+  elif [[ "${TFENV_ENGINE}" = "tofu" ]]; then
+    if [[ -z "${TFENV_TOFU_VERSION:-""}" ]]; then
+      log 'debug' 'We are not hardcoded by TFENV_TOFU_VERSION environment variables';
+
+      TFENV_VERSION_FILE="$(tfenv-version-file)" \
+        && log 'debug' "TFENV_VERSION_FILE retrieved from tfenv-version-file: ${TFENV_VERSION_FILE}" \
+          || log 'error' 'Failed to retrieve TFENV_VERSION_FILE from tfenv-version-file';
+
+      TFENV_VERSION="$(cat "${TFENV_VERSION_FILE}" || true)" \
+        && log 'debug' "TFENV_VERSION specified in TFENV_VERSION_FILE: ${TFENV_VERSION}";
+
+      TFENV_VERSION_SOURCE="${TFENV_VERSION_FILE}";
+    else
+      TFENV_VERSION="${TFENV_TOFU_VERSION}" \
+        && log 'debug' "TFENV_VERSION specified in TFENV_TOFU_VERSION environment variable: ${TFENV_VERSION}";
+
+      TFENV_VERSION_SOURCE='TFENV_TOFU_VERSION';
+    fi
   else
-    TFENV_VERSION="${TFENV_TERRAFORM_VERSION}" \
-      && log 'debug' "TFENV_VERSION specified in TFENV_TERRAFORM_VERSION environment variable: ${TFENV_VERSION}";
-
-    TFENV_VERSION_SOURCE='TFENV_TERRAFORM_VERSION';
+      log 'error' "Unknown TFENV_ENGINE: ${TFENV_ENGINE}"
   fi;
 
   local auto_install="${TFENV_AUTO_INSTALL:-true}";
@@ -54,8 +78,8 @@ function tfenv-version-name() {
     fi;
 
     declare local_version='';
-    if [[ -d "${TFENV_CONFIG_DIR}/versions" ]]; then
-      local_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
+    if [[ -d "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions" ]]; then
+      local_version="$(\find "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions" -type d -exec basename {} \; \
         | tail -n +2 \
         | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
         | grep -e "${regex}" \
@@ -104,7 +128,7 @@ function tfenv-version-name() {
     TFENV_VERSION="$(tfenv-min-required)";
   fi;
 
-  if [[ ! -d "${TFENV_CONFIG_DIR}/versions/${TFENV_VERSION}" ]]; then
+  if [[ ! -d "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions/${TFENV_VERSION}" ]]; then
     log 'debug' "version '${TFENV_VERSION}' is not installed (set by ${TFENV_VERSION_SOURCE})";
   fi;
 

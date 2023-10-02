@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail;
 
-export TFENV_ENGINE=terraform
+export TFENV_ENGINE=tofu
 
 ####################################
 # Ensure we can execute standalone #

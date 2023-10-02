@@ -60,10 +60,14 @@ done;
 
 [ "${#}" -gt 1 ] && log 'error' 'usage: tfenv use [<version>]';
 
+TFENV_ENGINE="$(tfenv-resolve-engine)"
+
+export TFENV_ENGINE
+
 declare auto_install="${TFENV_AUTO_INSTALL:-true}";
 
 if [ "${auto_install}" != 'true' ]; then
-  [ -d "${TFENV_CONFIG_DIR}/versions" ] \
+  [ -d "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions" ] \
     || log 'error' 'No versions of terraform installed. Please install one with: tfenv install';
 fi;
 
@@ -97,10 +101,10 @@ declare version="${resolved%%\:*}";
 declare regex="${resolved##*\:}";
 declare installed_version='';
 
-log 'debug' "Searching ${TFENV_CONFIG_DIR}/versions/ for latest version matching ${regex}";
+log 'debug' "Searching ${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions for latest version matching ${regex}";
 
-if [ -d "${TFENV_CONFIG_DIR}/versions" ]; then
-  installed_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
+if [ -d "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions" ]; then
+  installed_version="$(\find "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions" -type d -exec basename {} \; \
     | tail -n +2 \
     | grep -e "${regex}" \
     | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3r,3 \
@@ -119,7 +123,7 @@ else
 
     tfenv-install "${install_version}" || log 'error' 'Installing a matching version failed';
 
-    installed_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
+    installed_version="$(\find "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions" -type d -exec basename {} \; \
       | tail -n +2 \
       | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
       | grep -e "${regex}" \
@@ -127,19 +131,19 @@ else
     )";
 
     [ -n "${installed_version}" ] \
-      || log 'error' "Despite successfully installing a version matching '${resolved}', a matching version could not be found in '${TFENV_CONFIG_DIR}/versions/' - This should be pretty much impossible";
+      || log 'error' "Despite successfully installing a version matching '${resolved}', a matching version could not be found in '${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions' - This should be pretty much impossible";
   fi;
 fi;
 
-target_path="${TFENV_CONFIG_DIR}/versions/${installed_version}";
-log 'debug' "target_path is ${TFENV_CONFIG_DIR}/versions/${installed_version}";
+target_path="${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions/${installed_version}";
+log 'debug' "target_path is ${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions/${installed_version}";
 
 [ -d "${target_path}" ] \
   || log 'error' "Version directory for ${installed_version} (${target_path}) is not present! Manual intervention required.";
-[ -f "${target_path}/terraform" ] \
-  || log 'error' "Version directory for ${installed_version} is present, but the terraform binary is not! Manual intervention required.";
-[ -x "${target_path}/terraform" ] \
-  || log 'error' "Version directory for ${installed_version} is present, but the terraform binary is not executable! Manual intervention required.";
+[ -f "${target_path}/${TFENV_ENGINE}" ] \
+  || log 'error' "Version directory for ${installed_version} is present, but the ${TFENV_ENGINE} binary is not! Manual intervention required.";
+[ -x "${target_path}/${TFENV_ENGINE}" ] \
+  || log 'error' "Version directory for ${installed_version} is present, but the ${TFENV_ENGINE} binary is not executable! Manual intervention required.";
 
 log 'info' "Switching default version to v${installed_version}";
 version_file="${TFENV_CONFIG_DIR}/version";
@@ -151,4 +155,8 @@ if [ "${version_file}" != "${loaded_version_file}" ]; then
   log 'warn' "Default version file overridden by ${loaded_version_file}, changing the default version has no effect";
 fi;
 
-log 'info' "Default version (when not overridden by .terraform-version or TFENV_TERRAFORM_VERSION) is now: ${installed_version}";
+if [[ "${TFENV_ENGINE}" = "terraform" ]]; then
+    log 'info' "Default version (when not overridden by .terraform-version or TFENV_TERRAFORM_VERSION) is now: ${installed_version}";
+else
+    log 'info' "Default version (when not overridden by .tofu-version or TFENV_TOFU_VERSION) is now: ${installed_version}";
+fi

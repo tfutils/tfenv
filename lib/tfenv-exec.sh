@@ -10,6 +10,15 @@ function tfenv-exec() {
     fi;
   done;
 
+  log 'debug' 'Resolving engine from tfenv-resolve-engine';
+  TFENV_ENGINE="$(tfenv-resolve-engine)" \
+    && log 'debug' "TFENV_ENGINE is ${TFENV_ENGINE}" \
+    || {
+      log 'debug' 'Failed to resolve engine';
+      return 1;
+    };
+  export TFENV_ENGINE;
+
   log 'debug' 'Getting version from tfenv-version-name';
   TFENV_VERSION="$(tfenv-version-name)" \
     && log 'debug' "TFENV_VERSION is ${TFENV_VERSION}" \
@@ -21,7 +30,7 @@ function tfenv-exec() {
     };
   export TFENV_VERSION;
 
-  if [ ! -d "${TFENV_CONFIG_DIR}/versions/${TFENV_VERSION}" ]; then
+  if [ ! -d "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions/${TFENV_VERSION}" ]; then
   if [ "${TFENV_AUTO_INSTALL:-true}" == "true" ]; then
     if [ -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
       TFENV_VERSION_SOURCE="$(tfenv-version-file)";
@@ -35,7 +44,7 @@ function tfenv-exec() {
     fi;
   fi;
 
-  TF_BIN_PATH="${TFENV_CONFIG_DIR}/versions/${TFENV_VERSION}/terraform";
+  TF_BIN_PATH="${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions/${TFENV_VERSION}/${TFENV_ENGINE}";
   export PATH="${TF_BIN_PATH}:${PATH}";
   log 'debug' "TF_BIN_PATH added to PATH: ${TF_BIN_PATH}";
   log 'debug' "Executing: ${TF_BIN_PATH} $@";

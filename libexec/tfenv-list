@@ -62,22 +62,38 @@ done;
 [ "${#}" -ne 0 ] \
   && log 'error' "usage: tfenv list";
 
-[ -d "${TFENV_CONFIG_DIR}/versions" ] \
+TFENV_ENGINE="$(tfenv-resolve-engine)"
+
+export TFENV_ENGINE
+
+[ -d "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions" ] \
   || log 'error' 'No versions available. Please install one with: tfenv install';
 
-[[ -x "${TFENV_CONFIG_DIR}/versions" && -r "${TFENV_CONFIG_DIR}/versions" ]] \
-  || log 'error' "tfenv versions directory is inaccessible: ${TFENV_CONFIG_DIR}/versions";
+[[ -x "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions" && -r "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions" ]] \
+  || log 'error' "tfenv versions directory is inaccessible: ${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions";
 
 version_name="$(tfenv-version-name 2>/dev/null || true)" \
   && log 'debug' "tfenv-version-name reported: ${version_name}";
 export version_name;
 
-if [ -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
-  version_source="$(tfenv-version-file)" \
-    && log 'debug' "tfenv-version-file reported: ${version_source}" \
-    || log 'error' "tfenv-version-file failed";
+if [[ "${TFENV_ENGINE}" = "terraform" ]]; then
+  if [[ -z "${TFENV_TERRAFORM_VERSION:-""}" ]]; then
+    version_source="$(tfenv-version-file)" \
+      && log 'debug' "tfenv-version-file reported: ${version_source}" \
+        || log 'error' "tfenv-version-file failed";
+  else
+    version_source='TFENV_TERRAFORM_VERSION';
+  fi
+elif [[ "${TFENV_ENGINE}" = "tofu" ]]; then
+  if [[ -z "${TFENV_TOFU_VERSION:-""}" ]]; then
+    version_source="$(tfenv-version-file)" \
+      && log 'debug' "tfenv-version-file reported: ${version_source}" \
+        || log 'error' "tfenv-version-file failed";
+  else
+    version_source='TFENV_TOFU_VERSION';
+  fi
 else
-  version_source='TFENV_TERRAFORM_VERSION';
+    log 'error' "Could not determine version.  Engine was determined to be ${TFENV_ENGINE}, ensure version files match that engine"
 fi;
 export version_source;
 
@@ -94,7 +110,7 @@ print_version () {
 };
 
 log 'debug' 'Listing versions...';
-local_versions=($(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
+local_versions=($(\find "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions" -type d -exec basename {} \; \
   | tail -n +2 \
   | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3));
 

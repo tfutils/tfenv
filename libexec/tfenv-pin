@@ -62,16 +62,25 @@ done;
 [ "${#}" -ne 0 ] \
   && log 'error' "usage: tfenv pin";
 
-[ -d "${TFENV_CONFIG_DIR}/versions/" ] \
+TFENV_ENGINE="$(tfenv-resolve-engine)"
+
+export TFENV_ENGINE
+
+[ -d "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions" ] \
   || log 'error' 'No versions available. Please install one with: tfenv install';
 
-[[ -x "${TFENV_CONFIG_DIR}/versions" && -r "${TFENV_CONFIG_DIR}/versions" ]] \
-  || log 'error' "tfenv versions directory is inaccessible: ${TFENV_CONFIG_DIR}/versions";
+[[ -x "${TFENV_CONFIG_DIR}/versions/${TFENV_ENGINE}" && -r "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions" ]] \
+  || log 'error' "tfenv versions directory is inaccessible: ${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions";
 
 version_name="$(tfenv-version-name 2>/dev/null || true)" \
   && log 'debug' "tfenv-version-name reported: ${version_name}";
 
-echo "${version_name}" > .terraform-version;
-log 'info' "Pinned version by writing \"${version_name}\" to $(pwd)/.terraform-version";
+if [[ "${TFENV_ENGINE}" = "terraform" ]]; then
+    echo "${version_name}" > .terraform-version;
+    log 'info' "Pinned version by writing \"${version_name}\" to $(pwd)/.terraform-version";
+else
+    echo "${version_name}" > .tofu-version;
+    log 'info' "Pinned version by writing \"${version_name}\" to $(pwd)/.tofu-version";
+fi
 
 exit 0;

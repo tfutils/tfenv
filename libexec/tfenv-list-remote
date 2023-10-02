@@ -64,17 +64,39 @@ if [ "${#}" -ne 0 ];then
   exit 1;
 fi;
 
-TFENV_REMOTE="${TFENV_REMOTE:-https://releases.hashicorp.com}";
-log 'debug' "TFENV_REMOTE: ${TFENV_REMOTE}";
+TFENV_ENGINE="$(tfenv-resolve-engine)"
 
-declare remote_versions;
-remote_versions="$(curlw -sSf "${TFENV_REMOTE}/terraform/")" \
-  || log 'error' "Failed to download remote versions from ${TFENV_REMOTE}/terraform/";
+export TFENV_ENGINE
 
-#log 'debug' "Remote versions available: ${remote_versions}"; # Even in debug mode this is too verbose
+if [[ "${TFENV_ENGINE}" = "terraform" ]]; then
+    TFENV_REMOTE="${TFENV_REMOTE:-https://releases.hashicorp.com}";
+    log 'debug' "TFENV_REMOTE: ${TFENV_REMOTE}";
 
-if [[ "${TFENV_REVERSE_REMOTE:-0}" -eq 1 ]]; then
-  grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)-?[0-9]*)?" <<<"${remote_versions}" | uniq | awk '{a[i++]=$0} END {for (j=i-1; j>=0;) print a[j--] }';
+    declare remote_versions;
+    remote_versions="$(curlw -sSf "${TFENV_REMOTE}/terraform/")" \
+        || log 'error' "Failed to download remote versions from ${TFENV_REMOTE}/terraform/";
+
+    if [[ "${TFENV_REVERSE_REMOTE:-0}" -eq 1 ]]; then
+        grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)-?[0-9]*)?" <<<"${remote_versions}" | uniq | awk '{a[i++]=$0} END {for (j=i-1; j>=0;) print a[j--] }';
+    else
+        grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)-?[0-9]*)?" <<<"${remote_versions}" | uniq;
+    fi;
 else
-  grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)-?[0-9]*)?" <<<"${remote_versions}" | uniq;
-fi;
+    TFENV_REMOTE="${TFENV_REMOTE:-https://github.com/opentofu/opentofu/releases}";
+    log 'debug' "TFENV_REMOTE: ${TFENV_REMOTE}";
+
+    declare remote_versions;
+    remote_versions="$(curlw -sSf "${TFENV_REMOTE}")" \
+        || log 'error' "Failed to download remote versions from ${TFENV_REMOTE}?per_page=100";
+
+    if [[ "${TFENV_REVERSE_REMOTE:-0}" -eq 1 ]]; then
+        grep -Eo 'releases/download/[^/]+' <<<"${remote_versions}" \
+            | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)-?[0-9]*)?" \
+            | uniq \
+            | awk '{a[i++]=$0} END {for (j=i-1; j>=0;) print a[j--] }';
+    else
+        grep -Eo 'releases/download/[^/]+' <<<"${remote_versions}" \
+            | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)-?[0-9]*)?" \
+            | uniq;
+    fi;
+fi

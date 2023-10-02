@@ -103,14 +103,14 @@ export -f check_active_version;
 
 function check_installed_version() {
   local v="${1}";
-  local bin="${TFENV_CONFIG_DIR}/versions/${v}/terraform";
+  local bin="${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions/${v}/${TFENV_ENGINE}";
   [ -n "$(${bin} version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
 };
 export -f check_installed_version;
 
 function check_default_version() {
   local v="${1}";
-  local def="$(cat "${TFENV_CONFIG_DIR}/version")";
+  local def="$(cat "${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/version")";
   [ "${def}" == "${v}" ];
 };
 export -f check_default_version;
@@ -120,10 +120,14 @@ function cleanup() {
   local pwd="$(pwd)";
   log 'debug' "Deleting ${pwd}/version";
   rm -rf ./version;
-  log 'debug' "Deleting ${pwd}/versions";
-  rm -rf ./versions;
+  log 'debug' "Deleting ${pwd}/terraform/versions";
+  rm -rf ./terraform/versions;
+  log 'debug' "Deleting ${pwd}/tofu/versions";
+  rm -rf ./tofu/versions;
   log 'debug' "Deleting ${pwd}/.terraform-version";
   rm -rf ./.terraform-version;
+  log 'debug' "Deleting ${pwd}/.tofu-version";
+  rm -rf ./.tofu-version;
   log 'debug' "Deleting ${pwd}/latest_allowed.tf";
   rm -rf ./latest_allowed.tf;
   log 'debug' "Deleting ${pwd}/min_required.tf";
@@ -155,5 +159,6 @@ source "$TFENV_ROOT/lib/tfenv-exec.sh";
 source "$TFENV_ROOT/lib/tfenv-min-required.sh";
 source "$TFENV_ROOT/lib/tfenv-version-file.sh";
 source "$TFENV_ROOT/lib/tfenv-version-name.sh";
+source "$TFENV_ROOT/lib/tfenv-resolve-engine.sh";
 
 export TFENV_HELPERS=1;

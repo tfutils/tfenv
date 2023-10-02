@@ -62,6 +62,9 @@ done;
 
 declare requested="${1:-""}";
 
+TFENV_ENGINE="$(tfenv-resolve-engine)"
+export TFENV_ENGINE
+
 log debug "Resolving version with: tfenv-resolve-version ${requested}";
 declare resolved;
 resolved="$(tfenv-resolve-version ${requested})" || log 'error' "Failed to resolve ${requested} version";
@@ -76,9 +79,9 @@ log 'debug' "Processing install for version ${version}, using regex ${regex}";
 remote_version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
 [ -n "${remote_version}" ] && version="${remote_version}" || log 'error' "No versions matching '${requested:-$version}' found in remote";
 
-dst_path="${TFENV_CONFIG_DIR}/versions/${version}";
-if [ -f "${dst_path}/terraform" ]; then
-  echo "Terraform v${version} is already installed";
+dst_path="${TFENV_CONFIG_DIR}/${TFENV_ENGINE}/versions/${version}";
+if [ -f "${dst_path}/${TFENV_ENGINE}" ]; then
+  echo "${TFENV_ENGINE} v${version} is already installed";
   exit 0;
 fi;
 
@@ -144,21 +147,32 @@ keybase_bin="$(command -v keybase 2>/dev/null)";
 shasum_bin="$(command -v shasum 2>/dev/null)";
 sha256sum_bin="$(command -v sha256sum 2>/dev/null)";
 
-TFENV_REMOTE="${TFENV_REMOTE:-https://releases.hashicorp.com}";
-version_url="${TFENV_REMOTE}/terraform/${version}";
+if [ "${TFENV_ENGINE}" = "terraform" ]; then
+    TFENV_REMOTE="${TFENV_REMOTE:-https://releases.hashicorp.com}";
+    version_url="${TFENV_REMOTE}/terraform/${version}";
 
-# Thanks for the inconsistency in 0.12-alpha, Hashicorp(!)
-if [[ "${version}" =~ 0.12.0-alpha[3-9] ]]; then
-  tarball_name="terraform_${version}_terraform_${version}_${os}.zip";
+    # Thanks for the inconsistency in 0.12-alpha, Hashicorp(!)
+    if [[ "${version}" =~ 0.12.0-alpha[3-9] ]]; then
+        tarball_name="terraform_${version}_terraform_${version}_${os}.zip";
+    else
+        tarball_name="terraform_${version}_${os}.zip";
+    fi
+
+    shasums_name="terraform_${version}_SHA256SUMS";
+    shasums_signing_key_postfix=".72D7468F";
+    shasums_sig="${shasums_name}${shasums_signing_key_postfix}.sig";
+elif [ "${TFENV_ENGINE}" = "tofu" ]; then
+    TFENV_REMOTE="${TFENV_REMOTE:-https://github.com/opentofu/opentofu/releases}";
+    version_url="${TFENV_REMOTE}/download/v${version}";
+    tarball_name="tofu_${version}_${os}.zip";
+    shasums_name="tofu_${version}_SHA256SUMS";
+    shasums_signing_key_postfix="???";
+    shasums_sig="${shasums_name}${shasums_signing_key_postfix}.sig";
 else
-  tarball_name="terraform_${version}_${os}.zip";
-fi;
+    log 'error' "Unknown tfenv engine: ${TFENV_ENGINE}"
+fi
 
-shasums_name="terraform_${version}_SHA256SUMS";
-shasums_signing_key_postfix=".72D7468F";
-shasums_sig="${shasums_name}${shasums_signing_key_postfix}.sig";
-
-log 'info' "Installing Terraform v${version}";
+log 'info' "Installing ${TFENV_ENGINE} v${version}";
 
 # Create a local temporary directory for downloads
 tmpdir_arg="-t";
@@ -299,4 +313,4 @@ while IFS= read -r unzip_line; do
  log 'info' "${unzip_line}";
 done < <(printf '%s\n' "${unzip_output}");
 
-log 'info' "Installation of terraform v${version} successful. To make this your default version, run 'tfenv use ${version}'";
+log 'info' "Installation of ${TFENV_ENGINE} v${version} successful. To make this your default version, run 'tfenv use ${version}'";

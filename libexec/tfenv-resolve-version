@@ -71,7 +71,11 @@ declare version_requested version regex min_required version_file;
 
 declare arg="${1:-""}";
 
-if [ -z "${arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+TFENV_ENGINE="$(tfenv-resolve-engine)"
+
+export TFENV_ENGINE
+
+if [ -z "${arg}" ] && [ -z "${TFENV_TERRAFORM_VERSION:-""}" ] && [ -z "${TFENV_TOFU_VERSION:-""}" ]; then
   version_file="$(tfenv-version-file)";
   log 'debug' "Version File: ${version_file}";
 
@@ -91,14 +95,17 @@ if [ -z "${arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
       version_requested='latest';
     fi;
 
-  else 
+  else
     log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version) but it doesn't exist";
     log 'debug' 'No version requested on the command line or in the version file search path. Installing "latest"';
     version_requested='latest';
   fi;
-elif [ -n "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+elif [ "${TFENV_ENGINE}" = "terraform" ] && [ -n "${TFENV_TERRAFORM_VERSION:-""}" ]; then
   version_requested="${TFENV_TERRAFORM_VERSION}";
   log 'debug' "TFENV_TERRAFORM_VERSION is set: ${TFENV_TERRAFORM_VERSION}";
+elif [ "${TFENV_ENGINE}" = "tofu" ] && [ -n "${TFENV_TOFU_VERSION:-""}" ]; then
+  version_requested="${TFENV_TOFU_VERSION}";
+  log 'debug' "TFENV_TERRAFORM_VERSION is set: ${TFENV_TOFU_VERSION}";
 else
   version_requested="${arg}";
 fi;

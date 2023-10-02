@@ -9,12 +9,12 @@ function find_local_version_file() {
 
   while ! [[ "${root}" =~ ^//[^/]*$ ]]; do
 
-    if [ -e "${root}/.terraform-version" ]; then
-      log 'debug' "Found at ${root}/.terraform-version";
-      echo "${root}/.terraform-version";
+    if [ -e "${root}/.${TFENV_ENGINE}-version" ]; then
+      log 'debug' "${TFENV_ENGINE} found at ${root}/.${TFENV_ENGINE}-version";
+      echo "${root}/.${TFENV_ENGINE}-version";
       return 0;
     else
-      log 'debug' "Not found at ${root}/.terraform-version";
+      log 'debug' "Not found at ${root}/.${TFENV_ENGINE}-version";
     fi;
 
     [ -n "${root}" ] || break;
