@@ -55,7 +55,7 @@ cleanup || log 'error' 'Cleanup failed?!';
 
 log 'info' '### Install min-required normal version (#.#.#)';
 
-minv='0.8.0';
+minv='0.11.9';
 
 echo "terraform {
   required_version = \">=${minv}\"
