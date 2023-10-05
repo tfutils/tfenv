@@ -105,7 +105,7 @@ tests__kv=(
   "$(tfenv list-remote | grep 'rc' | head -n 1),latest:rc"
   "$(tfenv list-remote | grep '^0\.11\.' | head -n 1),latest:^0.11."
   '0.11.15-oci,0.11.15-oci'
-  '0.11.14,latest:^0.11'
+  '0.11.15,latest:^0.11'
   '0.11.9,0.11.9'
   '0.14.6,v0.14.6'
 );
