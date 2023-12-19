@@ -53,7 +53,7 @@ declare -a errors=();
 log 'info' '### List local versions';
 cleanup || log 'error' "Cleanup failed?!";
 
-for v in 0.7.2 0.7.13 0.9.1 0.9.2 v0.9.11 0.14.6; do
+for v in 0.11.9 0.11.11 v0.11.13 0.14.6; do
   log 'info' "## Installing version ${v} to construct list";
   tfenv install "${v}" \
     && log 'debug' "Install of version ${v} succeeded" \
@@ -71,11 +71,9 @@ log 'info' '## Comparing "tfenv list" with default set';
 result="$(tfenv list)";
 expected="$(cat << EOS
 * 0.14.6 (set by $(tfenv version-file))
-  0.9.11
-  0.9.2
-  0.9.1
-  0.7.13
-  0.7.2
+  0.11.13
+  0.11.11
+  0.11.9
 EOS
 )";
 

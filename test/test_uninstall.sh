@@ -63,18 +63,18 @@ log 'info' '### Test Suite: Uninstall Local Versions';
 cleanup || log 'error' 'Cleanup failed?!';
 
 tests__keywords=(
-  '0.9.1'
+  '0.11.10'
   '0.11.15-oci'
   'latest'
-  'latest:^0.8'
+  'latest:^0.11'
   'v0.14.6'
 );
 
 tests__versions=(
-  '0.9.1'
+  '0.11.10'
   '0.11.15-oci'
   "$(tfenv list-remote | head -n1)"
-  "$(tfenv list-remote | grep -e "^0.8" | head -n1)"
+  "$(tfenv list-remote | grep -e "^0.11" | head -n1)"
   '0.14.6'
 );
 
