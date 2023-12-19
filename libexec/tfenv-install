@@ -73,14 +73,14 @@ declare regex="${resolved##*\:}";
 
 log 'debug' "Processing install for version ${version}, using regex ${regex}";
 
+remote_version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
+[ -n "${remote_version}" ] && version="${remote_version}" || log 'error' "No versions matching '${requested:-$version}' found in remote";
+
 dst_path="${TFENV_CONFIG_DIR}/versions/${version}";
 if [ -f "${dst_path}/terraform" ]; then
   echo "Terraform v${version} is already installed";
   exit 0;
 fi;
-
-remote_version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
-[ -n "${remote_version}" ] && version="${remote_version}" || log 'error' "No versions matching '${requested:-$version}' found in remote";
 
 case "$(uname -s)" in
   Darwin*)
