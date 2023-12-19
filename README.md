@@ -1,4 +1,4 @@
-![CI](https://github.com/tfutils/tfenv/workflows/CI/badge.svg)
+[![CI Test](https://github.com/tfutils/tfenv/actions/workflows/test.yml/badge.svg)](https://github.com/tfutils/tfenv/actions/workflows/test.yml)
 
 # tfenv
 
@@ -23,13 +23,13 @@ Currently tfenv supports the following OSes
 Install via Homebrew
 
 ```console
-$ brew install tfenv
+brew install tfenv
 ```
 
 Install via Arch User Repository (AUR)
    
 ```console
-$ yay --sync tfenv
+yay --sync tfenv
 ```
 
 Install via puppet
@@ -45,34 +45,34 @@ include ::tfenv
 1. Check out tfenv into any path (here is `${HOME}/.tfenv`)
 
 ```console
-$ git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv
+git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv
 ```
 
 2. Add `~/.tfenv/bin` to your `$PATH` any way you like
 
 ```console
-$ echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bash_profile
+echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bash_profile
 ```
 
   For WSL users
 ```bash
-$ echo 'export PATH=$PATH:$HOME/.tfenv/bin' >> ~/.bashrc
+echo 'export PATH=$PATH:$HOME/.tfenv/bin' >> ~/.bashrc
 ```
 
   OR you can make symlinks for `tfenv/bin/*` scripts into a path that is already added to your `$PATH` (e.g. `/usr/local/bin`) `OSX/Linux Only!`
 
 ```console
-$ ln -s ~/.tfenv/bin/* /usr/local/bin
+ln -s ~/.tfenv/bin/* /usr/local/bin
 ```
 
   On Ubuntu/Debian touching `/usr/local/bin` might require sudo access, but you can create `${HOME}/bin` or `${HOME}/.local/bin` and on next login it will get added to the session `$PATH`
   or by running `. ${HOME}/.profile` it will get added to the current shell session's `$PATH`.
 
 ```console
-$ mkdir -p ~/.local/bin/
-$ . ~/.profile
-$ ln -s ~/.tfenv/bin/* ~/.local/bin
-$ which tfenv
+mkdir -p ~/.local/bin/
+. ~/.profile
+ln -s ~/.tfenv/bin/* ~/.local/bin
+which tfenv
 ```
 
 ## Usage
@@ -110,8 +110,8 @@ You can opt-in to using GnuPG tools for PGP signature verification if keybase is
 Where `TFENV_INSTALL_DIR` is for example, `~/.tfenv` or `/usr/local/Cellar/tfenv/<version>`
 
 ```console
-$ echo 'trust-tfenv: yes' > ${TFENV_INSTALL_DIR}/use-gpgv
-$ tfenv install
+echo 'trust-tfenv: yes' > ${TFENV_INSTALL_DIR}/use-gpgv
+tfenv install
 ```
 
 The `trust-tfenv` directive means that verification uses a copy of the
@@ -157,7 +157,7 @@ Specify architecture. Architecture other than the default amd64 can be specified
 Note: Default changes to `arm64` for versions that have arm64 builds available when `$(uname -m)` matches `aarch64* | arm64*`
 
 ```console
-$ TFENV_ARCH=arm64 tfenv install 0.7.9
+TFENV_ARCH=arm64 tfenv install 0.7.9
 ```
 
 ##### `TFENV_AUTO_INSTALL`
@@ -167,11 +167,11 @@ String (Default: true)
 Should tfenv automatically install terraform if the version specified by defaults or a .terraform-version file is not currently installed.
 
 ```console
-$ TFENV_AUTO_INSTALL=false terraform plan
+TFENV_AUTO_INSTALL=false terraform plan
 ```
 
 ```console
-$ terraform use <version that is not yet installed>
+terraform use <version that is not yet installed>
 ```
 
 ##### `TFENV_CURL_OUTPUT`
@@ -202,7 +202,7 @@ String (Default: https://releases.hashicorp.com)
 To install from a remote other than the default
 
 ```console
-$ TFENV_REMOTE=https://example.jfrog.io/artifactory/hashicorp
+TFENV_REMOTE=https://example.jfrog.io/artifactory/hashicorp
 ```
 
 ##### `TFENV_REVERSE_REMOTE`
@@ -217,7 +217,7 @@ is instead providing a list that is oldes-first, set `TFENV_REVERSE_REMOTE=1` an
 functionality will be restored.
 
 ```console
-$ TFENV_REVERSE_REMOTE=1 tfenv list-remote
+TFENV_REVERSE_REMOTE=1 tfenv list-remote
 ```
 
 ##### `TFENV_CONFIG_DIR`
@@ -241,7 +241,7 @@ If not empty string, this variable overrides Terraform version, specified in [.t
 e.g.
 
 ```console
-$ TFENV_TERRAFORM_VERSION=latest:^0.11. terraform --version
+TFENV_TERRAFORM_VERSION=latest:^0.11. terraform --version
 ```
 
 ##### `TFENV_NETRC_PATH`
@@ -253,7 +253,7 @@ If not empty string, this variable specifies the credentials file used to access
 e.g.
 
 ```console
-$ TFENV_NETRC_PATH="$PWD/.netrc.tfenv"
+TFENV_NETRC_PATH="$PWD/.netrc.tfenv"
 ```
 
 #### Bashlog Logging Library
@@ -294,7 +294,7 @@ Each executable logs to its own file.
 e.g.
 
 ```console
-$ BASHLOG_FILE=1 tfenv use latest
+BASHLOG_FILE=1 tfenv use latest
 ```
 
 will log to `/tmp/tfenv-use.log`
@@ -316,7 +316,7 @@ This variable allows you to pass a string containing a command that will be exec
 e.g.
 
 ```console
-$ BASHLOG_I_PROMISE_TO_BE_CAREFUL_CUSTOM_EVAL_PREFIX='echo "${$$} "'
+BASHLOG_I_PROMISE_TO_BE_CAREFUL_CUSTOM_EVAL_PREFIX='echo "${$$} "'
 ```
 will prefix every log line with the calling process' PID.
 
@@ -332,7 +332,7 @@ Each executable logs to its own file.
 e.g.
 
 ```console
-$ BASHLOG_JSON=1 tfenv use latest
+BASHLOG_JSON=1 tfenv use latest
 ```
 
 will log in JSON format to `/tmp/tfenv-use.log.json`
@@ -356,10 +356,10 @@ To log to syslog using the `logger` binary, set this to 1.
 The basic functionality is thus:
 
 ```console
-$ local tag="${BASHLOG_SYSLOG_TAG:-$(basename "${0}")}";
-$ local facility="${BASHLOG_SYSLOG_FACILITY:-local0}";
-$ local pid="${$}";
-$ logger --id="${pid}" -t "${tag}" -p "${facility}.${severity}" "${syslog_line}"
+local tag="${BASHLOG_SYSLOG_TAG:-$(basename "${0}")}";
+local facility="${BASHLOG_SYSLOG_FACILITY:-local0}";
+local pid="${$}";
+logger --id="${pid}" -t "${tag}" -p "${facility}.${severity}" "${syslog_line}"
 ```
 
 ##### `BASHLOG_SYSLOG_FACILITY`
@@ -489,13 +489,13 @@ Terraform v0.7.3
 ## Upgrading
 
 ```console
-$ git --git-dir=~/.tfenv/.git pull
+git --git-dir=~/.tfenv/.git pull
 ```
 
 ## Uninstalling
 
 ```console
-$ rm -rf /some/path/to/tfenv
+rm -rf /some/path/to/tfenv
 ```
 
 ## LICENSE
