@@ -68,7 +68,7 @@ terraform {
   required_version = ">= 0.0.0"
 }
 
-see https://www.terraform.io/docs/configuration/terraform.html for details';
+see https://developer.hashicorp.com/terraform/language/settings for details';
 };
 
 declare min_required="$(tfenv-min-required "${TFENV_DIR:-$(pwd)}")";

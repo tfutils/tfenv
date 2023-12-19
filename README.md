@@ -50,11 +50,16 @@ git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv
 
 2. Add `~/.tfenv/bin` to your `$PATH` any way you like
 
+bash:
 ```console
 echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bash_profile
 ```
+zsh:
+```console
+$ echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.zprofile
+```
 
-  For WSL users
+For WSL users:
 ```bash
 echo 'export PATH=$PATH:$HOME/.tfenv/bin' >> ~/.bashrc
 ```
@@ -91,7 +96,7 @@ If a parameter is passed, available options:
 - `latest-allowed` is a syntax to scan your Terraform files to detect which version is maximally allowed.
 - `min-required` is a syntax to scan your Terraform files to detect which version is minimally required.
 
-See [required_version](https://www.terraform.io/docs/configuration/terraform.html) docs. Also [see min-required & latest-allowed](#min-required) section below.
+See [required_version](https://developer.hashicorp.com/terraform/language/settings) docs. Also [see min-required & latest-allowed](#min-required) section below.
 
 ```console
 $ tfenv install
