@@ -129,7 +129,7 @@ fi;
 
 if [[ "${version_requested}" =~ ^latest-allowed$ ]]; then
   log 'debug' 'Detecting latest allowable version...';
-  version_spec="$(grep -h required_version "${TFENV_DIR:-$(pwd)}"/{*.tf,*.tf.json} 2>/dev/null | rev | cut -d'"' -f2 | rev | cut -d, -f1)";
+  version_spec="$(grep -h required_version "${TFENV_DIR:-$(pwd)}"/{*.tf,*.tf.json} 2>/dev/null | { IFS='"' read -r _ ver _; echo "${ver%%,*}"; })";
   version_num="$(echo "${version_spec}" | sed -E 's/[^0-9.]+//')";
   log 'debug' "Using ${version_num} from version spec: ${version_spec}";
 
@@ -141,7 +141,7 @@ if [[ "${version_requested}" =~ ^latest-allowed$ ]]; then
       version_requested="${version_num}";
       ;;
     '~>'*)
-      version_without_rightmost="$(echo "${version_num}" | rev | cut -d. -f2- | rev)";
+      version_without_rightmost="${version_num%.*}";
       version_requested="latest:^${version_without_rightmost}";
       ;;
     *)
