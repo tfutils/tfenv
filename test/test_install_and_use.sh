@@ -105,10 +105,27 @@ tests__kv=(
   "$(tfenv list-remote | grep 'rc' | head -n 1),latest:rc"
   "$(tfenv list-remote | grep '^0\.11\.' | head -n 1),latest:^0.11."
   '0.11.15-oci,0.11.15-oci'
-  '0.8.8,latest:^0.8'
-  '0.7.13,0.7.13'
+  '1.3.10,latest:^1\.3'
+  '1.6.3,1.6.3'
   '0.14.6,v0.14.6'
 );
+
+log 'info' "Kernel under test: $(uname -s)";
+
+if [[ "$(uname -s)" != Darwin* ]]; then
+  log 'info' "We're not Darwin! Adding legacy tests.";
+  tests__desc+=(
+    'legacy latest version matching regex'
+    'legacy specific version'
+  );
+
+  tests__kv+=(
+    '0.8.8,latest:^0.8'
+    '0.7.13,0.7.13'
+  );
+else
+  log 'warn' "We're Darwin! Skipping legacy tests.";
+fi;
 
 tests_count=${#tests__desc[@]};
 

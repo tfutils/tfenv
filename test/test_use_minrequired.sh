@@ -55,7 +55,7 @@ cleanup || log 'error' 'Cleanup failed?!';
 
 log 'info' '### Install min-required normal version (#.#.#)';
 
-minv='0.8.0';
+minv='1.6.0';
 
 echo "terraform {
   required_version = \">=${minv}\"
@@ -72,7 +72,7 @@ cleanup || log 'error' 'Cleanup failed?!';
 
 log 'info' '### Install min-required tagged version (#.#.#-tag#)'
 
-minv='0.13.0-rc1'
+minv='1.5.0-rc1'
 
 echo "terraform {
     required_version = \">=${minv}\"
@@ -89,7 +89,7 @@ cleanup || log 'error' 'Cleanup failed?!';
 
 log 'info' '### Install min-required incomplete version (#.#.<missing>)'
 
-minv='0.12';
+minv='1.3';
 
 echo "terraform {
   required_version = \">=${minv}\"
@@ -106,7 +106,7 @@ cleanup || log 'error' 'Cleanup failed?!';
 
 log 'info' '### Install min-required with TFENV_AUTO_INSTALL';
 
-minv='1.0.0';
+minv='1.2.0';
 
 echo "terraform {
   required_version = \">=${minv}\"

@@ -60,14 +60,14 @@ ln -s "${PWD}"/bin/* "${TFENV_BIN_DIR}";
 
 cleanup || log 'error' 'Cleanup failed?!';
 
-log 'info' '## Installing 0.8.2';
-${TFENV_BIN_DIR}/tfenv install 0.8.2 || error_and_proceed 'Install failed';
+log 'info' '## Installing 1.6.1';
+${TFENV_BIN_DIR}/tfenv install 1.6.1 || error_and_proceed 'Install failed';
 
-log 'info' '## Using 0.8.2';
-${TFENV_BIN_DIR}/tfenv use 0.8.2 || error_and_proceed 'Use failed';
+log 'info' '## Using 1.6.1';
+${TFENV_BIN_DIR}/tfenv use 1.6.1 || error_and_proceed 'Use failed';
 
-log 'info' '## Check-Version for 0.8.2';
-check_active_version 0.8.2 || error_and_proceed 'Version check failed';
+log 'info' '## Check-Version for 1.6.1';
+check_active_version 1.6.1 || error_and_proceed 'Version check failed';
 
 if [ "${#errors[@]}" -gt 0 ]; then
   log 'warn' '===== The following symlink tests failed =====';
