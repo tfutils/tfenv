@@ -89,10 +89,10 @@ case "$(uname -s)" in
   MINGW64*)
     kernel="windows";
     ;;
-  MSYSNT*)
+  MSYS*NT*)
     kernel="windows";
     ;;
-  CYGWINNT*)
+  CYGWIN*NT*)
     kernel="windows";
     ;;
   FreeBSD*)
