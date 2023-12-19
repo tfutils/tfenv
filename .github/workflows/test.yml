@@ -30,7 +30,7 @@ jobs:
         run: './test/run.sh'
         shell: 'bash'
 
-      - uses: 'docker/setup-buildx-action@v2'
+      - uses: 'docker/setup-buildx-action@v3'
         if: contains(matrix.os, 'ubuntu')
         with:
           install: true
@@ -69,7 +69,7 @@ jobs:
         run: './test/run.sh'
         shell: 'bash'
 
-      - uses: 'docker/setup-buildx-action@v2'
+      - uses: 'docker/setup-buildx-action@v3'
         if: contains(matrix.os, 'ubuntu')
         with:
           install: true
