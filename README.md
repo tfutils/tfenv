@@ -50,11 +50,16 @@ git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv
 
 2. Add `~/.tfenv/bin` to your `$PATH` any way you like
 
+bash:
 ```console
 echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bash_profile
 ```
+zsh:
+```console
+$ echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.zprofile
+```
 
-  For WSL users
+For WSL users:
 ```bash
 echo 'export PATH=$PATH:$HOME/.tfenv/bin' >> ~/.bashrc
 ```
