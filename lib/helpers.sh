@@ -140,8 +140,8 @@ function error_and_proceed() {
 export -f error_and_proceed;
 
 function check_dependencies() {
-  if [[ $(uname) == 'Darwin' ]] && [ $(which brew) ]; then
-    if ! [ $(which ggrep) ]; then
+  if [[ $(uname) == 'Darwin' ]] && [ "$(which brew)" ]; then
+    if ! [ "$(which ggrep)" ]; then
       log 'error' 'A metaphysical dichotomy has caused this unit to overload and shut down. GNU Grep is a requirement and your Mac does not have it. Consider "brew install grep"';
     fi;
 
