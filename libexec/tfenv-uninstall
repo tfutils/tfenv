@@ -64,7 +64,7 @@ done;
 declare version_requested version regex;
 declare arg="${1:-""}";
 
-if [ -z "${arg:-""}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+if [ -z "${arg:-""}" ] && [ -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
   version_file="$(tfenv-version-file)";
   log 'debug' "Version File: ${version_file}";
   if [ "${version_file}" != "${TFENV_CONFIG_DIR}/version" ]; then

@@ -26,7 +26,7 @@ if [ -z "${TFENV_ROOT:-""}" ]; then
   };
 
   TFENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)";
-  [ -n ${TFENV_ROOT} ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TFENV_ROOT";
+  [ -n "${TFENV_ROOT}" ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TFENV_ROOT";
 else
   TFENV_ROOT="${TFENV_ROOT%/}";
 fi;
@@ -51,7 +51,7 @@ export PATH="${TFENV_ROOT}/bin:${PATH}";
 
 errors=();
 if [ "${#}" -ne 0 ]; then
-  targets="$@";
+  targets="$*";
 else
   targets="$(\ls "$(dirname "${0}")" | grep 'test_')";
 fi;

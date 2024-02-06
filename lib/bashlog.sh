@@ -40,7 +40,7 @@ function log() {
 
   shift 1;
 
-  local line="$@";
+  local line="$*";
 
   # RFC 5424
   #

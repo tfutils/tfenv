@@ -133,7 +133,7 @@ declare desc kv k v test_num;
 
 for ((test_iter=0; test_iter<${tests_count}; ++test_iter )) ; do
   cleanup || log 'error' 'Cleanup failed?!';
-  test_num=$((test_iter + 1)); 
+  test_num=$((test_iter + 1));
   desc=${tests__desc[${test_iter}]};
   kv="${tests__kv[${test_iter}]}";
   v="${kv%,*}";
@@ -146,7 +146,7 @@ done;
 
 for ((test_iter=0; test_iter<${tests_count}; ++test_iter )) ; do
   cleanup || log 'error' 'Cleanup failed?!';
-  test_num=$((test_iter + 1)); 
+  test_num=$((test_iter + 1));
   desc=${tests__desc[${test_iter}]};
   kv="${tests__kv[${test_iter}]}";
   v="${kv%,*}";
@@ -161,7 +161,7 @@ done;
 
 for ((test_iter=0; test_iter<${tests_count}; ++test_iter )) ; do
   cleanup || log 'error' 'Cleanup failed?!';
-  test_num=$((test_iter + 1)); 
+  test_num=$((test_iter + 1));
   desc=${tests__desc[${test_iter}]};
   kv="${tests__kv[${test_iter}]}";
   v="${kv%,*}";
