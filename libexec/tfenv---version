@@ -27,7 +27,7 @@ if [ -z "${TFENV_ROOT:-""}" ]; then
     local file_name;
 
     while [ "${target_file}" != "" ]; do
-      cd "$(dirname ${target_file})" || early_death "Failed to 'cd \$(dirname ${target_file})' while trying to determine TFENV_ROOT";
+      cd "$(dirname "${target_file}")" || early_death "Failed to 'cd \$(dirname ${target_file})' while trying to determine TFENV_ROOT";
       file_name="$(basename "${target_file}")" || early_death "Failed to 'basename \"${target_file}\"' while trying to determine TFENV_ROOT";
       target_file="$(readlink "${file_name}")";
     done;
@@ -74,7 +74,7 @@ version="$(awk '/^##/{ print $2; exit}' "${TFENV_ROOT}/CHANGELOG.md")" \
   || log 'error' 'Failed to scrape version from CHANGELOG.md';
 
 git_revision="";
-if cd "$(dirname ${0})" 2>/dev/null && git remote -v 2>/dev/null | grep -q tfenv; then
+if cd "$(dirname "${0}")" 2>/dev/null && git remote -v 2>/dev/null | grep -q tfenv; then
   log 'debug' 'Git configuration found. Overriding CHANGELOG version from git revision...';
   git_revision="$(git describe --tags HEAD 2>/dev/null || true)";
   log 'debug' "Stripping git revision string from ${git_revision}";
