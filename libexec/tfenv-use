@@ -72,7 +72,7 @@ declare version_source_suffix="";
 declare requested="${requested_arg}";
 declare loaded_version_file="$(tfenv-version-file)";
 
-if [ -z "${requested_arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+if [ -z "${requested_arg}" ] && [ -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
   version_source_suffix=" (set by ${loaded_version_file})";
 
   if [ -f "${loaded_version_file}" ]; then

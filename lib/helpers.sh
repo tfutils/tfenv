@@ -72,7 +72,7 @@ function curlw () {
     TLS_OPT="";
   fi;
 
-  if [[ ! -z "${TFENV_NETRC_PATH:-""}" ]]; then
+  if [[ -n "${TFENV_NETRC_PATH:-""}" ]]; then
     NETRC_OPT="--netrc-file ${TFENV_NETRC_PATH}";
   else
     NETRC_OPT="";
@@ -104,7 +104,7 @@ export -f check_active_version;
 function check_installed_version() {
   local v="${1}";
   local bin="${TFENV_CONFIG_DIR}/versions/${v}/terraform";
-  [ -n "$(${bin} version | grep -E "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$")" ];
+  "${bin}" version | grep -qE "^Terraform v${v}((-dev)|( \([a-f0-9]+\)))?$"
 };
 export -f check_installed_version;
 
@@ -117,18 +117,17 @@ export -f check_default_version;
 
 function cleanup() {
   log 'info' 'Performing cleanup';
-  local pwd="$(pwd)";
-  log 'debug' "Deleting ${pwd}/version";
+  log 'debug' "Deleting ${PWD}/version";
   rm -rf ./version;
-  log 'debug' "Deleting ${pwd}/versions";
+  log 'debug' "Deleting ${PWD}/versions";
   rm -rf ./versions;
-  log 'debug' "Deleting ${pwd}/.terraform-version";
+  log 'debug' "Deleting ${PWD}/.terraform-version";
   rm -rf ./.terraform-version;
-  log 'debug' "Deleting ${pwd}/latest_allowed.tf";
+  log 'debug' "Deleting ${PWD}/latest_allowed.tf";
   rm -rf ./latest_allowed.tf;
-  log 'debug' "Deleting ${pwd}/min_required.tf";
+  log 'debug' "Deleting ${PWD}/min_required.tf";
   rm -rf ./min_required.tf;
-  log 'debug' "Deleting ${pwd}/chdir-dir";
+  log 'debug' "Deleting ${PWD}/chdir-dir";
   rm -rf ./chdir-dir;
 };
 export -f cleanup;

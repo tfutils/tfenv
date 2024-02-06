@@ -2,7 +2,7 @@
 
 set -uo pipefail;
 
-echo 'Usage: tfenv <command> [<options>]
+echo "Usage: tfenv <command> [<options>]
 
 Commands:
    install       Install a specific version of Terraform
@@ -13,6 +13,6 @@ Commands:
    version-name  Print current version
    init          Update environment to use 'tfenv' correctly.
    pin           Write the current active version to ./.terraform-version
-';
+";
 
 exit 0;

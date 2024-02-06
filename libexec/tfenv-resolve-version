@@ -71,7 +71,7 @@ declare version_requested version regex min_required version_file;
 
 declare arg="${1:-""}";
 
-if [ -z "${arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+if [ -z "${arg}" ] && [ -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
   version_file="$(tfenv-version-file)";
   log 'debug' "Version File: ${version_file}";
 
@@ -91,7 +91,7 @@ if [ -z "${arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
       version_requested='latest';
     fi;
 
-  else 
+  else
     log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version) but it doesn't exist";
     log 'debug' 'No version requested on the command line or in the version file search path. Installing "latest"';
     version_requested='latest';
