@@ -10,7 +10,7 @@ function tfenv-version-name() {
       && log 'debug' "TFENV_VERSION_FILE retrieved from tfenv-version-file: ${TFENV_VERSION_FILE}" \
       || log 'error' 'Failed to retrieve TFENV_VERSION_FILE from tfenv-version-file';
 
-    TFENV_VERSION="$(cat "${TFENV_VERSION_FILE}" || true)" \
+    TFENV_VERSION="$(cat "${TFENV_VERSION_FILE}" || true | tr -d '\r')" \
       && log 'debug' "TFENV_VERSION specified in TFENV_VERSION_FILE: ${TFENV_VERSION}";
 
     TFENV_VERSION_SOURCE="${TFENV_VERSION_FILE}";
