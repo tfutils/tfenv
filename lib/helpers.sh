@@ -152,24 +152,6 @@ function check_dependencies() {
   fi;
 };
 
-function generate_regex_for_latest_allowed_stable() {
-    local constraint="$1"
-
-    # Extract major, minor, patch, and optional pre-release tag
-    local major minor patch pre_release
-    IFS='.-' read -r major minor patch pre_release <<< "$constraint"
-
-    # Start building the regex pattern
-    local regex="^${major}\."
-    regex+="("
-    regex+="${minor}\.${patch}-${pre_release}"
-    regex+="|$(seq 0 $(($minor - 1)) | sed 's/[0-9]*/&\.[0-9]+|/g' | tr -d '\n')"
-    regex="${regex%|}"
-    regex+=")$"
-
-    echo "$regex"
-}
-
 export -f check_dependencies;
 
 source "$TFENV_ROOT/lib/tfenv-exec.sh";
