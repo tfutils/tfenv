@@ -126,6 +126,8 @@ function cleanup() {
   rm -rf ./.terraform-version;
   log 'debug' "Deleting ${pwd}/latest_allowed.tf";
   rm -rf ./latest_allowed.tf;
+  log 'debug' "Deleting ${pwd}/latest_allowed_stable.tf";
+    rm -rf ./latest_allowed_stable.tf;
   log 'debug' "Deleting ${pwd}/min_required.tf";
   rm -rf ./min_required.tf;
   log 'debug' "Deleting ${pwd}/chdir-dir";
@@ -149,6 +151,7 @@ function check_dependencies() {
     alias grep=ggrep;
   fi;
 };
+
 export -f check_dependencies;
 
 source "$TFENV_ROOT/lib/tfenv-exec.sh";
