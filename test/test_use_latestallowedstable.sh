@@ -53,62 +53,74 @@ declare -a errors=();
 cleanup || log 'error' 'Cleanup failed?!';
 
 
-log 'info' '### Install latest-allowed normal version (#.#.#)';
+log 'info' '### Install latest-allowed-stable normal version (#.#.#)';
 
 echo "terraform {
   required_version = \"~> 1.1.0\"
-}" > latest_allowed.tf;
+}" > latest_allowed_stable.tf;
 
 (
-  tfenv install latest-allowed;
-  tfenv use latest-allowed;
+  tfenv install latest-allowed-stable;
+  tfenv use latest-allowed-stable;
   check_active_version 1.1.9;
-) || error_and_proceed 'Latest allowed version does not match';
+) || error_and_proceed 'Latest allowed stable version does not match';
 
 cleanup || log 'error' 'Cleanup failed?!';
 
-
-log 'info' '### Install latest-allowed tagged version (#.#.#-tag#)'
+log 'info' '### Install latest-allowed-stable tagged version (#.#.#-tag#)'
 
 echo "terraform {
     required_version = \"<=0.13.0-rc1\"
-}" > latest_allowed.tf;
+}" > latest_allowed_stable.tf;
 
 (
-  tfenv install latest-allowed;
-  tfenv use latest-allowed;
-  check_active_version 0.13.0-rc1;
-) || error_and_proceed 'Latest allowed tagged-version does not match';
+  tfenv install latest-allowed-stable;
+  tfenv use latest-allowed-stable;
+  check_active_version 0.12.31;
+) || error_and_proceed 'Latest allowed stable tagged-version does not match';
 
 cleanup || log 'error' 'Cleanup failed?!';
 
 
-log 'info' '### Install latest-allowed incomplete version (#.#.<missing>)'
+echo "terraform {
+    required_version = \"<=1.1.0-alpha20211006\"
+}" > latest_allowed_stable.tf;
+
+(
+  tfenv install latest-allowed-stable;
+  tfenv use latest-allowed-stable;
+  check_active_version 1.0.11;
+) || error_and_proceed 'Latest allowed stable tagged-version does not match';
+
+cleanup || log 'error' 'Cleanup failed?!';
+
+
+log 'info' '### Install latest-allowed-stable incomplete version (#.#.<missing>)'
 
 echo "terraform {
   required_version = \"~> 0.12\"
-}" >> latest_allowed.tf;
+}" >> latest_allowed_stable.tf;
 
 (
-  tfenv install latest-allowed;
-  tfenv use latest-allowed;
+  tfenv install latest-allowed-stable;
+  tfenv use latest-allowed-stable;
   check_active_version 0.15.5;
-) || error_and_proceed 'Latest allowed incomplete-version does not match';
+) || error_and_proceed 'Latest allowed stable incomplete-version does not match';
 
 cleanup || log 'error' 'Cleanup failed?!';
 
 
-log 'info' '### Install latest-allowed with TFENV_AUTO_INSTALL';
+log 'info' '### Install latest-allowed-stable with TFENV_AUTO_INSTALL';
 
 echo "terraform {
   required_version = \"~> 1.0.0\"
-}" >> latest_allowed.tf;
-echo 'latest-allowed' > .terraform-version;
+}" >> latest_allowed_stable.tf;
+echo 'latest-allowed-stable' > .terraform-version;
 
 (
   TFENV_AUTO_INSTALL=true terraform version;
   check_active_version 1.0.11;
-) || error_and_proceed 'Latest allowed auto-installed version does not match';
+) || error_and_proceed 'Latest allowed stable auto-installed version does not match';
 
 cleanup || log 'error' 'Cleanup failed?!';
 
@@ -119,7 +131,7 @@ mkdir -p chdir-dir
 echo "terraform {
   required_version = \"~> 0.14.3\"
 }" >> chdir-dir/latest_allowed.tf;
-echo 'latest-allowed' > chdir-dir/.terraform-version
+echo 'latest-allowed-stable' > chdir-dir/.terraform-version
 
 (
   TFENV_AUTO_INSTALL=true terraform -chdir=chdir-dir version;
