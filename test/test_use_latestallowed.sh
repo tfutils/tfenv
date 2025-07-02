@@ -63,7 +63,7 @@ echo "terraform {
   tfenv install latest-allowed;
   tfenv use latest-allowed;
   check_active_version 1.1.9;
-) || error_and_proceed 'Latest allowed version does not match';
+) || error_and_proceed 'Latest allowed version does not match. Requested: "~> 1.1.0", Expected: 1.1.9';
 
 cleanup || log 'error' 'Cleanup failed?!';
 
@@ -78,7 +78,7 @@ echo "terraform {
   tfenv install latest-allowed;
   tfenv use latest-allowed;
   check_active_version 0.13.0-rc1;
-) || error_and_proceed 'Latest allowed tagged-version does not match';
+) || error_and_proceed 'Latest allowed tagged-version does not match. Requested: "<=0.13.0-rc1", Expected: 0.13.0-rc1';
 
 cleanup || log 'error' 'Cleanup failed?!';
 
@@ -93,7 +93,7 @@ echo "terraform {
   tfenv install latest-allowed;
   tfenv use latest-allowed;
   check_active_version 0.15.5;
-) || error_and_proceed 'Latest allowed incomplete-version does not match';
+) || error_and_proceed 'Latest allowed incomplete-version does not match. Requested: "~> 0.12", Expected: 0.15.5';
 
 cleanup || log 'error' 'Cleanup failed?!';
 
@@ -108,7 +108,7 @@ echo 'latest-allowed' > .terraform-version;
 (
   TFENV_AUTO_INSTALL=true terraform version;
   check_active_version 1.0.11;
-) || error_and_proceed 'Latest allowed auto-installed version does not match';
+) || error_and_proceed 'Latest allowed auto-installed version does not match. Requested: "~> 1.0.0", Expected: 1.0.11';
 
 cleanup || log 'error' 'Cleanup failed?!';
 
@@ -124,7 +124,7 @@ echo 'latest-allowed' > chdir-dir/.terraform-version
 (
   TFENV_AUTO_INSTALL=true terraform -chdir=chdir-dir version;
   check_active_version 0.14.11 chdir-dir;
-) || error_and_proceed 'Latest allowed version from -chdir does not match';
+) || error_and_proceed 'Latest allowed version from -chdir does not match. Requested: "~> 0.14.3", Expected: 0.14.11';
 
 cleanup || log 'error' 'Cleanup failed?!';
 

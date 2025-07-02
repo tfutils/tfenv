@@ -142,7 +142,7 @@ if [[ "${version_requested}" =~ ^latest-allowed$ ]]; then
       ;;
     '~>'*)
       version_without_rightmost="${version_num%.*}";
-      version_requested="latest:^${version_without_rightmost}";
+      version_requested="latest:^${version_without_rightmost}\.";
       ;;
     *)
       log 'error' "Unsupported version spec: '${version_spec}', only >, >=, <=, and ~> are supported.";
