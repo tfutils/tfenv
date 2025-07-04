@@ -2,11 +2,39 @@
 
 set -uo pipefail;
 
+function realpath-relative-to() {
+  # A basic implementation of GNU `realpath --relative-to=$1 $2`
+  # that can also be used on macOS.
+
+  # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
+  readlink_f() {
+    local target_file="${1}";
+    local file_name;
+
+    while [ "${target_file}" != "" ]; do
+      cd "$(dirname "$target_file")" || early_death "Failed to 'cd \$(${target_file%/*})'";
+      file_name="${target_file##*/}" || early_death "Failed to '\"${target_file##*/}\"'";
+      target_file="$(readlink "${file_name}")";
+    done;
+
+    echo "$(pwd -P)/${file_name}";
+  };
+
+  local relative_to="$(readlink_f "${1}")";
+  local path="$(readlink_f "${2}")";
+
+  echo "${path#"${relative_to}/"}";
+  return 0;
+}
+export -f realpath-relative-to;
+
 function tfenv-exec() {
   for _arg in ${@:1}; do
     if [[ "${_arg}" == -chdir=* ]]; then
-      log 'debug' "Found -chdir arg. Setting TFENV_DIR to: ${_arg#-chdir=}";
-      export TFENV_DIR="${PWD}/${_arg#-chdir=}";
+      chdir="${_arg#-chdir=}";
+      log 'debug' "Found -chdir arg: ${chdir}";
+      export TFENV_DIR="${PWD}/$(realpath-relative-to "${PWD}" "${chdir}")";
+      log 'debug' "Setting TFENV_DIR to: ${TFENV_DIR}";
     fi;
   done;
 
