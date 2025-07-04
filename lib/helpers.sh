@@ -152,6 +152,10 @@ function check_dependencies() {
     if command -v ggrep >/dev/null 2>&1; then
       shopt -s expand_aliases;
       alias grep=ggrep;
+
+      # The alias can't be defined and used in the same parsing unit. But
+      # since we know the correct package is installed, we can exit early.
+      exit
     fi;
 
     if ! grep --version 2>&1 | grep -q "GNU grep"; then
