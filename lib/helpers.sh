@@ -118,6 +118,13 @@ export -f check_default_version;
 function cleanup() {
   log 'info' 'Performing cleanup';
   local pwd="$(pwd)";
+  
+  # Safety check to ensure TFENV_CONFIG_DIR is set and not empty
+  if [ -z "${TFENV_CONFIG_DIR:-""}" ]; then
+    log 'error' 'TFENV_CONFIG_DIR is not set, cannot perform cleanup safely';
+    return 1;
+  fi;
+  
   log 'debug' "Deleting ${TFENV_CONFIG_DIR}/version";
   rm -rf "${TFENV_CONFIG_DIR}/version";
   log 'debug' "Deleting ${TFENV_CONFIG_DIR}/versions";
