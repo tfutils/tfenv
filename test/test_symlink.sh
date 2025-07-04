@@ -48,6 +48,8 @@ fi;
 # Begin Script Body #
 #####################
 
+export PATH="${TFENV_ROOT}/bin:${PATH}";
+
 declare -a errors=();
 
 log 'info' '### Testing symlink functionality';
@@ -55,8 +57,8 @@ log 'info' '### Testing symlink functionality';
 TFENV_BIN_DIR='/tmp/tfenv-test';
 log 'info' "## Creating/clearing ${TFENV_BIN_DIR}"
 rm -rf "${TFENV_BIN_DIR}" && mkdir "${TFENV_BIN_DIR}";
-log 'info' "## Symlinking ${PWD}/bin/* into ${TFENV_BIN_DIR}";
-ln -s "${PWD}"/bin/* "${TFENV_BIN_DIR}";
+log 'info' "## Symlinking ${TFENV_ROOT}/bin/* into ${TFENV_BIN_DIR}";
+ln -s "${TFENV_ROOT}"/bin/* "${TFENV_BIN_DIR}";
 
 cleanup || log 'error' 'Cleanup failed?!';
 

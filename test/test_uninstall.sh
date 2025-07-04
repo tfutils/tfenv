@@ -48,6 +48,8 @@ fi;
 # Begin Script Body #
 #####################
 
+export PATH="${TFENV_ROOT}/bin:${PATH}";
+
 declare -a errors=();
 
 function test_uninstall() {
@@ -94,11 +96,11 @@ cleanup || error_and_die "Cleanup failed?!"
 (
   tfenv install 0.12.1 || exit 1
   tfenv install 0.12.2 || exit 1
-  [ -d "./versions" ] || exit 1
+  [ -d "${TFENV_CONFIG_DIR}/versions" ] || exit 1
   tfenv uninstall 0.12.1 || exit 1
-  [ -d "./versions" ] || exit 1
+  [ -d "${TFENV_CONFIG_DIR}/versions" ] || exit 1
   tfenv uninstall 0.12.2 || exit 1
-  [ -d "./versions" ] && exit 1 || exit 0
+  [ -d "${TFENV_CONFIG_DIR}/versions" ] && exit 1 || exit 0
 ) || error_and_proceed "Removing last version deletes versions directory"
 
 if [ "${#errors[@]}" -gt 0 ]; then

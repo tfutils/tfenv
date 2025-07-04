@@ -48,6 +48,8 @@ fi;
 # Begin Script Body #
 #####################
 
+export PATH="${TFENV_ROOT}/bin:${PATH}";
+
 declare -a errors=();
 
 cleanup || log 'error' 'Cleanup failed?!';

@@ -118,10 +118,10 @@ export -f check_default_version;
 function cleanup() {
   log 'info' 'Performing cleanup';
   local pwd="$(pwd)";
-  log 'debug' "Deleting ${pwd}/version";
-  rm -rf ./version;
-  log 'debug' "Deleting ${pwd}/versions";
-  rm -rf ./versions;
+  log 'debug' "Deleting ${TFENV_CONFIG_DIR}/version";
+  rm -rf "${TFENV_CONFIG_DIR}/version";
+  log 'debug' "Deleting ${TFENV_CONFIG_DIR}/versions";
+  rm -rf "${TFENV_CONFIG_DIR}/versions";
   log 'debug' "Deleting ${pwd}/.terraform-version";
   rm -rf ./.terraform-version;
   log 'debug' "Deleting ${pwd}/latest_allowed.tf";

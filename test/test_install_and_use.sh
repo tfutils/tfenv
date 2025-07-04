@@ -47,6 +47,8 @@ fi;
 # Begin Script Body #
 #####################
 
+export PATH="${TFENV_ROOT}/bin:${PATH}";
+
 test_install_and_use() {
   # Takes a static version and the optional keyword to install it with
   local k="${2-""}";
