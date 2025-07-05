@@ -77,7 +77,7 @@ function tfenv-version-name() {
             TFENV_VERSION="${local_version}";
           fi;
       else
-        log 'error' "No versions matching '${requested}' found in remote";
+        log 'error' "No versions matching '${TFENV_VERSION}' found in remote";
       fi;
     else
       if [[ -n "${local_version}" ]]; then
