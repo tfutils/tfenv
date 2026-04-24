@@ -60,5 +60,22 @@ cleanup || error_and_proceed "Cleanup failed?!"
   [ -d "${TFENV_CONFIG_DIR}/versions" ] && exit 1 || exit 0
 ) || error_and_proceed "Removing last version deletes versions directory"
 
+log 'info' '### Multi-version uninstall';
+cleanup || log 'error' 'Cleanup failed?!';
+(
+  tfenv install 0.12.1 || exit 1;
+  tfenv install 0.12.2 || exit 1;
+  tfenv install 0.12.3 || exit 1;
+  # Uninstall multiple versions in one command
+  tfenv uninstall 0.12.1 0.12.3 || exit 1;
+  # 0.12.2 should still be present
+  [ -d "${TFENV_CONFIG_DIR}/versions/0.12.2" ] || { echo '0.12.2 should still exist'; exit 1; };
+  # 0.12.1 and 0.12.3 should be gone
+  [ -d "${TFENV_CONFIG_DIR}/versions/0.12.1" ] && { echo '0.12.1 should be removed'; exit 1; };
+  [ -d "${TFENV_CONFIG_DIR}/versions/0.12.3" ] && { echo '0.12.3 should be removed'; exit 1; };
+  exit 0;
+) && log 'info' '### Multi-version uninstall passed' \
+  || error_and_proceed 'Multi-version uninstall failed';
+
 finish_tests 'uninstall';
 exit 0;
