@@ -105,6 +105,29 @@ cleanup || log 'error' 'Cleanup failed?!';
 ) && log 'info' '## version-file: working directory resolution passed' \
   || error_and_proceed 'version-file did not find .terraform-version from working directory';
 
+
+log 'info' '## version-file: comments and blank lines are stripped';
+cleanup || log 'error' 'Cleanup failed?!';
+(
+  # Write a version file with comments and blank lines
+  printf '# This is a comment\n\n# Use 1.0 series\nlatest:^1\\.0\\.\n\n' > .terraform-version;
+  declare vn;
+  vn="$(tfenv version-name)";
+  # Should resolve to the version spec, not the comment
+  [[ "${vn}" =~ ^1\.0\. ]] || { echo "Expected 1.0.x but got: ${vn}"; exit 1; };
+) && log 'info' '## version-file: comments stripped passed' \
+  || error_and_proceed 'version-file did not strip comments correctly';
+
+log 'info' '## version-file: inline comments are stripped';
+cleanup || log 'error' 'Cleanup failed?!';
+(
+  echo '1.0.0 # pinned for compatibility' > .terraform-version;
+  declare vn;
+  vn="$(tfenv version-name)";
+  [ "${vn}" == '1.0.0' ] || { echo "Expected 1.0.0 but got: ${vn}"; exit 1; };
+) && log 'info' '## version-file: inline comments passed' \
+  || error_and_proceed 'version-file did not strip inline comments correctly';
+
 finish_tests 'version_file';
 
 exit 0;
