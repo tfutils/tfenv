@@ -109,6 +109,14 @@ function curlw () {
 };
 export -f curlw;
 
+# Read a version file, stripping comments (lines starting with #) and blank lines,
+# and removing carriage returns for Windows/WSL compatibility.
+function read_version_file() {
+  local file="${1}";
+  sed -e 's/#.*$//' -e 's/[[:space:]]*$//' -e '/^[[:space:]]*$/d' "${file}" | tr -d '\r';
+};
+export -f read_version_file;
+
 function check_active_version() {
   local v="${1}";
   local maybe_chdir=;
@@ -137,7 +145,7 @@ export -f check_installed_version;
 
 function check_default_version() {
   local v="${1}";
-  local def="$(cat "${TFENV_CONFIG_DIR}/version")";
+  local def="$(read_version_file "${TFENV_CONFIG_DIR}/version")";
   [ "${def}" == "${v}" ];
 };
 export -f check_default_version;
@@ -154,6 +162,8 @@ function cleanup() {
   
   log 'debug' "Deleting ${TFENV_CONFIG_DIR}/version";
   rm -rf "${TFENV_CONFIG_DIR}/version";
+  log 'debug' "Deleting ${TFENV_CONFIG_DIR}/version.prev";
+  rm -rf "${TFENV_CONFIG_DIR}/version.prev";
   log 'debug' "Deleting ${TFENV_CONFIG_DIR}/versions";
   rm -rf "${TFENV_CONFIG_DIR}/versions";
   log 'debug' "Deleting ${pwd}/.terraform-version";

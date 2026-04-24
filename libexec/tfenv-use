@@ -72,11 +72,23 @@ declare version_source_suffix="";
 declare requested="${requested_arg}";
 declare loaded_version_file="$(tfenv-version-file)";
 
+# Handle 'tfenv use -' to switch to previous version
+if [ "${requested_arg}" == '-' ]; then
+  declare prev_file="${TFENV_CONFIG_DIR}/version.prev";
+  [ -f "${prev_file}" ] \
+    || log 'error' 'No previous version to switch to. Use tfenv use <version> first.';
+  requested_arg="$(cat "${prev_file}" | tr -d '\r')";
+  [ -n "${requested_arg}" ] \
+    || log 'error' 'Previous version file is empty.';
+  requested="${requested_arg}";
+  log 'info' "Switching to previous version: ${requested_arg}";
+fi;
+
 if [ -z "${requested_arg}" -a -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
   version_source_suffix=" (set by ${loaded_version_file})";
 
   if [ -f "${loaded_version_file}" ]; then
-    requested="$(cat "${loaded_version_file}" || true)";
+    requested="$(read_version_file "${loaded_version_file}" || true)";
   else
     # No-one asked for anything, no default version is set either
     requested='latest';
@@ -154,6 +166,18 @@ log 'debug' "target_path is ${TFENV_CONFIG_DIR}/versions/${installed_version}";
 
 log 'info' "Switching default version to v${installed_version}";
 version_file="${TFENV_CONFIG_DIR}/version";
+
+# Save current version as previous before overwriting
+if [ -f "${version_file}" ]; then
+  declare current_version;
+  current_version="$(cat "${version_file}" | tr -d '\r')" || true;
+  if [ -n "${current_version}" ] && [ "${current_version}" != "${installed_version}" ]; then
+    log 'debug' "Saving previous version '${current_version}' to ${version_file}.prev";
+    echo "${current_version}" > "${version_file}.prev" \
+      || log 'warn' "Failed to save previous version to ${version_file}.prev";
+  fi;
+fi;
+
 log 'debug' "Writing \"${installed_version}\" to \"${version_file}\"";
 echo "${installed_version}" > "${version_file}" \
   || log 'error' "Switch to v${installed_version} failed";

@@ -110,11 +110,11 @@ if [ "${#}" -eq 0 ] && [ -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
   log 'debug' "Version File: ${version_file}";
   if [ "${version_file}" != "${TFENV_CONFIG_DIR}/version" ]; then
     log 'debug' "Version File (${version_file}) is not the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version)";
-    versions_to_uninstall+=("$(cat "${version_file}")") \
+    versions_to_uninstall+=("$(read_version_file "${version_file}")") \
       || log 'error' "Failed to open ${version_file}";
   elif [ -f "${version_file}" ]; then
     log 'debug' "Version File is the default \${TFENV_CONFIG_DIR}/version (${TFENV_CONFIG_DIR}/version)";
-    versions_to_uninstall+=("$(cat "${version_file}")") \
+    versions_to_uninstall+=("$(read_version_file "${version_file}")") \
       || log 'error' "Failed to open ${version_file}";
   else
     log 'error' 'No version requested on the command line or in the version file search path.';
