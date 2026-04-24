@@ -73,8 +73,18 @@ remote_versions="$(curlw -sSf "${TFENV_REMOTE}/terraform/")" \
 
 #log 'debug' "Remote versions available: ${remote_versions}"; # Even in debug mode this is too verbose
 
-if [[ "${TFENV_REVERSE_REMOTE:-0}" -eq 1 ]]; then
-  grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)-?[0-9]*)?" <<<"${remote_versions}" | uniq | awk '{a[i++]=$0} END {for (j=i-1; j>=0;) print a[j--] }';
-else
-  grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)-?[0-9]*)?" <<<"${remote_versions}" | uniq;
+# Filter out non-version lines (e.g. Artifactory server headers)
+remote_versions="$(grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta|alpha|oci)-?[0-9]*)?" <<< "${remote_versions}" | uniq)";
+
+# When using custom remotes (e.g. Artifactory), versions may be sorted
+# alphabetically rather than by version. Use version-aware sort to fix.
+if [[ "${TFENV_SORT_VERSIONS_REMOTE:-0}" -eq 1 ]]; then
+  remote_versions="$(sort -t'.' -k 1n,1 -k 2n,2 -k 3n,3 <<< "${remote_versions}")";
 fi;
+
+# Reverse the order if requested
+if [[ "${TFENV_REVERSE_REMOTE:-0}" -eq 1 ]]; then
+  remote_versions="$(awk '{a[i++]=$0} END {for (j=i-1; j>=0;) print a[j--] }' <<< "${remote_versions}")";
+fi;
+
+echo "${remote_versions}";
