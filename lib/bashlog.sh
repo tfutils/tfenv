@@ -27,7 +27,7 @@ function log() {
   local file_path="${BASHLOG_FILE_PATH:-/tmp/${0##*/}.log}";
   local json_path="${BASHLOG_JSON_PATH:-/tmp/${0##*/}.log.json}";
 
-  local tag="${BASHLOG_SYSLOG_TAG:-${0##*/})}";
+  local tag="${BASHLOG_SYSLOG_TAG:-${0##*/}}";
   local facility="${BASHLOG_SYSLOG_FACILITY:-local0}";
   local pid="${$}";
 
