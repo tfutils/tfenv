@@ -14,7 +14,7 @@ Currently tfenv supports the following OSes
 - Linux
   - 64bit
   - Arm
-- Windows (64bit) - only tested in git-bash - currently presumed failing due to symlink issues in git-bash
+- Windows (64bit) - tested in git-bash. Ensure `core.symlinks` is enabled (`git config --global core.symlinks true`)
 
 ## Installation
 
@@ -154,6 +154,18 @@ terraform {
   required_version  = "~> 0.10.0, <0.12.3"
 }
 ```
+
+##### Supported `latest-allowed` constraint operators
+
+`latest-allowed` reads the first `required_version` value from your `.tf` files and resolves
+the latest installable version. Only the first constraint before any comma is evaluated.
+
+| Constraint | Behaviour | Example | Resolves to |
+|------------|-----------|---------|-------------|
+| `>` or `>=` | Installs the latest available version | `">= 1.0.0"` | latest |
+| `<=` | Installs that exact version | `"<= 1.2.3"` | `1.2.3` |
+| `~>` | Installs the latest version matching the prefix | `"~> 1.2.0"` | latest `1.2.x` |
+| `=` or bare version | Installs that exact version | `"0.12.31"` or `"= 0.12.31"` | `0.12.31` |
 
 ### Environment Variables
 
