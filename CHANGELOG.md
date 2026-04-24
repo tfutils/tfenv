@@ -1,3 +1,10 @@
+## 3.2.0 (April 24, 2026)
+
+ * NEW FEATURE: Support comments in `.terraform-version` files — lines starting with `#` and inline `#` comments are stripped, fixing #391 and #283 (Mike Peachey <mike.peachey@bjss.com>)
+ * NEW FEATURE: Support uninstalling multiple versions in a single `tfenv uninstall` invocation, fixing #449 (Mike Peachey <mike.peachey@bjss.com>)
+ * NEW FEATURE: Show binary architecture in `tfenv list` output (e.g. `amd64`, `arm64`), fixing #321 (Mike Peachey <mike.peachey@bjss.com>)
+ * NEW FEATURE: Support `tfenv use -` to switch to the previously active version, fixing #378 (Mike Peachey <mike.peachey@bjss.com>)
+
 ## 3.1.0 (April 24, 2026)
 
  * NEW FEATURE: Add `latest-allowed` version resolution from `required_version` constraint in Terraform files, supporting `=`, `>=`, `>`, `<=`, and `~>` operators (Oliver Ford <dev@ojford.com>, Mike Peachey <mike.peachey@bjss.com>)
