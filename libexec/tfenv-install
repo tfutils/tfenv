@@ -170,7 +170,8 @@ fi;
 download_tmp="$(mktemp -d ${tmpdir_arg} tfenv_download.XXXXXX)" || log 'error' "Unable to create temporary download directory (mktemp -d ${tmpdir_arg} tfenv_download.XXXXXX). Working Directory is: $(pwd)";
 
 # Clean it up in case of error
-trap "rm -rf ${download_tmp}" EXIT;
+cleanup_download() { rm -rf "${download_tmp}"; }
+trap cleanup_download EXIT;
 
 declare curl_progress="";
 case "${TFENV_CURL_OUTPUT:-2}" in
