@@ -84,6 +84,41 @@ if [ -f "${dst_path}/terraform" ]; then
   exit 0;
 fi;
 
+# Acquire a per-version lock to prevent concurrent installs of the same version.
+# Uses mkdir as a portable atomic lock (works on Linux, macOS, and Windows/MSYS).
+declare lockdir="${TFENV_CONFIG_DIR}/.install-lock-${version}";
+declare lock_retries=0;
+declare lock_max_retries=60;
+
+cleanup_lock() {
+  rmdir "${lockdir}" 2>/dev/null || true;
+};
+
+while ! mkdir "${lockdir}" 2>/dev/null; do
+  if [ "${lock_retries}" -eq 0 ]; then
+    log 'info' "Another process is installing Terraform v${version}. Waiting...";
+  fi;
+  lock_retries=$((lock_retries + 1));
+  if [ "${lock_retries}" -ge "${lock_max_retries}" ]; then
+    log 'warn' "Lock wait timeout after ${lock_max_retries}s. Removing stale lock and retrying.";
+    rmdir "${lockdir}" 2>/dev/null || true;
+    if ! mkdir "${lockdir}" 2>/dev/null; then
+      log 'error' "Failed to acquire install lock for Terraform v${version}";
+    fi;
+    break;
+  fi;
+  # Check if the version appeared while we were waiting (another process finished)
+  if [ -f "${dst_path}/terraform" ]; then
+    echo "Terraform v${version} was installed by another process while waiting";
+    exit 0;
+  fi;
+  sleep 1;
+done;
+
+# Ensure lock is released on exit (normal, error, or signal)
+trap 'cleanup_lock' EXIT;
+trap 'cleanup_lock; exit 1' INT TERM;
+
 case "$(uname -s)" in
   Darwin*)
     kernel="darwin";
@@ -173,7 +208,8 @@ download_tmp="$(mktemp -d ${tmpdir_arg} tfenv_download.XXXXXX)" || log 'error' "
 
 # Clean it up in case of error
 cleanup_download() { rm -rf "${download_tmp}"; }
-trap cleanup_download EXIT;
+trap 'cleanup_download; cleanup_lock' EXIT;
+trap 'cleanup_download; cleanup_lock; exit 1' INT TERM;
 
 declare curl_progress="";
 case "${TFENV_CURL_OUTPUT:-2}" in
