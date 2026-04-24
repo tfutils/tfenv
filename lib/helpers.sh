@@ -65,20 +65,19 @@ fi;
 
 # Curl wrapper to switch TLS option for each OS
 function curlw () {
-  local TLS_OPT="--tlsv1.2";
+  local -a tls_opt=(--tlsv1.2);
 
   # Check if curl is 10.12.6 or above
   if [[ -n "$(command -v sw_vers 2>/dev/null)" && ("$(sw_vers)" =~ 10\.12\.([6-9]|[0-9]{2}) || "$(sw_vers)" =~ 10\.1[3-9]) ]]; then
-    TLS_OPT="";
+    tls_opt=();
   fi;
 
+  local -a netrc_opt=();
   if [[ ! -z "${TFENV_NETRC_PATH:-""}" ]]; then
-    NETRC_OPT="--netrc-file ${TFENV_NETRC_PATH}";
-  else
-    NETRC_OPT="";
+    netrc_opt=(--netrc-file "${TFENV_NETRC_PATH}");
   fi;
 
-  curl ${TLS_OPT} ${NETRC_OPT} "$@";
+  curl ${tls_opt[@]+"${tls_opt[@]}"} ${netrc_opt[@]+"${netrc_opt[@]}"} "$@";
 };
 export -f curlw;
 
