@@ -136,7 +136,13 @@ function log() {
   # Standard Output (Pretty)
   case "${level}" in
     'info'|'warn')
-      echo -e "${std_line}";
+      if [ "${TFENV_SHIM_MODE:-0}" -eq 1 ]; then
+        # In shim mode (bin/terraform), all tfenv output goes to stderr
+        # to avoid corrupting terraform's stdout (e.g. terraform version -json | jq)
+        echo -e "${std_line}" >&2;
+      else
+        echo -e "${std_line}";
+      fi;
       ;;
     'debug')
       if [ "${debug_level}" -gt 0 ]; then
