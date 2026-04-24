@@ -126,7 +126,7 @@ tfenv install
 ```
 
 The `trust-tfenv` directive means that verification uses a copy of the
-Hashicorp OpenPGP key found in the tfenv repository.  Skipping that directive
+Hashicorp OpenPGP key found in the tfenv repository. Skipping that directive
 means that the Hashicorp key must be in the existing default trusted keys.
 Use the file `${TFENV_INSTALL_DIR}/use-gnupg` to instead invoke the full `gpg` tool and
 see web-of-trust status; beware that a lack of trust path will not cause a
@@ -229,6 +229,20 @@ functionality will be restored.
 
 ```console
 TFENV_REVERSE_REMOTE=1 tfenv list-remote
+```
+
+##### `TFENV_SKIP_REMOTE_CHECK`
+
+Integer (Default: 0)
+
+When using a custom remote, such as Artifactory, lazy caching may be used meaning the versions
+returned by the remote aren't the full list available (more can be pulled on demand). This option 
+disables the pre-install validation and will blindly pull the requested version from the remote. When
+using `latest` as the specified version, this will still rely on the latest version returned from the
+configured remote.
+
+```console
+TFENV_SKIP_REMOTE_CHECK=1 tfenv install 1.14.5
 ```
 
 ##### `TFENV_CONFIG_DIR`
