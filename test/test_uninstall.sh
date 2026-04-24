@@ -49,7 +49,7 @@ for ((test_num=0; test_num<${tests_count}; ++test_num )) ; do
 done;
 
 echo "### Uninstall removes versions directory"
-cleanup || error_and_die "Cleanup failed?!"
+cleanup || error_and_proceed "Cleanup failed?!"
 (
   tfenv install 0.12.1 || exit 1
   tfenv install 0.12.2 || exit 1
