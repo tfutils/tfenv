@@ -28,15 +28,6 @@ ${TFENV_BIN_DIR}/tfenv use 1.6.1 || error_and_proceed 'Use failed';
 log 'info' '## Check-Version for 1.6.1';
 check_active_version 1.6.1 || error_and_proceed 'Version check failed';
 
-if [ "${#errors[@]}" -gt 0 ]; then
-  log 'warn' '===== The following symlink tests failed =====';
-  for error in "${errors[@]}"; do
-    log 'warn' "\t${error}";
-  done;
-  log 'error' 'Symlink test failure(s)';
-  exit 1;
-else
-  log 'info' 'All symlink tests passed.';
-fi;
+finish_tests 'symlink';
 
 exit 0;

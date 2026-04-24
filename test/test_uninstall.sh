@@ -60,14 +60,5 @@ cleanup || error_and_proceed "Cleanup failed?!"
   [ -d "${TFENV_CONFIG_DIR}/versions" ] && exit 1 || exit 0
 ) || error_and_proceed "Removing last version deletes versions directory"
 
-if [ "${#errors[@]}" -gt 0 ]; then
-  log 'warn' "===== The following list tests failed =====";
-  for error in "${errors[@]}"; do
-    log 'warn' "\t${error}";
-  done;
-  log 'error' 'List test failure(s)';
-  exit 1;
-else
-  log 'info' 'All list tests passed.';
-fi;
+finish_tests 'uninstall';
 exit 0;

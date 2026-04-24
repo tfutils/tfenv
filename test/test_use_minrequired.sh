@@ -115,15 +115,6 @@ echo 'min-required' > chdir-dir/.terraform-version
 
 cleanup || log 'error' 'Cleanup failed?!';
 
-if [ "${#errors[@]}" -gt 0 ]; then
-  log 'warn' '===== The following use_minrequired tests failed =====';
-  for error in "${errors[@]}"; do
-    log 'warn' "\t${error}";
-  done;
-  log 'error' 'use_minrequired test failure(s)';
-  exit 1;
-else
-  log 'info' 'All use_minrequired tests passed.';
-fi;
+finish_tests 'use_minrequired';
 
 exit 0;
