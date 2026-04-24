@@ -113,7 +113,7 @@ export -f curlw;
 # and removing carriage returns for Windows/WSL compatibility.
 function read_version_file() {
   local file="${1}";
-  sed -e 's/#.*$//' -e '/^[[:space:]]*$/d' "${file}" | tr -d '\r';
+  sed -e 's/#.*$//' -e 's/[[:space:]]*$//' -e '/^[[:space:]]*$/d' "${file}" | tr -d '\r';
 };
 export -f read_version_file;
 
