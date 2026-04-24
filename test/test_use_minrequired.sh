@@ -121,6 +121,7 @@ if [ "${#errors[@]}" -gt 0 ]; then
     log 'warn' "\t${error}";
   done;
   log 'error' 'use_minrequired test failure(s)';
+  exit 1;
 else
   log 'info' 'All use_minrequired tests passed.';
 fi;

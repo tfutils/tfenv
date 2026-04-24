@@ -224,6 +224,7 @@ if [ "${#errors[@]}" -gt 0 ]; then
     log 'warn' "\t${error}";
   done
   log 'error' 'Test failure(s): install_and_use';
+  exit 1;
 else
   log 'info' 'All install_and_use tests passed';
 fi;
