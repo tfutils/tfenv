@@ -29,21 +29,28 @@ tfenv use 0.14.6;
 log 'info' '## Comparing "tfenv list" with default set';
 result="$(tfenv list)";
 
-# Determine expected arch from host platform
-case "$(uname -m)" in
-  x86_64)       expected_arch='amd64';;
-  aarch64|arm64) expected_arch='arm64';;
-  i386|i686)    expected_arch='386';;
-  *)            expected_arch='unknown';;
-esac;
+# Detect arch from each installed binary — can't assume host arch
+# because older versions may only have amd64 builds (e.g. macOS arm64 via Rosetta)
+detect_arch() {
+  local binary="${1}";
+  local file_output;
+  file_output="$(file -b "${binary}" 2>/dev/null)" || { echo 'unknown'; return; };
+  case "${file_output}" in
+    *x86-64*|*x86_64*)  echo 'amd64';;
+    *aarch64*|*arm64*)   echo 'arm64';;
+    *386*|*i386*|*80386*) echo '386';;
+    *ARM,*)              echo 'arm';;
+    *)                   echo 'unknown';;
+  esac;
+};
 
 expected="$(cat << EOS
-* 0.14.6 (${expected_arch}) (set by $(tfenv version-file))
-  0.9.11 (${expected_arch})
-  0.9.2 (${expected_arch})
-  0.9.1 (${expected_arch})
-  0.7.13 (${expected_arch})
-  0.7.2 (${expected_arch})
+* 0.14.6 ($(detect_arch "${TFENV_CONFIG_DIR}/versions/0.14.6/terraform")) (set by $(tfenv version-file))
+  0.9.11 ($(detect_arch "${TFENV_CONFIG_DIR}/versions/0.9.11/terraform"))
+  0.9.2 ($(detect_arch "${TFENV_CONFIG_DIR}/versions/0.9.2/terraform"))
+  0.9.1 ($(detect_arch "${TFENV_CONFIG_DIR}/versions/0.9.1/terraform"))
+  0.7.13 ($(detect_arch "${TFENV_CONFIG_DIR}/versions/0.7.13/terraform"))
+  0.7.2 ($(detect_arch "${TFENV_CONFIG_DIR}/versions/0.7.2/terraform"))
 EOS
 )";
 
