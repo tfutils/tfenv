@@ -17,11 +17,11 @@ RUN wget -O /tmp/tfenv.tar.gz "https://github.com/tfutils/tfenv/archive/refs/tag
     && mv "/tmp/tfenv-${TFENV_VERSION}/LICENSE" /usr/local/share/licenses/tfenv \
     && rm -rf /tmp/tfenv* \
     ;
-ENV TFENV_ROOT /usr/local/lib/tfenv
+ENV TFENV_ROOT=/usr/local/lib/tfenv
 
-ENV TFENV_CONFIG_DIR /var/tfenv
+ENV TFENV_CONFIG_DIR=/var/tfenv
 VOLUME /var/tfenv
 
 # Default to latest; user-specifiable
-ENV TFENV_TERRAFORM_VERSION latest
+ENV TFENV_TERRAFORM_VERSION=latest
 ENTRYPOINT ["/usr/local/bin/terraform"]
