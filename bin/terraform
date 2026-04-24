@@ -58,6 +58,12 @@ done;
 # Begin Script Body #
 #####################
 
+# Signal to bashlog that we are in the terraform shim context.
+# All tfenv log output (info, warn) should go to stderr so it does
+# not mix with terraform's stdout and break piped commands like:
+#   terraform version -json | jq
+export TFENV_SHIM_MODE=1;
+
 log 'debug' "program=\"${0##*/}\"";
 
 declare tfenv_path="${TFENV_ROOT}/bin/tfenv";
