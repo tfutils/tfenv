@@ -146,7 +146,12 @@ if [[ "${version_requested}" =~ ^latest-allowed$ ]]; then
       version_requested="latest:^${version_without_rightmost}\.";
       ;;
     *)
-      log 'error' "Unsupported version spec: '${version_spec}', only >, >=, <=, and ~> are supported.";
+      # Treat bare version numbers (e.g. "0.12.31") and = prefix as exact pins
+      if [[ "${version_num}" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+        version_requested="${version_num}";
+      else
+        log 'error' "Unsupported version spec: '${version_spec}', only exact versions, >, >=, <=, and ~> are supported.";
+      fi;
       ;;
   esac;
   log 'debug' "Determined the requested version to be: ${version_requested}";
