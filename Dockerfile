@@ -6,7 +6,7 @@ RUN apk add --no-cache --purge \
     curl \
     ;
 
-ARG TFENV_VERSION=3.0.0
+ARG TFENV_VERSION=3.1.0
 RUN wget -O /tmp/tfenv.tar.gz "https://github.com/tfutils/tfenv/archive/refs/tags/v${TFENV_VERSION}.tar.gz" \
     && tar -C /tmp -xf /tmp/tfenv.tar.gz \
     && mv "/tmp/tfenv-${TFENV_VERSION}/bin"/* /usr/local/bin/ \
