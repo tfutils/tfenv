@@ -50,12 +50,12 @@ function tfenv-exec() {
   export TFENV_VERSION;
 
   if [ ! -d "${TFENV_CONFIG_DIR}/versions/${TFENV_VERSION}" ]; then
-  if [ "${TFENV_AUTO_INSTALL:-true}" == "true" ]; then
-    if [ -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
-      TFENV_VERSION_SOURCE="$(tfenv-version-file)";
-    else
-      TFENV_VERSION_SOURCE='TFENV_TERRAFORM_VERSION';
-    fi;
+    if [ "${TFENV_AUTO_INSTALL:-true}" == "true" ]; then
+      if [ -z "${TFENV_TERRAFORM_VERSION:-""}" ]; then
+        TFENV_VERSION_SOURCE="$(tfenv-version-file)";
+      else
+        TFENV_VERSION_SOURCE='TFENV_TERRAFORM_VERSION';
+      fi;
       log 'info' "version '${TFENV_VERSION}' is not installed (set by ${TFENV_VERSION_SOURCE}). Installing now as TFENV_AUTO_INSTALL==true";
       tfenv-install;
     else
