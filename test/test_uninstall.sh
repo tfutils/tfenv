@@ -66,6 +66,7 @@ if [ "${#errors[@]}" -gt 0 ]; then
     log 'warn' "\t${error}";
   done;
   log 'error' 'List test failure(s)';
+  exit 1;
 else
   log 'info' 'All list tests passed.';
 fi;

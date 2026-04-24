@@ -25,8 +25,11 @@ if [ "${#errors[@]}" -ne 0 ]; then
     log 'warn' "\t${error}";
   done;
   log 'error' 'Test suite failure(s)';
+  # log 'error' exits 1, but be explicit in case log behaviour changes
+  exit 1;
 else
   log 'info' 'All test suites passed.';
 fi;
 
 exit 0;
+# vi: set ts=2 sw=2 et:

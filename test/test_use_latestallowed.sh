@@ -93,6 +93,7 @@ if [ "${#errors[@]}" -gt 0 ]; then
     log 'warn' "\t${error}";
   done;
   log 'error' 'use_latestallowed test failure(s)';
+  exit 1;
 else
   log 'info' 'All use_latestallowed tests passed.';
 fi;
