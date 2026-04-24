@@ -245,6 +245,20 @@ configured remote.
 TFENV_SKIP_REMOTE_CHECK=1 tfenv install 1.14.5
 ```
 
+##### `TFENV_SORT_VERSIONS_REMOTE`
+
+Integer (Default: 0)
+
+When using a custom remote, such as Artifactory, the list of versions may be sorted
+alphabetically rather than by version number. This causes `1.0.10` to appear between
+`1.0.1` and `1.0.2`, breaking `latest` and version matching.
+
+Set `TFENV_SORT_VERSIONS_REMOTE=1` to apply version-aware sorting to the remote list.
+
+```console
+TFENV_SORT_VERSIONS_REMOTE=1 tfenv list-remote
+```
+
 ##### `TFENV_CONFIG_DIR`
 
 Path (Default: `$TFENV_ROOT`)
