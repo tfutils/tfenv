@@ -84,7 +84,6 @@ case "${arg}" in
       tfenv---version;
       tfenv-help;
     } | abort && exit 1;
-exit 1;
     ;;
   -v | --version )
     log 'debug' 'tfenv version requested...';
