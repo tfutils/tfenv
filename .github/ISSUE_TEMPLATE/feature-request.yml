@@ -1,0 +1,65 @@
+name: Feature Request
+description: Propose new functionality or an improvement
+labels: ['type:feature']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting an improvement to tfenv. Please describe
+        what you would like and why it would be useful.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A clear, concise description of the feature or improvement.
+      placeholder: Describe the feature...
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: |
+        Why do you want this? What problem does it solve? What workflow
+        does it improve?
+      placeholder: Explain why this feature would be valuable...
+    validations:
+      required: true
+
+  - type: textarea
+    id: design
+    attributes:
+      label: Proposed Design
+      description: |
+        How should this work? Include CLI interface, environment variables,
+        file formats, or behaviour descriptions as appropriate.
+      placeholder: |
+        ```console
+        $ tfenv example-command --flag
+        Expected output...
+        ```
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: |
+        How will we know when this is done? List specific, testable criteria.
+      placeholder: |
+        - [ ] `tfenv example-command` does X
+        - [ ] Documented in README.md
+        - [ ] Test added in test/
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What other approaches did you consider and why did you reject them?
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Anything else — related issues, links, examples from other tools.

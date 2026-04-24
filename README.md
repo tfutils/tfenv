@@ -1,12 +1,35 @@
 [![CI Test](https://github.com/tfutils/tfenv/actions/workflows/test.yml/badge.svg)](https://github.com/tfutils/tfenv/actions/workflows/test.yml)
+[![GitHub release](https://img.shields.io/github/v/release/tfutils/tfenv)](https://github.com/tfutils/tfenv/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 # tfenv
 
 [Terraform](https://www.terraform.io/) version manager inspired by [rbenv](https://github.com/rbenv/rbenv)
 
-## Support
+---
 
-Currently tfenv supports the following OSes
+## Table of Contents
+
+- [Supported Platforms](#supported-platforms)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [tfenv install](#tfenv-install-version)
+  - [tfenv use](#tfenv-use-version)
+  - [tfenv uninstall](#tfenv-uninstall-version)
+  - [tfenv list](#tfenv-list)
+  - [tfenv list-remote](#tfenv-list-remote)
+  - [tfenv pin](#tfenv-pin)
+- [Environment Variables](#environment-variables)
+- [.terraform-version File](#terraform-version-file)
+- [Upgrading](#upgrading)
+- [Uninstalling](#uninstalling)
+- [Contributing](#contributing)
+- [Security](#security)
+- [License](#license)
+
+---
+
+## Supported Platforms
 
 - macOS
   - 64bit
@@ -549,8 +572,24 @@ git --git-dir=~/.tfenv/.git pull
 rm -rf /some/path/to/tfenv
 ```
 
-## LICENSE
+## Contributing
 
-- [tfenv itself](https://github.com/tfutils/tfenv/blob/master/LICENSE)
-- [rbenv](https://github.com/rbenv/rbenv/blob/master/LICENSE)
-  - tfenv partially uses rbenv's source code
+Contributions are welcome. Please:
+
+1. Fork the repository
+2. Create a feature branch (`fix/description` or `feat/description`)
+3. Run the test suite: `./test/run.sh`
+4. Open a pull request against `master`
+
+See [AGENTS.md](AGENTS.md) for detailed project conventions and coding standards.
+
+## Security
+
+To report a vulnerability, please see [SECURITY.md](SECURITY.md). Do **not**
+open a public issue for security concerns.
+
+## License
+
+- [tfenv itself](https://github.com/tfutils/tfenv/blob/master/LICENSE) — MIT
+- [rbenv](https://github.com/rbenv/rbenv/blob/master/LICENSE) — MIT
+  (tfenv partially uses rbenv's source code)
