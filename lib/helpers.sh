@@ -146,13 +146,21 @@ function error_and_proceed() {
 export -f error_and_proceed;
 
 function check_dependencies() {
-  if [[ $(uname) == 'Darwin' ]] && [ $(which brew) ]; then
-    if ! [ $(which ggrep) ]; then
-      log 'error' 'A metaphysical dichotomy has caused this unit to overload and shut down. GNU Grep is a requirement and your Mac does not have it. Consider "brew install grep"';
+  if [[ "$(uname)" == 'Darwin' ]]; then
+    # Prefer ggrep (typically from Homebrew) if available
+    if command -v ggrep >/dev/null 2>&1; then
+      shopt -s expand_aliases;
+      alias grep=ggrep;
+      return;
     fi;
 
-    shopt -s expand_aliases;
-    alias grep=ggrep;
+    # Fall back to checking if the system grep is GNU grep
+    # (e.g. installed via nix or manually)
+    if grep --version 2>&1 | grep -q 'GNU grep'; then
+      return;
+    fi;
+
+    log 'error' 'GNU Grep is a requirement and your Mac does not have it. Consider "brew install grep" or "nix profile install nixpkgs#gnugrep"';
   fi;
 };
 export -f check_dependencies;
