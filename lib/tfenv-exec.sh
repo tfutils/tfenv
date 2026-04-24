@@ -29,7 +29,7 @@ function realpath-relative-to() {
 export -f realpath-relative-to;
 
 function tfenv-exec() {
-  for _arg in ${@:1}; do
+  for _arg in "${@}"; do
     if [[ "${_arg}" == -chdir=* ]]; then
       chdir="${_arg#-chdir=}";
       log 'debug' "Found -chdir arg: ${chdir}";
