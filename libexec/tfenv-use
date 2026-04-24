@@ -100,12 +100,23 @@ declare installed_version='';
 log 'debug' "Searching ${TFENV_CONFIG_DIR}/versions/ for latest version matching ${regex}";
 
 if [ -d "${TFENV_CONFIG_DIR}/versions" ]; then
-  installed_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
-    | tail -n +2 \
-    | grep -e "${regex}" \
-    | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3r,3 \
-    | head -n 1
-  )";
+  # Exclude pre-releases only for version-number-only regexes (not latest:rc etc.)
+  if [[ "${version}" == "latest" && -n "${regex}" && ! "${regex}" =~ [a-zA-Z] ]]; then
+    installed_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
+      | tail -n +2 \
+      | grep -e "${regex}" \
+      | grep -v '-' \
+      | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3r,3 \
+      | head -n 1
+    )";
+  else
+    installed_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
+      | tail -n +2 \
+      | grep -e "${regex}" \
+      | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3r,3 \
+      | head -n 1
+    )";
+  fi;
 fi;
 
 if [ -n "${installed_version}" ]; then

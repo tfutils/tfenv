@@ -55,11 +55,21 @@ function tfenv-version-name() {
 
     declare local_version='';
     if [[ -d "${TFENV_CONFIG_DIR}/versions" ]]; then
-      local_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
-        | tail -n +2 \
-        | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
-        | grep -e "${regex}" \
-        | head -n 1)";
+      # Exclude pre-releases only for version-number-only regexes (not latest:rc etc.)
+      if [[ -n "${regex}" && ! "${regex}" =~ [a-zA-Z] ]]; then
+        local_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
+          | tail -n +2 \
+          | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
+          | grep -e "${regex}" \
+          | grep -v '-' \
+          | head -n 1)";
+      else
+        local_version="$(\find "${TFENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
+          | tail -n +2 \
+          | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
+          | grep -e "${regex}" \
+          | head -n 1)";
+      fi;
 
       log 'debug' "Resolved ${TFENV_VERSION} to locally installed version: ${local_version}";
     elif [[ "${auto_install}" != "true" ]]; then
@@ -68,7 +78,12 @@ function tfenv-version-name() {
 
     if [[ "${auto_install}" == "true" ]]; then
       log 'debug' "Using latest keyword and auto_install means the current version is whatever is latest in the remote. Trying to find the remote version using the regex: ${regex}";
-      remote_version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
+      # Exclude pre-releases only for version-number-only regexes
+      if [[ -n "${regex}" && ! "${regex}" =~ [a-zA-Z] ]]; then
+        remote_version="$(tfenv-list-remote | grep -e "${regex}" | grep -v '-' | head -n 1)";
+      else
+        remote_version="$(tfenv-list-remote | grep -e "${regex}" | head -n 1)";
+      fi;
       if [[ -n "${remote_version}" ]]; then
           if [[ "${local_version}" != "${remote_version}" ]]; then
             log 'debug' "The installed version '${local_version}' does not much the remote version '${remote_version}'";
