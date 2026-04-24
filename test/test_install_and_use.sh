@@ -218,15 +218,6 @@ for ((test_iter=0; test_iter<${neg_tests_count}; ++test_iter )) ; do
     && error_and_proceed "Installing invalid version ${k}";
 done;
 
-if [ "${#errors[@]}" -gt 0 ]; then
-  log 'warn' '===== The following install_and_use tests failed =====';
-  for error in "${errors[@]}"; do
-    log 'warn' "\t${error}";
-  done
-  log 'error' 'Test failure(s): install_and_use';
-  exit 1;
-else
-  log 'info' 'All install_and_use tests passed';
-fi;
+finish_tests 'install_and_use';
 
 exit 0;

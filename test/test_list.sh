@@ -42,15 +42,6 @@ EOS
   && log 'info' 'List matches expectation.' \
   || error_and_proceed "List mismatch.\nExpected:\n${expected}\nGot:\n${result}";
 
-if [ "${#errors[@]}" -gt 0 ]; then
-  log 'warn' "===== The following list tests failed =====";
-  for error in "${errors[@]}"; do
-    log 'warn' "\t${error}";
-  done;
-  log 'error' 'List test failure(s)';
-  exit 1;
-else
-  log 'info' 'All list tests passed.';
-fi;
+finish_tests 'list';
 
 exit 0;

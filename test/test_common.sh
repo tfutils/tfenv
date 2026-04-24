@@ -49,3 +49,38 @@ fi;
 
 # Ensure local tfenv binaries take precedence
 export PATH="${TFENV_ROOT}/bin:${PATH}";
+
+##############################
+# Environment var isolation  #
+##############################
+
+# Use an isolated TFENV_CONFIG_DIR for tests so we never pollute the real install.
+# Individual tests can override this if they need to test TFENV_CONFIG_DIR itself.
+if [ -z "${TFENV_TEST_NO_ISOLATE:-""}" ]; then
+  TFENV_TEST_DIR="$(mktemp -d 2>/dev/null || mktemp -d -t 'tfenv_test')";
+  export TFENV_CONFIG_DIR="${TFENV_TEST_DIR}";
+  # Clean up the isolated directory on exit
+  trap 'rm -rf "${TFENV_TEST_DIR}"' EXIT;
+fi;
+
+####################
+# Test helpers     #
+####################
+
+# Standard test suite finaliser. Call at the end of every test file.
+# Uses the 'errors' array populated by error_and_proceed.
+# Arguments: $1 = suite name (e.g. 'install_and_use')
+function finish_tests() {
+  local suite="${1}";
+  if [ "${#errors[@]}" -gt 0 ]; then
+    log 'warn' "===== The following ${suite} tests failed =====";
+    for error in "${errors[@]}"; do
+      log 'warn' "\t${error}";
+    done;
+    log 'error' "${suite} test failure(s)";
+    exit 1;
+  else
+    log 'info' "All ${suite} tests passed.";
+  fi;
+};
+export -f finish_tests;

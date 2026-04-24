@@ -87,15 +87,6 @@ echo 'latest-allowed' > chdir-dir/.terraform-version
 
 cleanup || log 'error' 'Cleanup failed?!';
 
-if [ "${#errors[@]}" -gt 0 ]; then
-  log 'warn' '===== The following use_latestallowed tests failed =====';
-  for error in "${errors[@]}"; do
-    log 'warn' "\t${error}";
-  done;
-  log 'error' 'use_latestallowed test failure(s)';
-  exit 1;
-else
-  log 'info' 'All use_latestallowed tests passed.';
-fi;
+finish_tests 'use_latestallowed';
 
 exit 0;
