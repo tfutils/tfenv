@@ -1,34 +1,91 @@
 # Agent Guidelines for tfutils/tfenv
 
-Ground rules for AI coding agents contributing to this repository.
+Master context document for AI coding agents contributing to this repository.
+Every agent MUST read this file before starting work.
+
+---
 
 ## Project Overview
 
 tfenv is a Terraform version manager written in Bash, modelled after rbenv.
 ~2.5k LOC across `bin/`, `lib/`, `libexec/`, `test/`, and `share/`.
 
-- **Language:** Bash (no shellcheck — deliberate choice)
+- **Language:** Bash (no shellcheck — deliberate choice; see
+  [ADR-0003](docs/adr/0003-no-shellcheck.md))
 - **Default branch:** `master`
-- **Last release:** v3.0.0 (July 2022) — there is a large unreleased backlog
-- **Maintainer:** Mike Peachey (Jaz)
+- **Current release:** v3.2.0 (April 2025)
+- **Maintainer:** Mike Peachey / Jaz (@Zordrak)
+- **Minimal dependencies:** bash, curl, grep/ggrep, sort, unzip
+- **License:** MIT
 
 ## Repository Structure
 
 ```
-bin/            Entry points (terraform shim, tfenv command)
-lib/            Shared libraries sourced by multiple scripts
-libexec/        Subcommands (tfenv-install, tfenv-use, etc.)
-test/           Integration tests (download real Terraform binaries)
-share/          Static assets (HashiCorp PGP keys)
-.github/        CI workflows
+bin/              Entry points (terraform shim, tfenv command)
+lib/              Shared libraries sourced by multiple scripts
+libexec/          Subcommands (tfenv-install, tfenv-use, etc.)
+test/             Integration tests (download real Terraform binaries)
+share/            Static assets (HashiCorp PGP keys)
+.github/          CI workflows, agent definitions, issue templates
+  agents/         Agent definition files (.agent.md)
+  instructions/   Auto-loaded coding standards
+  ISSUE_TEMPLATE/ Structured issue forms
+docs/
+  adr/            Architecture Decision Records
 ```
 
-### Design Principle: Standalone Execution
+---
+
+## Core Principles
+
+### 1. Standalone Script Execution
 
 Every `libexec/` script contains its own boilerplate for resolving
 `TFENV_ROOT` and sourcing helpers. This is **intentional** — each script
-must be executable in isolation for independent testing. Do not refactor
-this into a shared loader.
+must be executable in isolation. Do NOT refactor this into a shared loader.
+See [ADR-0002](docs/adr/0002-standalone-script-execution.md).
+
+### 2. Worktree-First
+
+ALL code changes MUST happen in a git worktree under `.worktrees/`. The main
+working tree is shared by all agents and the human — modifying it directly
+risks conflicts. `.worktrees/` is gitignored.
+
+```bash
+# Create a worktree for your work
+git worktree add .worktrees/fix-123 -b fix/123-description master
+
+# Do all work inside the worktree
+cd .worktrees/fix-123
+
+# Clean up when done (after PR is created)
+cd /path/to/main/tree
+git worktree remove .worktrees/fix-123
+```
+
+**Exception:** Read-only operations (searching, reading files, running tests)
+may use the main working tree.
+
+### 3. Quality Over Speed
+
+- Run the test suite before committing
+- Read the diff before pushing
+- Check your own work before calling it done
+- Fix problems when you find them — do not defer
+
+### 4. Minimal Dependencies
+
+The project deliberately has minimal dependencies: bash, curl, grep/ggrep,
+sort, and unzip. Do NOT add new external tools or packages without explicit
+approval from the maintainer.
+
+### 5. No ShellCheck
+
+The project does not use ShellCheck. This is a deliberate architectural
+decision. Do NOT add shellcheck directives, configs, or CI steps.
+See [ADR-0003](docs/adr/0003-no-shellcheck.md).
+
+---
 
 ## Branch and PR Workflow
 
@@ -51,6 +108,56 @@ Historical examples:
 - `Fix realpath not available on macOS`
 - `Cope with different line endings in .terraform-version`
 - `Reduce duplication, and add safety`
+
+---
+
+## Claim Protocol
+
+Before starting work on any issue, an agent MUST claim it:
+
+1. Add the `agent:in-progress` label to the issue
+2. Post a comment: `Claimed by <agent-name>. Working on this.`
+3. If the label is already present, the issue is claimed — do NOT work on it
+
+This acts as a distributed lock preventing duplicate effort when multiple
+agents run concurrently.
+
+When work is complete (PR created), remove `agent:in-progress` and add
+`agent:review-requested`.
+
+---
+
+## GitHub CLI Strategy
+
+The `gh` CLI is the **primary and load-bearing** interface to GitHub for all
+agents. Use `gh api repos/tfutils/tfenv/...` for operations not covered by
+high-level `gh` commands.
+
+The GitHub MCP server may supplement `gh` where proven reliable, but must
+never be on the critical path.
+
+---
+
+## Work Type Ownership
+
+Each work type is owned by a specific agent. If you receive a request that
+belongs to a different agent, say so and stop.
+
+| Work Type | Owning Agent | Description |
+| --------- | ------------ | ----------- |
+| Autonomous delivery orchestration | `developer` | Assess board, dispatch specialists |
+| Bug hunting and auditing | `bug-finder` | Find defects, file structured issues |
+| Bug fixing | `bug-fixer` | Implement fixes with tests |
+| Feature design and specification | `feature-designer` | Write detailed specs as issues |
+| Feature implementation | `feature-implementer` | Build from specs with tests |
+| Code review | `reviewer` | First-pass structured PR review |
+| Architecture and design decisions | `architect` | ADRs, decomposition, trade-off analysis |
+| Documentation quality | `documenter` | Cross-doc consistency, link integrity |
+| Delivery metrics and reporting | `evaluator` | Compute metrics from `gh` data |
+| Board management and triage | `pm` | Organise backlog, recommend priorities |
+| Release management | `releaser` | CHANGELOG, tags, GitHub releases |
+
+---
 
 ## Testing
 
@@ -97,21 +204,12 @@ catch test regressions. Be aware and check test output manually.
 
 CI also builds the Dockerfile and validates it on Ubuntu runners.
 
-## Before Submitting a PR
-
-1. **Run the test suite locally** and verify all tests pass. Do not rely
-   solely on CI — the exit code bug means CI may report green on failure.
-2. **Read the diff carefully.** Bash quoting and operator precedence bugs
-   are the most common class of defect in this codebase.
-3. **Test on at least one platform.** If you only have Linux, note that
-   in the PR. macOS and Windows have different `readlink`, `grep`, and
-   `sed` behaviours.
-4. **Do not modify the test runner exit code bug** as a drive-by fix in
-   an unrelated PR. It should be its own tracked change.
+---
 
 ## Release Process
 
-Releases are manual and infrequent. The historical process is:
+Releases are manual and infrequent. The `releaser` agent handles the
+judgement-intensive parts but always requires human confirmation.
 
 1. Accumulate changes on `master`
 2. Update `CHANGELOG.md` with a new version section using the format:
@@ -123,24 +221,48 @@ Releases are manual and infrequent. The historical process is:
    Categories: `BREAKING CHANGE`, `NEW FEATURE`, `FIX`, `MAJOR THANKS`
 3. Create an annotated tag: `git tag -a vX.Y.Z -m "tfenv vX.Y.Z"`
 4. Push the tag: `git push origin vX.Y.Z`
-5. Update `Dockerfile` if it hardcodes the version
+5. Create a GitHub Release from the tag
+6. Update `Dockerfile` if it hardcodes the version
 
 **Agents must not create releases or tags without explicit instruction
 from the maintainer.**
 
+---
+
+## Label Taxonomy
+
+Issues use a namespaced label system:
+
+| Namespace | Labels | Purpose |
+| --------- | ------ | ------- |
+| `type:` | `bug`, `feature`, `chore`, `question` | What kind of work |
+| `severity:` | `critical`, `high`, `medium`, `low` | Impact of bugs |
+| `priority:` | `critical`, `high`, `medium`, `low` | When to address |
+| `complexity:` | `trivial`, `small`, `medium`, `large` | Effort estimate |
+| `confidence:` | `confirmed`, `probable`, `speculative` | Bug certainty |
+| `category:` | `install`, `use`, `list`, `uninstall`, `version-resolution`, `verification`, `platform`, `logging` | Affected area |
+| `agent:` | `in-progress`, `review-requested` | Agent workflow state |
+
+---
+
 ## Things Agents Must Not Do
 
 - **Do not run `git push` to `master` or any remote branch** without
-  explicit approval from Jaz.
-- **Do not create GitHub releases or tags.**
-- **Do not close or lock issues** — only the maintainer triages.
-- **Do not refactor the standalone boilerplate** in `libexec/` scripts.
-- **Do not add shellcheck** directives, configs, or CI steps.
-- **Do not add new dependencies** (external tools, packages) without
-  discussion. The project deliberately has minimal dependencies
-  (bash, curl, grep/ggrep, unzip).
+  explicit approval from Jaz
+- **Do not create GitHub releases or tags** without explicit instruction
+- **Do not close or lock issues** — only the maintainer triages
+- **Do not refactor the standalone boilerplate** in `libexec/` scripts
+- **Do not add shellcheck** directives, configs, or CI steps
+- **Do not add new dependencies** without discussion
 - **Do not modify `.github/workflows/`** without explicit approval —
-  CI changes affect all platforms and have outsized blast radius.
+  CI changes affect all platforms and have outsized blast radius
+- **Do not merge PRs** — create them and leave for human review
+- **Do not modify Terraform structure** (if any) without explicit approval
+  from Jaz — content changes are fine, structural changes are not
+- **Do not write to `/tmp` or `/dev/null`** — use `.tmp/` in the workspace
+  root for temporary files
+
+---
 
 ## Common Pitfalls in This Codebase
 
@@ -163,3 +285,15 @@ These are the most frequent sources of bugs. Check for them in every change:
    variables.
 8. **Carriage returns:** `.terraform-version` files from Windows/WSL may
    contain `\r`. Always strip with `tr -d '\r'` after reading.
+
+---
+
+## Satellite Documentation
+
+| Document | Purpose |
+| -------- | ------- |
+| [.github/copilot-instructions.md](.github/copilot-instructions.md) | Copilot configuration, auto-loading |
+| [.github/instructions/bash.instructions.md](.github/instructions/bash.instructions.md) | Bash coding standards (auto-loaded for `**/*.sh`) |
+| [SECURITY.md](SECURITY.md) | Vulnerability reporting policy |
+| [docs/adr/](docs/adr/) | Architecture Decision Records |
+| [CHANGELOG.md](CHANGELOG.md) | Release history |

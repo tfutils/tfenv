@@ -5,3 +5,5 @@ bin/terraform-*
 /use-gnupg
 /use-gpgv
 .*.swp
+.worktrees/
+.tmp/
