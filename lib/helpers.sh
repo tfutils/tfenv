@@ -154,6 +154,8 @@ function cleanup() {
   
   log 'debug' "Deleting ${TFENV_CONFIG_DIR}/version";
   rm -rf "${TFENV_CONFIG_DIR}/version";
+  log 'debug' "Deleting ${TFENV_CONFIG_DIR}/version.prev";
+  rm -rf "${TFENV_CONFIG_DIR}/version.prev";
   log 'debug' "Deleting ${TFENV_CONFIG_DIR}/versions";
   rm -rf "${TFENV_CONFIG_DIR}/versions";
   log 'debug' "Deleting ${pwd}/.terraform-version";
