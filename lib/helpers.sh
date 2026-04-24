@@ -47,19 +47,47 @@ function load_bashlog () {
 };
 export -f load_bashlog;
 
-if [ "${TFENV_DEBUG:-0}" -gt 0 ] ; then
-  # our shim below cannot be used when debugging is enabled
+# Lightweight log function used when bashlog is not loaded.
+# Handles 'error' (exit 1) and 'debug' (no-op), everything else goes to stderr.
+function _tfenv_lightweight_log () {
+  if [ "${1}" == 'debug' ]; then
+    return;
+  fi;
+  if [ "${1}" == 'error' ]; then
+    echo -e "tfenv: [ERROR] ${*:2}" >&2;
+    exit 1;
+  fi;
+  echo -e "tfenv: ${*:2}" >&2;
+};
+export -f _tfenv_lightweight_log;
+
+# Determine whether to load full bashlog:
+#   TFENV_BASHLOG=1        → always load
+#   TFENV_BASHLOG=0        → never load (lightweight log)
+#   TFENV_BASHLOG unset    → auto: interactive shell loads bashlog, non-interactive does not
+#   TFENV_DEBUG > 0        → always load (overrides TFENV_BASHLOG=0)
+if [ "${TFENV_DEBUG:-0}" -gt 0 ]; then
+  # Debug mode always needs full bashlog
   load_bashlog;
-else
-  # Shim that understands to no-op for debug messages, and defers to
-  # full bashlog for everything else.
+elif [ "${TFENV_BASHLOG:-auto}" == '1' ]; then
+  # Explicitly requested full bashlog
+  load_bashlog;
+elif [ "${TFENV_BASHLOG:-auto}" == '0' ]; then
+  # Explicitly disabled bashlog
+  function log () { _tfenv_lightweight_log "$@"; };
+  export -f log;
+elif [[ $- == *i* ]]; then
+  # Interactive shell: use deferred loading shim (current default behaviour)
   function log () {
-    if [ "$1" != 'debug' ] ; then
-      # Loading full bashlog will overwrite the `log` function
+    if [ "$1" != 'debug' ]; then
       load_bashlog;
       log "$@";
     fi;
   };
+  export -f log;
+else
+  # Non-interactive shell: use lightweight log by default
+  function log () { _tfenv_lightweight_log "$@"; };
   export -f log;
 fi;
 
