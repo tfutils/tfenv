@@ -84,12 +84,31 @@ export version_source;
 # Register for whether a default terraform version has yet been set
 declare -i default_set=0;
 
+detect_arch() {
+  local binary="${1}";
+  if [ ! -f "${binary}" ]; then
+    echo 'unknown';
+    return;
+  fi;
+  local file_output;
+  file_output="$(file -b "${binary}" 2>/dev/null)" || { echo 'unknown'; return; };
+  case "${file_output}" in
+    *x86-64*|*x86_64*)  echo 'amd64';;
+    *aarch64*|*arm64*)   echo 'arm64';;
+    *386*|*i386*|*80386*) echo '386';;
+    *ARM,*)              echo 'arm';;
+    *)                   echo 'unknown';;
+  esac;
+};
+
 print_version () {
+  local arch;
+  arch="$(detect_arch "${TFENV_CONFIG_DIR}/versions/${1}/terraform")";
   if [ "${1}" == "${version_name}" ]; then
-    echo "* ${1} (set by ${version_source})";
+    echo "* ${1} (${arch}) (set by ${version_source})";
     default_set=1;
   else
-    echo "  ${1}";
+    echo "  ${1} (${arch})";
   fi;
 };
 
