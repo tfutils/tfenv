@@ -5,8 +5,10 @@ go 1.25.0
 require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/charmbracelet/log v1.0.0
+	github.com/hashicorp/go-version v1.9.0
 	github.com/muesli/termenv v0.16.0
 	golang.org/x/crypto v0.50.0
+	golang.org/x/net v0.53.0
 )
 
 require (
