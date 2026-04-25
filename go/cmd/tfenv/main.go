@@ -18,6 +18,7 @@ import (
 	// Register subcommands via init().
 	_ "github.com/tfutils/tfenv/go/internal/install"
 	_ "github.com/tfutils/tfenv/go/internal/list"
+	_ "github.com/tfutils/tfenv/go/internal/uninstall"
 	_ "github.com/tfutils/tfenv/go/internal/use"
 )
 
