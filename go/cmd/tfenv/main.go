@@ -14,6 +14,9 @@ import (
 
 	"github.com/tfutils/tfenv/go/internal/cli"
 	"github.com/tfutils/tfenv/go/internal/shim"
+
+	// Register subcommands via init().
+	_ "github.com/tfutils/tfenv/go/internal/install"
 )
 
 // version is set at build time via -ldflags "-X main.version=...".
