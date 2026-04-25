@@ -32,11 +32,18 @@ func Register(name string, description string, handler Handler) {
 	}
 }
 
+// BuildInfo holds version metadata injected at build time.
+type BuildInfo struct {
+	Version string
+	Commit  string
+	Date    string
+}
+
 // Run dispatches to the appropriate subcommand based on args.
 // It returns an exit code suitable for os.Exit.
-func Run(version string, args []string) int {
+func Run(info BuildInfo, args []string) int {
 	if len(args) == 0 {
-		printUsage(version)
+		printUsage(info.Version)
 		return 0
 	}
 
@@ -44,13 +51,13 @@ func Run(version string, args []string) int {
 
 	// Handle --version and version as special cases.
 	if subcmd == "--version" || subcmd == "version" {
-		fmt.Fprintf(os.Stdout, "tfenv %s\n", version)
+		fmt.Fprintf(os.Stdout, "tfenv %s (commit: %s, built: %s)\n", info.Version, info.Commit, info.Date)
 		return 0
 	}
 
 	// Handle help as a special case.
 	if subcmd == "help" || subcmd == "--help" || subcmd == "-h" {
-		printUsage(version)
+		printUsage(info.Version)
 		return 0
 	}
 

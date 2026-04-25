@@ -1,0 +1,133 @@
+version: 2
+
+project_name: tfenv
+
+dist: ../dist
+
+builds:
+  - id: tfenv
+    dir: .
+    main: ./cmd/tfenv
+    binary: tfenv
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+      - freebsd
+    goarch:
+      - amd64
+      - arm64
+      - arm
+    goarm:
+      - "7"
+    ignore:
+      - goos: darwin
+        goarch: arm
+      - goos: windows
+        goarch: arm
+      - goos: freebsd
+        goarch: arm
+      - goos: freebsd
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+  # Second build: the terraform shim entry point.
+  # Same source as tfenv — multi-call dispatch uses the invoked basename
+  # to decide whether to act as the CLI or the terraform shim.
+  - id: terraform-shim
+    dir: .
+    main: ./cmd/tfenv
+    binary: terraform
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+      - freebsd
+    goarch:
+      - amd64
+      - arm64
+      - arm
+    goarm:
+      - "7"
+    ignore:
+      - goos: darwin
+        goarch: arm
+      - goos: windows
+        goarch: arm
+      - goos: freebsd
+        goarch: arm
+      - goos: freebsd
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: default
+    builds:
+      - tfenv
+      - terraform-shim
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - src: ../LICENSE
+        dst: .
+      - src: ../README.md
+        dst: .
+
+checksum:
+  name_template: 'checksums.txt'
+  algorithm: sha256
+
+nfpms:
+  - id: packages
+    package_name: tfenv-go
+    vendor: tfutils
+    homepage: https://github.com/tfutils/tfenv
+    maintainer: Mike Peachey <mike.peachey@bjss.com>
+    description: Terraform version manager (Go edition)
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/local/bin
+    contents:
+      - src: ../LICENSE
+        dst: /usr/share/doc/tfenv-go/LICENSE
+      - src: ../README.md
+        dst: /usr/share/doc/tfenv-go/README.md
+
+brews:
+  - name: tfenv-go
+    repository:
+      owner: tfutils
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    directory: Formula
+    homepage: https://github.com/tfutils/tfenv
+    description: Terraform version manager (Go edition)
+    license: MIT
+    install: |
+      bin.install "tfenv"
+      bin.install "terraform"
+    test: |
+      system "#{bin}/tfenv", "--version"
+    skip_upload: auto
+
+release:
+  draft: true
+  name_template: "tfenv {{.Version}}"
+
+changelog:
+  use: github-native
