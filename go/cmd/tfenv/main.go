@@ -11,6 +11,8 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/tfutils/tfenv/go/internal/cli"
 	"github.com/tfutils/tfenv/go/internal/shim"
@@ -29,6 +31,11 @@ var version = "dev"
 
 func main() {
 	basename := filepath.Base(os.Args[0])
+
+	// Strip .exe suffix on Windows for multi-call matching.
+	if runtime.GOOS == "windows" {
+		basename = strings.TrimSuffix(basename, ".exe")
+	}
 
 	switch basename {
 	case "terraform":
