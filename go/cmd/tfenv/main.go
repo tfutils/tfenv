@@ -25,9 +25,13 @@ import (
 	_ "github.com/tfutils/tfenv/go/internal/use"
 )
 
-// version is set at build time via -ldflags "-X main.version=...".
-// It defaults to "dev" for local builds.
-var version = "dev"
+// Build-time variables injected via -ldflags.
+// Defaults are used for local `go build` invocations.
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
 
 func main() {
 	basename := filepath.Base(os.Args[0])
@@ -41,6 +45,11 @@ func main() {
 	case "terraform":
 		os.Exit(shim.Run(os.Args[1:]))
 	default:
-		os.Exit(cli.Run(version, os.Args[1:]))
+		info := cli.BuildInfo{
+			Version: version,
+			Commit:  commit,
+			Date:    date,
+		}
+		os.Exit(cli.Run(info, os.Args[1:]))
 	}
 }
