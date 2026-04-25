@@ -1,0 +1,109 @@
+name: 'Go Edition Tests'
+
+on:
+  pull_request:
+    paths:
+      - 'go/**'
+      - '.github/workflows/go-test.yml'
+  push:
+    branches:
+      - 'master'
+      - 'feat/488-go-edition'
+    paths:
+      - 'go/**'
+      - '.github/workflows/go-test.yml'
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  unit-tests:
+    name: 'Unit Tests (${{ matrix.os }})'
+    runs-on: '${{ matrix.os }}'
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - 'ubuntu-latest'
+          - 'macos-latest'
+          - 'windows-latest'
+    steps:
+      - uses: 'actions/checkout@v4'
+      - uses: 'actions/setup-go@v5'
+        with:
+          go-version-file: 'go/go.mod'
+          cache-dependency-path: 'go/go.sum'
+      - name: 'Run unit tests'
+        working-directory: 'go'
+        run: 'go test -v -race -count=1 ./internal/...'
+      - name: 'Vet'
+        working-directory: 'go'
+        run: 'go vet ./...'
+
+  acceptance-tests:
+    name: 'Acceptance (${{ matrix.edition }}, ${{ matrix.os }})'
+    runs-on: '${{ matrix.os }}'
+    strategy:
+      fail-fast: false
+      matrix:
+        edition:
+          - 'bash'
+          - 'go'
+        os:
+          - 'ubuntu-latest'
+          - 'macos-latest'
+          - 'windows-latest'
+        exclude:
+          # Bash edition does not work on Windows natively
+          - edition: 'bash'
+            os: 'windows-latest'
+    steps:
+      - uses: 'actions/checkout@v4'
+      - uses: 'actions/setup-go@v5'
+        with:
+          go-version-file: 'go/go.mod'
+          cache-dependency-path: 'go/go.sum'
+
+      - name: 'Build Go edition binary'
+        if: matrix.edition == 'go'
+        working-directory: 'go'
+        run: 'go build -o tfenv-go ./cmd/tfenv'
+
+      - name: 'Set TFENV_TEST_BINARY (Go edition, Unix)'
+        if: matrix.edition == 'go' && runner.os != 'Windows'
+        run: echo "TFENV_TEST_BINARY=${{ github.workspace }}/go/tfenv-go" >> "$GITHUB_ENV"
+
+      - name: 'Set TFENV_TEST_BINARY (Go edition, Windows)'
+        if: matrix.edition == 'go' && runner.os == 'Windows'
+        run: echo "TFENV_TEST_BINARY=${{ github.workspace }}\go\tfenv-go.exe" >> $env:GITHUB_ENV
+
+      - name: 'Set TFENV_TEST_BINARY (Bash edition)'
+        if: matrix.edition == 'bash'
+        run: echo "TFENV_TEST_BINARY=${{ github.workspace }}/bin/tfenv" >> "$GITHUB_ENV"
+
+      - name: 'Run acceptance tests'
+        working-directory: 'go'
+        run: 'go test -v -race -count=1 ./test/acceptance/...'
+
+  integration-tests:
+    name: 'Integration Tests'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v4'
+      - uses: 'actions/setup-go@v5'
+        with:
+          go-version-file: 'go/go.mod'
+          cache-dependency-path: 'go/go.sum'
+      - name: 'Build Go edition'
+        working-directory: 'go'
+        run: 'go build -o tfenv-go ./cmd/tfenv'
+      - name: 'Run integration tests'
+        working-directory: 'go'
+        env:
+          TFENV_TEST_BINARY: '${{ github.workspace }}/go/tfenv-go'
+        run: 'go test -v -tags=integration -count=1 ./test/acceptance/...'
