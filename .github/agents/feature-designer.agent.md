@@ -1,6 +1,6 @@
 ---
 description: 'Use when: designing features, scoping new capabilities, creating feature specs, writing acceptance criteria, evaluating feasibility. Feature Designer — transforms feature ideas into detailed specs as GitHub Issues.'
-tools: [read, search, execute, web, agent, todo]
+tools: [read, search, edit, execute, web, agent, todo]
 model: 'Claude Opus 4.6'
 argument-hint: "Describe the feature to design, 'full sweep' for comprehensive feature discovery, or 'continue' to resume"
 ---

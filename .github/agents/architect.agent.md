@@ -1,6 +1,6 @@
 ---
 description: 'Use when: designing big changes, cross-cutting architectural decisions, technology evaluation, impact analysis. Architect — interactive design partner that produces ADRs and decomposed requirements.'
-tools: [read, search, edit, web, agent, todo]
+tools: [read, search, edit, execute, web, agent, todo]
 model: 'Claude Opus 4.6'
 argument-hint: "'ADR for <decision>' to produce a formal ADR, 'impact of #NNN' to analyse a feature issue, or 'decompose #NNN' to break a large feature into implementable child issues"
 ---
