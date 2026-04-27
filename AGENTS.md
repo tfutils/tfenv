@@ -13,7 +13,7 @@ tfenv is a Terraform version manager written in Bash, modelled after rbenv.
 - **Language:** Bash (no shellcheck — deliberate choice; see
   [ADR-0003](docs/adr/0003-no-shellcheck.md))
 - **Default branch:** `master`
-- **Current release:** v3.2.0 (April 2025)
+- **Current release:** v3.2.0 (April 2026)
 - **Maintainer:** Mike Peachey / Jaz (@Zordrak)
 - **Minimal dependencies:** bash, curl, grep/ggrep, sort, unzip
 - **License:** MIT
@@ -124,6 +124,15 @@ agents run concurrently.
 
 When work is complete (PR created), remove `agent:in-progress` and add
 `agent:review-requested`.
+
+```bash
+# Claim an issue
+gh issue edit NNN --add-label 'agent:in-progress'
+gh issue comment NNN --body 'Claimed by <agent-name>. Working on this.'
+
+# Release after PR created
+gh issue edit NNN --remove-label 'agent:in-progress' --add-label 'agent:review-requested'
+```
 
 ---
 
@@ -261,6 +270,23 @@ Issues use a namespaced label system:
   from Jaz — content changes are fine, structural changes are not
 - **Do not write to `/tmp` or `/dev/null`** — use `.tmp/` in the workspace
   root for temporary files
+- **Do not remove tool permissions** from agent definitions — granted
+  permissions (`tools:` in frontmatter) are the maintainer's decision.
+  Agents may recommend changes but must not unilaterally reduce access.
+
+---
+
+## Before Submitting a PR
+
+1. **Run the test suite locally** and verify all tests pass. Do not rely
+   solely on CI — the exit code bug means CI may report green on failure.
+2. **Read the diff carefully.** Bash quoting and operator precedence bugs
+   are the most common class of defect in this codebase.
+3. **Test on at least one platform.** If you only have Linux, note that
+   in the PR. macOS and Windows have different `readlink`, `grep`, and
+   `sed` behaviours.
+4. **Do not modify the test runner exit code bug** as a drive-by fix in
+   an unrelated PR. It should be its own tracked change.
 
 ---
 

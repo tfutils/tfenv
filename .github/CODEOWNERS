@@ -4,3 +4,4 @@
 # Security-sensitive paths
 share/hashicorp-keys.pgp @Zordrak
 .github/workflows/ @Zordrak
+
