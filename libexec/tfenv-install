@@ -98,11 +98,21 @@ declare lockdir="${TFENV_CONFIG_DIR}/.install-lock-${version}";
 declare lock_retries=0;
 declare lock_max_retries=60;
 
+# Ensure the config dir exists so the lock mkdir can succeed on a first install.
+# Without this, mkdir fails with ENOENT and the loop below misreads it as contention.
+mkdir -p "${TFENV_CONFIG_DIR}" || log 'error' "Failed to create ${TFENV_CONFIG_DIR}";
+
 cleanup_lock() {
   rmdir "${lockdir}" 2>/dev/null || true;
 };
 
 while ! mkdir "${lockdir}" 2>/dev/null; do
+  # Distinguish "lock held" (lockdir exists) from any other mkdir failure
+  # (missing parent, permissions, full disk, etc.) so we fail loud instead
+  # of looping silently for 60s on an unrecoverable error.
+  if [ ! -d "${lockdir}" ]; then
+    log 'error' "Failed to create lock directory ${lockdir} — check that ${TFENV_CONFIG_DIR} exists and is writable";
+  fi;
   if [ "${lock_retries}" -eq 0 ]; then
     log 'info' "Another process is installing Terraform v${version}. Waiting...";
   fi;
