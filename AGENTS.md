@@ -270,6 +270,9 @@ Issues use a namespaced label system:
   from Jaz — content changes are fine, structural changes are not
 - **Do not write to `/tmp` or `/dev/null`** — use `.tmp/` in the workspace
   root for temporary files
+- **Do not remove tool permissions** from agent definitions — granted
+  permissions (`tools:` in frontmatter) are the maintainer's decision.
+  Agents may recommend changes but must not unilaterally reduce access.
 
 ---
 
