@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 
-**Date:** 2025-04-24
+**Date:** 2026-04-24
 
 ## Context
 
@@ -39,7 +39,8 @@ We adopt a structured agentic SDLC with:
 
 - Significant upfront investment in agent definitions
 - Agent definitions require maintenance as the project evolves
-- Overhead is disproportionate to the project's current size (~2.5k LOC)
+- Overhead is an upfront investment, but the framework is designed to be
+  replicable across the organisation's repositories
 
 ## Alternatives Considered
 

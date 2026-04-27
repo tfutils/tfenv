@@ -530,6 +530,21 @@ $ tfenv list-remote
 ...
 ```
 
+### tfenv pin
+
+Write the currently-active Terraform version to a `.terraform-version` file
+in the current working directory. This is useful for pinning a project to a
+specific version without manually creating the file.
+
+```console
+$ tfenv use 1.7.5
+Switching default version to v1.7.5
+Default version (when not overridden by .terraform-version or TFENV_TERRAFORM_VERSION) is now: 1.7.5
+
+$ tfenv pin
+Pinned version by writing "1.7.5" to /path/to/project/.terraform-version
+```
+
 ## .terraform-version file
 
 If you put a `.terraform-version` file on your project root, or in your home directory, tfenv detects it and uses the version written in it. If the version is `latest` or `latest:<regex>`, the latest matching version currently installed will be selected.
