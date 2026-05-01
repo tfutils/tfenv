@@ -34,7 +34,7 @@ jobs:
         if: contains(matrix.os, 'ubuntu')
         with:
           install: true
-      - uses: 'docker/build-push-action@v6'
+      - uses: 'docker/build-push-action@v7'
         if: contains(matrix.os, 'ubuntu')
         with:
           context: .
@@ -74,7 +74,7 @@ jobs:
         if: contains(matrix.os, 'ubuntu')
         with:
           install: true
-      - uses: 'docker/build-push-action@v6'
+      - uses: 'docker/build-push-action@v7'
         if: contains(matrix.os, 'ubuntu')
         with:
           context: .
