@@ -379,17 +379,15 @@ fi;
 if [[ -n "${shasum_bin}" && -x "${shasum_bin}" ]]; then
   (
     cd "${download_tmp}";
-    "${shasum_bin}" \
-      -a 256 \
-      -s \
-      -c <(grep -F "${tarball_name}" "${shasums_name}")
+    grep -F "${tarball_name}" "${shasums_name}" \
+      | "${shasum_bin}" -a 256 -s -c -
   ) && log 'info' 'SHA256 hash matched!' \
     || log 'error' 'SHA256 hash does not match!';
 elif [[ -n "${sha256sum_bin}" && -x "${sha256sum_bin}" ]]; then
   (
     cd "${download_tmp}";
-    "${sha256sum_bin}" \
-      -c <(grep -F "${tarball_name}" "${shasums_name}")
+    grep -F "${tarball_name}" "${shasums_name}" \
+      | "${sha256sum_bin}" -c -
   ) && log 'info' 'SHA256 hash matched!' \
     || log 'error' 'SHA256 hash does not match!';
 else
