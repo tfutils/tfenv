@@ -202,7 +202,7 @@ function check_dependencies() {
   fi;
 
   if ! command -v unzip >/dev/null 2>&1; then
-      log 'error' 'unzip is a requirement and your device does not have it. Install unzip using your preferred method.'
+      log 'error' 'unzip is a requirement and your device does not have it. Install unzip using your preferred method.';
   fi;
 };
 export -f check_dependencies;
