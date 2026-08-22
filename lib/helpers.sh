@@ -183,23 +183,37 @@ function error_and_proceed() {
 };
 export -f error_and_proceed;
 
+# Probes the two grep behaviors tfenv depends on beyond POSIX:
+#   `\+` repetition in a BRE, per the 'latest' regex in lib/tfenv-version-name.sh
+#   `-o` reporting every match on a line, per libexec/tfenv-list-remote
+function grep_is_sufficient() {
+  local grep_bin="${1}";
+  local bre_result;
+  local multi_match_result;
+
+  bre_result="$("${grep_bin}" -e '^[0-9]\+$' <<< '42' 2>/dev/null)";
+  [ "${bre_result}" = '42' ] || return 1;
+
+  multi_match_result="$("${grep_bin}" -o -E '[0-9]+' <<< '1 2' 2>/dev/null | tr '\n' ' ')";
+  [ "${multi_match_result}" = '1 2 ' ] || return 1;
+
+  return 0;
+};
+export -f grep_is_sufficient;
+
 function check_dependencies() {
-  if [[ "$(uname)" == 'Darwin' ]]; then
-    # Prefer ggrep (typically from Homebrew) if available
-    if command -v ggrep >/dev/null 2>&1; then
-      shopt -s expand_aliases;
-      alias grep=ggrep;
-      return;
-    fi;
-
-    # Fall back to checking if the system grep is GNU grep
-    # (e.g. installed via nix or manually)
-    if grep --version 2>&1 | grep -q 'GNU grep'; then
-      return;
-    fi;
-
-    log 'error' 'GNU Grep is a requirement and your Mac does not have it. Consider "brew install grep" or "nix profile install nixpkgs#gnugrep"';
+  # ggrep, typically from Homebrew, takes precedence when it is capable
+  if command -v ggrep >/dev/null 2>&1 && grep_is_sufficient ggrep; then
+    shopt -s expand_aliases;
+    alias grep=ggrep;
+    return;
   fi;
+
+  if grep_is_sufficient grep; then
+    return;
+  fi;
+
+  log 'error' 'The grep on PATH does not support `\+` in basic expressions or `-o` multi-match, both of which tfenv requires. Consider "brew install grep" or "nix profile install nixpkgs#gnugrep"';
 };
 export -f check_dependencies;
 
