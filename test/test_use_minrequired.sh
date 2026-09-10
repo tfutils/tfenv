@@ -115,6 +115,31 @@ echo 'min-required' > chdir-dir/.terraform-version
 
 cleanup || log 'error' 'Cleanup failed?!';
 
+
+log 'info' '### Detect min-required when working directory path contains spaces (#537)';
+
+spaced_dir="${PWD}/project with spaces";
+mkdir -p "${spaced_dir}";
+minv='1.6.0';
+echo "terraform {
+  required_version = \">=${minv}\"
+}" > "${spaced_dir}/versions.tf";
+
+(
+  cd "${spaced_dir}" || exit 1;
+  # bin/tfenv exports TFENV_DIR="${PWD}" before dispatching. Paths with spaces
+  # used to break unquoted ${path}/{*.tf,*.tf.json} globs in tfenv-min-required,
+  # so install/resolve-version min-required failed with an empty version.
+  export TFENV_DIR="${PWD}";
+  detected="$(tfenv min-required)" || exit 1;
+  [ "${detected}" = "${minv}" ] || exit 1;
+  resolved="$(tfenv-resolve-version min-required)" || exit 1;
+  [ "${resolved}" = "${minv}:^${minv}$" ] || exit 1;
+) || error_and_proceed 'Min-required detection failed when path contains spaces';
+
+rm -rf "${spaced_dir}";
+cleanup || log 'error' 'Cleanup failed?!';
+
 finish_tests 'use_minrequired';
 
 exit 0;
