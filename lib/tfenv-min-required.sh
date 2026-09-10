@@ -5,7 +5,7 @@ set -uo pipefail;
 function tfenv-min-required() {
   local path="${1:-${TFENV_DIR:-.}}";
 
-  local versions="$( echo $(cat ${path}/{*.tf,*.tf.json} 2>/dev/null | grep -Eh '^\s*[^#]*\s*required_version') | grep -o '[~=!<>]\{0,2\}\s*\([0-9]\+\.\?\)\{2,3\}\(-[a-z]\+[0-9]\+\)\?')";
+  local versions="$( echo $(cat "${path}"/{*.tf,*.tf.json} 2>/dev/null | grep -Eh '^\s*[^#]*\s*required_version') | grep -o '[~=!<>]\{0,2\}\s*\([0-9]\+\.\?\)\{2,3\}\(-[a-z]\+[0-9]\+\)\?')";
 
   if [[ "${versions}" =~ ([~=!<>]{0,2}[[:blank:]]*)([0-9]+[0-9.]+)[^0-9]*(-[a-z]+[0-9]+)? ]]; then
     qualifier="${BASH_REMATCH[1]}";
@@ -13,7 +13,7 @@ function tfenv-min-required() {
     if [[ "${qualifier}" =~ ^!= ]]; then
       log 'debug' "required_version is a negation - we cannot guess the desired one, skipping.";
     else
-      local min_required_file="$(grep -Hn required_version ${path}/{*.tf,*.tf.json} 2>/dev/null | xargs)";
+      local min_required_file="$(grep -Hn required_version "${path}"/{*.tf,*.tf.json} 2>/dev/null | xargs)";
 
       # Probably not an advisable way to choose a terraform version,
       # but this is the way this functionality works in terraform:
