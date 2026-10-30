@@ -57,3 +57,4 @@ cleanup || log 'error' 'Cleanup failed?!';
 finish_tests 'exec';
 
 exit 0;
+# vim: set syntax=bash tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab :
