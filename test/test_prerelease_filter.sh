@@ -11,17 +11,33 @@ declare -a errors=();
 
 log 'info' '### Test Suite: Pre-release version filtering';
 
-log 'info' '## Numeric regex excludes pre-releases: latest:^0.14.';
-cleanup || log 'error' 'Cleanup failed?!';
-(
-  # latest:^0.14. with a numeric-only regex should skip 0.14.0-rc1 etc.
-  declare resolved;
-  resolved="$(tfenv list-remote | grep -e '^0\.14\.' | grep -v '-' | head -n 1)";
-  log 'info' "Expected stable version: ${resolved}";
-  tfenv install "latest:^0.14." || exit 1;
-  check_installed_version "${resolved}" || exit 1;
-) && log 'info' '## Numeric regex excludes pre-releases: passed' \
-  || error_and_proceed 'latest:^0.14. did not filter pre-releases';
+if can_run_pre_1_0_2_terraform; then
+  log 'info' '## Numeric regex excludes pre-releases: latest:^0.14.';
+  cleanup || log 'error' 'Cleanup failed?!';
+  (
+    # latest:^0.14. with a numeric-only regex should skip 0.14.0-rc1 etc.
+    declare resolved;
+    resolved="$(tfenv list-remote | grep -e '^0\.14\.' | grep -v '-' | head -n 1)";
+    log 'info' "Expected stable version: ${resolved}";
+    tfenv install "latest:^0.14." || exit 1;
+    check_installed_version "${resolved}" || exit 1;
+  ) && log 'info' '## Numeric regex excludes pre-releases: passed' \
+    || error_and_proceed 'latest:^0.14. did not filter pre-releases';
+
+  log 'info' '## Numeric regex on 0.11 excludes oci suffix';
+  cleanup || log 'error' 'Cleanup failed?!';
+  (
+    # latest:^0.11. should NOT match 0.11.15-oci since regex is numeric-only
+    declare resolved;
+    resolved="$(tfenv list-remote | grep -e '^0\.11\.' | grep -v '-' | head -n 1)";
+    log 'info' "Expected stable version: ${resolved}";
+    tfenv install "latest:^0.11." || exit 1;
+    check_installed_version "${resolved}" || exit 1;
+  ) && log 'info' '## Numeric regex on 0.11 excludes oci: passed' \
+    || error_and_proceed 'latest:^0.11. did not exclude oci-suffixed versions';
+else
+  log 'warn' '## Skipping latest:^0.14. and latest:^0.11.: Terraform < 1.0.2 needs Rosetta 2 on Apple Silicon';
+fi;
 
 log 'info' '## Alphabetic regex includes pre-releases: latest:alpha';
 cleanup || log 'error' 'Cleanup failed?!';
@@ -56,18 +72,6 @@ cleanup || log 'error' 'Cleanup failed?!';
   check_installed_version "${resolved}" || exit 1;
 ) && log 'info' '## latest:beta includes beta versions: passed' \
   || error_and_proceed 'latest:beta did not include beta versions';
-
-log 'info' '## Numeric regex on 0.11 excludes oci suffix';
-cleanup || log 'error' 'Cleanup failed?!';
-(
-  # latest:^0.11. should NOT match 0.11.15-oci since regex is numeric-only
-  declare resolved;
-  resolved="$(tfenv list-remote | grep -e '^0\.11\.' | grep -v '-' | head -n 1)";
-  log 'info' "Expected stable version: ${resolved}";
-  tfenv install "latest:^0.11." || exit 1;
-  check_installed_version "${resolved}" || exit 1;
-) && log 'info' '## Numeric regex on 0.11 excludes oci: passed' \
-  || error_and_proceed 'latest:^0.11. did not exclude oci-suffixed versions';
 
 log 'info' '## Bare latest (no regex) gives stable version';
 cleanup || log 'error' 'Cleanup failed?!';

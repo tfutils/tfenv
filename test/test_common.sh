@@ -84,3 +84,12 @@ function finish_tests() {
   fi;
 };
 export -f finish_tests;
+
+# HashiCorp shipped no Apple Silicon builds before Terraform 1.0.2, so tfenv
+# installs the darwin_amd64 build for those versions, which needs Rosetta 2 to
+# run. Tests that execute a pre-1.0.2 binary call this to skip where it cannot.
+function can_run_pre_1_0_2_terraform() {
+  [[ "$(uname -s)" == Darwin* && "$(uname -m)" == arm64* ]] || return 0;
+  arch -x86_64 /usr/bin/true >/dev/null 2>&1;
+};
+export -f can_run_pre_1_0_2_terraform;
