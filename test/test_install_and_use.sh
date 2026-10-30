@@ -50,8 +50,6 @@ tests__desc=(
   'latest alpha'
   'latest beta'
   'latest rc'
-  'latest possibly-unstable version from 0.11'
-  '0.11.15-oci'
   'latest version matching regex'
   'specific version'
   'specific version with v prefix'
@@ -63,12 +61,24 @@ tests__kv=(
   "$(tfenv list-remote | grep 'alpha' | head -n 1),latest:alpha"
   "$(tfenv list-remote | grep 'beta' | head -n 1),latest:beta"
   "$(tfenv list-remote | grep 'rc' | head -n 1),latest:rc"
-  "$(tfenv list-remote | grep '^0\.11\.' | head -n 1),latest:^0.11."
-  '0.11.15-oci,0.11.15-oci'
   '1.3.10,latest:^1\.3'
   '1.6.3,1.6.3'
-  '0.14.6,v0.14.6'
+  '1.5.7,v1.5.7'
 );
+
+if can_run_pre_1_0_2_terraform; then
+  tests__desc+=(
+    'latest possibly-unstable version from 0.11'
+    '0.11.15-oci'
+  );
+
+  tests__kv+=(
+    "$(tfenv list-remote | grep '^0\.11\.' | head -n 1),latest:^0.11."
+    '0.11.15-oci,0.11.15-oci'
+  );
+else
+  log 'warn' 'Skipping pre-1.0.2 tests: Terraform < 1.0.2 needs Rosetta 2 on Apple Silicon';
+fi;
 
 log 'info' "Kernel under test: $(uname -s)";
 
