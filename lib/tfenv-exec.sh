@@ -29,7 +29,10 @@ function realpath-relative-to() {
 export -f realpath-relative-to;
 
 function tfenv-exec() {
-  for _arg in "${@}"; do
+  # `for _arg; do` iterates "$@" without expanding it. Bash 3.2 (macOS /bin/bash)
+  # treats "$@" as unbound under `set -u` when there are no arguments, and
+  # zsh's bashcompinit runs `complete -C` commands with no arguments (#532).
+  for _arg; do
     if [[ "${_arg}" == -chdir=* ]]; then
       chdir="${_arg#-chdir=}";
       log 'debug' "Found -chdir arg: ${chdir}";

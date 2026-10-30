@@ -84,7 +84,10 @@ set -uo pipefail;
    word-splitting
 3. **Double-quoted traps:** `trap "rm ${var}" EXIT` expands at definition time.
    Use functions or single quotes.
-4. **`$@` in for-loops:** Always quote: `for arg in "$@"`
+4. **`$@` in for-loops:** Use `for arg; do`, which iterates `"$@"` without
+   expanding it. Unquoted `$@` word-splits, and quoted `"$@"` is an unbound
+   variable under `set -u` on Bash 3.2 (macOS `/bin/bash`) when there are
+   no arguments.
 5. **Regex anchoring:** `^1.1` matches `1.10.x` because `.` is a regex
    wildcard. Use `^1\.1\.` for exact prefix matching.
 
