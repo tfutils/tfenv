@@ -31,6 +31,15 @@ for shell in bash /bin/bash; do
     || error_and_proceed "terraform with no args under ${shell} did not reach terraform usage";
 done;
 
+log 'info' '## terraform (with args): arguments are passed through to terraform';
+(
+  declare output;
+  output="$(terraform version -json)" || exit 1;
+  echo "${output}" | grep -q 'terraform_version' || exit 1;
+  echo "${output}" | grep -q '1.6.1' || exit 1;
+) && log 'info' '## terraform (with args): passed' \
+  || error_and_proceed 'terraform arguments were not passed through';
+
 log 'info' '## terraform -chdir with a space in the path: argument is not word-split';
 cleanup || log 'error' 'Cleanup failed?!';
 (
