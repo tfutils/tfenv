@@ -85,7 +85,7 @@ echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.zprofile
 
 fish:
 ```console
-echo 'set -x PATH $HOME/.tfenv/bin $PATH' >> ~/.config/fish/config.fish
+fish_add_path ~/.tfenv/bin
 ```
 
 For WSL users:
