@@ -87,6 +87,51 @@ echo 'latest-allowed' > chdir-dir/.terraform-version
 
 cleanup || log 'error' 'Cleanup failed?!';
 
+
+log 'info' '### Install latest-allowed with an exact version pin (bare version) and TFENV_AUTO_INSTALL';
+
+echo "terraform {
+  required_version = \"1.0.11\"
+}" >> latest_allowed.tf;
+echo 'latest-allowed' > .terraform-version;
+
+(
+  TFENV_AUTO_INSTALL=true terraform version;
+  check_active_version 1.0.11;
+) || error_and_proceed 'Latest allowed exact pin does not match. Requested: "1.0.11", Expected: 1.0.11';
+
+cleanup || log 'error' 'Cleanup failed?!';
+
+
+log 'info' '### Install latest-allowed with an exact version pin (= operator) and TFENV_AUTO_INSTALL';
+
+echo "terraform {
+  required_version = \"= 1.0.11\"
+}" >> latest_allowed.tf;
+echo 'latest-allowed' > .terraform-version;
+
+(
+  TFENV_AUTO_INSTALL=true terraform version;
+  check_active_version 1.0.11;
+) || error_and_proceed 'Latest allowed exact pin does not match. Requested: "= 1.0.11", Expected: 1.0.11';
+
+cleanup || log 'error' 'Cleanup failed?!';
+
+
+log 'info' '### Install latest-allowed with a <= constraint and TFENV_AUTO_INSTALL';
+
+echo "terraform {
+  required_version = \"<= 1.0.11\"
+}" >> latest_allowed.tf;
+echo 'latest-allowed' > .terraform-version;
+
+(
+  TFENV_AUTO_INSTALL=true terraform version;
+  check_active_version 1.0.11;
+) || error_and_proceed 'Latest allowed <= constraint does not match. Requested: "<= 1.0.11", Expected: 1.0.11';
+
+cleanup || log 'error' 'Cleanup failed?!';
+
 finish_tests 'use_latestallowed';
 
 exit 0;
