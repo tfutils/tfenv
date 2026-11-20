@@ -37,13 +37,23 @@ function tfenv-version-name() {
     fi;
   fi;
 
+  if [[ "${TFENV_VERSION}" == latest-allowed ]]; then
+    # tfenv-resolve-version prints '<version>:<regex>'. A 'latest' lookup (>, >=, ~>)
+    # comes back as 'latest:<regex>', which the 'latest' block below understands.
+    # An exact version (bare or '=' pin, or '<=') comes back as '<version>:^<version>$':
+    # there is nothing to look up, so use that version itself instead of falling
+    # through to the 'latest' block, which would pick the newest stable version.
+    TFENV_VERSION="$(tfenv-resolve-version)";
+    log 'debug' "Resolved latest-allowed to: ${TFENV_VERSION}";
+
+    if [[ ! "${TFENV_VERSION}" =~ ^latest\:.*$ ]]; then
+      TFENV_VERSION="${TFENV_VERSION%%\:*}";
+      log 'debug' "latest-allowed resolved to an exact version: ${TFENV_VERSION}";
+    fi;
+  fi;
+
   if [[ "${TFENV_VERSION}" =~ ^latest.*$ ]]; then
     log 'debug' "TFENV_VERSION uses 'latest' keyword: ${TFENV_VERSION}";
-
-    if [[ "${TFENV_VERSION}" == latest-allowed ]]; then
-        TFENV_VERSION="$(tfenv-resolve-version)";
-        log 'debug' "Resolved latest-allowed to: ${TFENV_VERSION}";
-    fi;
 
     if [[ "${TFENV_VERSION}" =~ ^latest\:.*$ ]]; then
       regex="${TFENV_VERSION##*\:}";
